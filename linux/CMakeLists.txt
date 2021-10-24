@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(runner LANGUAGES CXX)
 
-set(BINARY_NAME "todo_list")
-set(APPLICATION_ID "com.example.todo_list")
+set(BINARY_NAME "adventure_list")
+set(APPLICATION_ID "com.example.adventure_list")
 
 cmake_policy(SET CMP0063 NEW)
 

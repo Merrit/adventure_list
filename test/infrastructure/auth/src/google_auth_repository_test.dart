@@ -1,8 +1,8 @@
 // import 'package:flutter_test/flutter_test.dart';
 // import 'package:googleapis_auth/src/auth_http_utils.dart';
 // import 'package:mocktail/mocktail.dart';
-// import 'package:todo_list/infrastructure/auth/src/google_auth_repository.dart';
-// import 'package:todo_list/infrastructure/preferences/preferences_repository.dart';
+// import 'package:adventure_list/infrastructure/auth/src/google_auth_repository.dart';
+// import 'package:adventure_list/infrastructure/preferences/preferences_repository.dart';
 
 // class MockPreferencesRepository extends Mock implements PreferencesRepository {}
 
