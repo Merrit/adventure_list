@@ -1,27 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import 'application/home/cubit/home_cubit.dart';
-import 'application/theme/cubit/theme_cubit.dart';
-import 'infrastructure/auth/auth_repository.dart';
-import 'infrastructure/preferences/preferences_repository.dart';
-import 'presentation/app_widget.dart';
+import 'src/app.dart';
+import 'src/authentication/authentication.dart';
+import 'src/logs/logs.dart';
+import 'src/storage/storage_service.dart';
 
-Future<void> main() async {
-  final sharedPreferences = await SharedPreferences.getInstance();
-  final prefsRepository = PreferencesRepository(sharedPreferences);
+void main() async {
+  initializeLogger();
 
-  final googleAuthRepository = AuthRepository.google(prefsRepository);
+  final storageService = await StorageService.initialize();
+
+  final authenticationCubit = await AuthenticationCubit.initialize(
+    googleAuth: GoogleAuth(),
+    storageService: storageService,
+  );
 
   runApp(
     MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => HomeCubit(googleAuthRepository),
-        ),
-        BlocProvider(
-          create: (context) => ThemeCubit(),
+          create: (context) => authenticationCubit,
         ),
       ],
       child: const App(),

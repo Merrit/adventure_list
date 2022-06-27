@@ -1,4 +1,0 @@
-enum TodoSource {
-  google,
-  local,
-}

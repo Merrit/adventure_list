@@ -1,0 +1,6 @@
+{
+  "appTitle": "todo_list",
+  "@appTitle": {
+    "description": "The title of the application"
+  }
+}
