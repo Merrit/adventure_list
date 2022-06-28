@@ -112,9 +112,23 @@ class GoogleCalendar implements TasksRepository {
 
     return createdEvent.toModel();
   }
+
+  @override
+  Future<Task> updateTask({
+    required String calendarId,
+    required Task updatedTask,
+  }) async {
+    final updatedEvent = await _api.events.update(
+      updatedTask.toGoogleEvent(),
+      calendarId,
+      updatedTask.id,
+    );
+
+    return updatedEvent.toModel();
+  }
 }
 
-extension on CalendarListEntry {
+extension CalendarListEntryHelper on CalendarListEntry {
   Future<models.TaskList> toModel(CalendarApi api) async {
     final calendar = await api.calendars.get(id!);
 
@@ -122,10 +136,11 @@ extension on CalendarListEntry {
   }
 }
 
-extension on Calendar {
+extension CalendarHelper on Calendar {
   Future<models.TaskList> toModel(CalendarApi api) async {
     final apiTasks = await api.events.list(
       id!,
+      showDeleted: true,
     );
 
     return models.TaskList(
@@ -136,26 +151,27 @@ extension on Calendar {
   }
 }
 
-extension on Event {
+extension EventHelper on Event {
   models.Task toModel() {
     return models.Task(
-      completed: false,
+      completed: (status == 'confirmed') ? false : true,
       deleted: false,
-      due: null,
-      etag: 'etag',
+      dueDate: null,
+      etag: etag!,
       id: id!,
       title: summary ?? '',
-      updated: 'updated',
+      updated: updated!,
     );
   }
 }
 
-extension on models.Task {
+extension TaskHelper on models.Task {
   Event toGoogleEvent() {
     return Event(
       end: EventDateTime(date: DateTime(2022, 06, 27)),
       // endTimeUnspecified: true,
       start: EventDateTime(date: DateTime(2022, 06, 27)),
+      status: completed ? 'cancelled' : 'confirmed',
       summary: title,
     );
   }

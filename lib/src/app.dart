@@ -4,9 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'authentication/cubit/authentication_cubit.dart';
 import 'authentication/login_page.dart';
-import 'tasks/pages/tasks_page.dart';
 import 'tasks/tasks.dart';
 
 class App extends StatelessWidget {

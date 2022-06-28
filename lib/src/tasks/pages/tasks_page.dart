@@ -61,11 +61,11 @@ class NavigationBar extends StatelessWidget {
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context),
-                              child: Text('OK'),
+                              child: const Text('OK'),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context),
-                              child: Text('CANCEL'),
+                              child: const Text('CANCEL'),
                             ),
                           ],
                         );
@@ -127,11 +127,11 @@ class TaskListView extends StatelessWidget {
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: Text('OK'),
+                            child: const Text('OK'),
                           ),
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: Text('CANCEL'),
+                            child: const Text('CANCEL'),
                           ),
                         ],
                       );
@@ -180,17 +180,28 @@ class TaskTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget? subtitle;
-    if (task.description != null) subtitle = Text(task.description!);
-    // if (task.due != null) subtitle = Text(task.due!.toString());
+    TextStyle titleTextStyle = TextStyle(
+      decoration: task.completed ? TextDecoration.lineThrough : null,
+    );
+
+    // Widget? subtitle;
+    // if (task.description != null) subtitle = Text(task.description!);
 
     return ListTile(
-      title: Text(task.title),
+      title: Text(task.title, style: titleTextStyle),
       leading: Checkbox(
         value: task.completed,
-        onChanged: (bool? value) {},
+        onChanged: (bool? value) => tasksCubit.updateTask(
+          task.copyWith(completed: value),
+        ),
       ),
-      subtitle: subtitle,
+      // subtitle: subtitle,
+      subtitle: Text('''
+completed: ${task.completed}
+description: ${task.description}
+dueDate: ${task.dueDate}
+updated: ${task.updated}
+'''),
       onTap: () {},
     );
   }

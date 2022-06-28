@@ -22,4 +22,9 @@ abstract class TasksRepository {
     required String calendarId,
     required Task newTask,
   });
+
+  Future<Task> updateTask({
+    required String calendarId,
+    required Task updatedTask,
+  });
 }

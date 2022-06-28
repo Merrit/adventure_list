@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:adventure_list/src/authentication/authentication.dart';
 import 'package:flutter/foundation.dart';
 import 'package:googleapis/calendar/v3.dart';
 import 'package:googleapis_auth/auth_io.dart';

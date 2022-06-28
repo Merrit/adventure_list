@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:googleapis/calendar/v3.dart';
 
 class Task extends Equatable {
   final bool completed;
@@ -8,7 +7,7 @@ class Task extends Equatable {
 
   final String? description;
 
-  final DateTime? due;
+  final DateTime? dueDate;
 
   /// ETag of the resource.
   final String etag;
@@ -28,13 +27,13 @@ class Task extends Equatable {
   /// Title of the task.
   final String title;
 
-  final String updated;
+  final DateTime updated;
 
-  const Task({
+  Task({
     this.completed = false,
     this.deleted = false,
     this.description,
-    this.due,
+    this.dueDate,
     this.etag = '',
     // required this.hidden,
     this.id = '',
@@ -43,8 +42,8 @@ class Task extends Equatable {
     // required this.position,
     // required this.status,
     required this.title,
-    this.updated = '',
-  });
+    DateTime? updated,
+  }) : updated = updated ?? DateTime.now();
 
   @override
   List<Object?> get props {
@@ -52,7 +51,7 @@ class Task extends Equatable {
       completed,
       deleted,
       description,
-      due,
+      dueDate,
       etag,
       // hidden,
       id,
@@ -78,13 +77,13 @@ class Task extends Equatable {
     String? position,
     String? status,
     String? title,
-    String? updated,
+    DateTime? updated,
   }) {
     return Task(
       completed: completed ?? this.completed,
       deleted: deleted ?? this.deleted,
       description: description ?? this.description,
-      due: due ?? this.due,
+      dueDate: due ?? dueDate,
       etag: etag ?? this.etag,
       // hidden: hidden ?? this.hidden,
       id: id ?? this.id,

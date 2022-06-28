@@ -53,4 +53,21 @@ class TasksCubit extends Cubit<TasksState> {
 
     emit(state.copyWith(activeList: updatedList, taskLists: updatedTaskLists));
   }
+
+  Future<void> updateTask(Task task) async {
+    // If the task is unchanged, don't do anything.
+    if (state.activeList!.items.contains(task)) return;
+
+    var items = List<Task>.from(state.activeList!.items)
+      ..removeWhere((element) => element.id == task.id)
+      ..add(task);
+    emit(state.copyWith(activeList: state.activeList!.copyWith(items: items)));
+    final updatedTaskFromRepo = await _tasksRepository.updateTask(
+      calendarId: state.activeList!.id,
+      updatedTask: task,
+    );
+    items.removeWhere((element) => element.id == updatedTaskFromRepo.id);
+    items.add(updatedTaskFromRepo);
+    emit(state.copyWith(activeList: state.activeList!.copyWith(items: items)));
+  }
 }
