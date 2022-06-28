@@ -59,7 +59,10 @@ class GoogleCalendar implements TasksRepository {
   @override
   Future<List<models.TaskList>> getAll() async {
     final calendarListRepository = _api.calendarList;
-    final apiCalendarsList = await calendarListRepository.list();
+    final apiCalendarsList = await calendarListRepository.list(
+      showHidden: true,
+    );
+
     apiCalendarsList.items?.removeWhere((element) {
       bool? isTodoList = element.description?.contains(
         RegExp(r'adventure_list'),
@@ -86,6 +89,13 @@ class GoogleCalendar implements TasksRepository {
       description: 'adventure_list_uuid',
       summary: title,
     ));
+
+    await _api.calendarList.update(
+      // Set the calendar to hidden, so it doesn't appear when the user
+      // accesses their calendars normally.
+      CalendarListEntry(hidden: true),
+      newCalendar.id!,
+    );
 
     return await newCalendar.toModel(_api);
   }
