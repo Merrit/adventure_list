@@ -182,10 +182,11 @@ class TaskTile extends StatelessWidget {
   Widget build(BuildContext context) {
     TextStyle titleTextStyle = TextStyle(
       decoration: task.completed ? TextDecoration.lineThrough : null,
+      fontSize: 18,
     );
 
-    // Widget? subtitle;
-    // if (task.description != null) subtitle = Text(task.description!);
+    Widget? subtitle;
+    if (task.description != null) subtitle = Text(task.description!);
 
     return ListTile(
       title: Text(task.title, style: titleTextStyle),
@@ -196,12 +197,7 @@ class TaskTile extends StatelessWidget {
         ),
       ),
       // subtitle: subtitle,
-      subtitle: Text('''
-completed: ${task.completed}
-description: ${task.description}
-dueDate: ${task.dueDate}
-updated: ${task.updated}
-'''),
+      subtitle: subtitle,
       onTap: () {},
     );
   }
