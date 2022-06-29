@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.adventure_list">
+    package="codes.merritt.adventurelist">
    <application
         android:label="adventure_list"
         android:name="${applicationName}"

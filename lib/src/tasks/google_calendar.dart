@@ -47,11 +47,17 @@ class GoogleCalendar implements TasksRepository {
     required ClientId clientId,
     required AccessCredentials credentials,
   }) {
-    final client = autoRefreshingClient(
-      clientId,
-      credentials,
-      Client(),
-    );
+    AuthClient client;
+    // `google_sign_in` can't get us a refresh token, so.
+    if (credentials.refreshToken != null) {
+      client = autoRefreshingClient(
+        clientId,
+        credentials,
+        Client(),
+      );
+    } else {
+      client = authenticatedClient(Client(), credentials);
+    }
 
     return GoogleCalendar._(CalendarApi(client));
   }

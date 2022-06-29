@@ -1,4 +1,4 @@
-package com.example.adventure_list
+package codes.merritt.adventurelist
 
 import io.flutter.embedding.android.FlutterActivity
 

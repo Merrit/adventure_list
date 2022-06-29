@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helpers/helpers.dart';
 
 import '../tasks.dart';
 
@@ -18,10 +19,21 @@ class TasksPage extends StatelessWidget {
           }
 
           return Scaffold(
+            appBar: platformIsMobile() ? AppBar() : null,
+            drawer: platformIsMobile()
+                ? Drawer(
+                    child: Column(
+                      children: const [
+                        CreateListButton(),
+                        ScrollingListTiles(),
+                      ],
+                    ),
+                  )
+                : null,
             body: Row(
-              children: const [
-                NavigationBar(),
-                TaskListView(),
+              children: [
+                if (!platformIsMobile()) const NavigationBar(),
+                const TaskListView(),
               ],
             ),
           );
@@ -44,6 +56,94 @@ class NavigationBar extends StatelessWidget {
         return SizedBox(
           width: 250,
           child: Card(
+            child: Column(
+              children: const [
+                CreateListButton(),
+                ScrollingListTiles(),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class CreateListButton extends StatelessWidget {
+  const CreateListButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.add),
+      onPressed: () async {
+        final textFieldController = TextEditingController();
+
+        await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              content: TextField(
+                controller: textFieldController,
+                onSubmitted: (_) => Navigator.pop(context),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('CANCEL'),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (textFieldController.value.text == '') return;
+
+        tasksCubit.createList(textFieldController.text);
+      },
+    );
+  }
+}
+
+class ScrollingListTiles extends StatelessWidget {
+  const ScrollingListTiles({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: BlocBuilder<TasksCubit, TasksState>(
+        builder: (context, state) {
+          return ListView(
+            children: state.taskLists
+                .map((e) => ListTile(
+                      title: Text(e.title),
+                      selected: (state.activeList == e),
+                      onTap: () => tasksCubit.setActiveList(e.id),
+                    ))
+                .toList(),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class TaskListView extends StatelessWidget {
+  const TaskListView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: BlocBuilder<TasksCubit, TasksState>(
+        builder: (context, state) {
+          if (state.activeList == null) return const SizedBox();
+
+          return SizedBox(
+            width: platformIsMobile() ? null : 500,
             child: Column(
               children: [
                 IconButton(
@@ -72,100 +172,35 @@ class NavigationBar extends StatelessWidget {
                       },
                     );
 
-                    if (textFieldController.value.text == '') return;
-
-                    tasksCubit.createList(textFieldController.text);
+                    tasksCubit.createTask(
+                      Task(title: textFieldController.text),
+                    );
                   },
                 ),
                 Expanded(
-                  child: ListView(
-                    children: state.taskLists
-                        .map((e) => ListTile(
-                              title: Text(e.title),
-                              selected: (state.activeList == e),
-                              onTap: () => tasksCubit.setActiveList(e.id),
-                            ))
+                  child: ReorderableListView(
+                    scrollController: ScrollController(),
+                    buildDefaultDragHandles: false,
+                    onReorder: (oldIndex, newIndex) {},
+                    children: state.activeList!.items
+                        .where((element) => !element.completed)
+                        .map((e) => TaskTile(key: ValueKey(e), task: e))
                         .toList(),
                   ),
                 ),
+                if (state.activeList!.items.any((element) => element.completed))
+                  ExpansionTile(
+                    title: const Text('Completed'),
+                    children: state.activeList!.items
+                        .where((element) => element.completed)
+                        .map((e) => TaskTile(task: e))
+                        .toList(),
+                  ),
               ],
             ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class TaskListView extends StatelessWidget {
-  const TaskListView({Key? key}) : super(key: key);
-
-// final ScrollController scrollController = ScrollController();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<TasksCubit, TasksState>(
-      builder: (context, state) {
-        if (state.activeList == null) return const SizedBox();
-
-        return SizedBox(
-          width: 500,
-          child: Column(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.add),
-                onPressed: () async {
-                  final textFieldController = TextEditingController();
-
-                  await showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        content: TextField(
-                          controller: textFieldController,
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('OK'),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('CANCEL'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-
-                  tasksCubit.createTask(
-                    Task(title: textFieldController.text),
-                  );
-                },
-              ),
-              Expanded(
-                child: ReorderableListView(
-                  scrollController: ScrollController(),
-                  buildDefaultDragHandles: false,
-                  onReorder: (oldIndex, newIndex) {},
-                  children: state.activeList!.items
-                      .where((element) => !element.completed)
-                      .map((e) => TaskTile(key: ValueKey(e), task: e))
-                      .toList(),
-                ),
-              ),
-              if (state.activeList!.items.any((element) => element.completed))
-                ExpansionTile(
-                  title: const Text('Completed'),
-                  children: state.activeList!.items
-                      .where((element) => element.completed)
-                      .map((e) => TaskTile(task: e))
-                      .toList(),
-                ),
-            ],
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

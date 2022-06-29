@@ -29,6 +29,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
+  change_app_package_name:
+    dependency: "direct dev"
+    description:
+      name: change_app_package_name
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   characters:
     dependency: transitive
     description:
@@ -71,6 +78,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.3"
+  extension_google_sign_in_as_googleapis_auth:
+    dependency: "direct main"
+    description:
+      name: extension_google_sign_in_as_googleapis_auth
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.5"
   fake_async:
     dependency: transitive
     description:
@@ -92,6 +106,48 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.1.2"
+  firebase_auth:
+    dependency: "direct main"
+    description:
+      name: firebase_auth
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.3.20"
+  firebase_auth_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_auth_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "6.2.8"
+  firebase_auth_web:
+    dependency: transitive
+    description:
+      name: firebase_auth_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.3.17"
+  firebase_core:
+    dependency: transitive
+    description:
+      name: firebase_core
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.18.0"
+  firebase_core_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_core_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.4.1"
+  firebase_core_web:
+    dependency: transitive
+    description:
+      name: firebase_core_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.6.5"
   flutter:
     dependency: "direct main"
     description: flutter
