@@ -87,4 +87,15 @@ class TasksCubit extends Cubit<TasksState> {
     items.add(updatedTaskFromRepo);
     emit(state.copyWith(activeList: state.activeList!.copyWith(items: items)));
   }
+
+  void setActiveTask(String? id) {
+    if (id == null) {
+      emit(state.copyWith(activeTask: Task(title: '', id: '')));
+      return;
+    }
+
+    emit(state.copyWith(
+      activeTask: state.activeList?.items.singleWhereOrNull((e) => e.id == id),
+    ));
+  }
 }

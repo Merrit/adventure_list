@@ -35,6 +35,7 @@ class TasksPage extends StatelessWidget {
               children: [
                 if (!platformIsMobile()) const NavigationBar(),
                 const TaskView(),
+                const TaskDetails(),
               ],
             ),
           );
@@ -303,12 +304,6 @@ class TaskTile extends StatelessWidget {
     required this.task,
   }) : super(key: key);
 
-  void onTaskTapped(BuildContext context) {
-    if (platformIsMobile()) {
-      Navigator.pushNamed(context, TaskDetails.routeName);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     TextStyle titleTextStyle = TextStyle(
@@ -329,7 +324,7 @@ class TaskTile extends StatelessWidget {
       ),
       // subtitle: subtitle,
       subtitle: subtitle,
-      onTap: () {},
+      onTap: () => tasksCubit.setActiveTask(task.id),
     );
   }
 }
