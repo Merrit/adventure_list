@@ -39,17 +39,17 @@ import 'tasks.dart';
 
 class GoogleCalendar implements TasksRepository {
   CalendarApi _api;
-  AuthClient _client;
+  Client _client;
 
   GoogleCalendar._(this._api, this._client) {
     getAll();
   }
 
-  factory GoogleCalendar({
+  static Future<GoogleCalendar> initialize({
     required ClientId clientId,
     required AccessCredentials credentials,
-  }) {
-    AuthClient client;
+  }) async {
+    Client client;
     // `google_sign_in` can't get us a refresh token, so.
     if (credentials.refreshToken != null) {
       client = autoRefreshingClient(
@@ -58,7 +58,8 @@ class GoogleCalendar implements TasksRepository {
         Client(),
       );
     } else {
-      client = authenticatedClient(Client(), credentials);
+      // client = authenticatedClient(Client(), credentials);
+      client = await GoogleAuth.refreshAuthClient();
     }
 
     return GoogleCalendar._(CalendarApi(client), client);
@@ -92,20 +93,20 @@ class GoogleCalendar implements TasksRepository {
     return taskLists;
   }
 
-  Future<void> _refreshCredentials() async {
-    bool tokenExpired = _client.credentials.accessToken.hasExpired;
-    if (!tokenExpired) return;
+  // Future<void> _refreshCredentials() async {
+  //   bool tokenExpired = _client.credentials.accessToken.hasExpired;
+  //   if (!tokenExpired) return;
 
-    final String? newAccessToken = await GoogleAuth.refreshAccessToken();
-    // final newClient = authenticatedClient(
-    //   Client(),
-    //   AccessCredentials(
-    //     AccessToken(type, data, expiry),
-    //     null,
-    //     GoogleAuth.scopes,
-    //   ),
-    // );
-  }
+  //   final String? newAccessToken = await GoogleAuth.refreshAccessToken();
+  //   // final newClient = authenticatedClient(
+  //   //   Client(),
+  //   //   AccessCredentials(
+  //   //     AccessToken(type, data, expiry),
+  //   //     null,
+  //   //     GoogleAuth.scopes,
+  //   //   ),
+  //   // );
+  // }
 
   @override
   Future<models.TaskList> createList({required String title}) async {

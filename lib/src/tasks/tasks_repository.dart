@@ -4,11 +4,11 @@ import '../authentication/authentication.dart';
 import 'tasks.dart';
 
 abstract class TasksRepository {
-  static TasksRepository initialize({
+  static Future<TasksRepository> initialize({
     required ClientId clientId,
     required AccessCredentials credentials,
-  }) {
-    return GoogleCalendar(
+  }) async {
+    return await GoogleCalendar.initialize(
       clientId: GoogleAuthIds.clientId,
       credentials: credentials,
     );

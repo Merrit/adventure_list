@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/calendar/v3.dart';
 import 'package:googleapis_auth/auth_io.dart';
+import 'package:http/http.dart';
+import 'package:http/io_client.dart';
 import 'package:logging/logging.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -93,8 +95,26 @@ class GoogleAuth {
     return client?.credentials;
   }
 
+  static Future<Client> refreshAuthClient() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn(scopes: scopes);
+    await googleSignIn.signInSilently();
+
+    assert(googleSignIn.currentUser != null);
+    final authHeaders = await googleSignIn.currentUser!.authHeaders;
+
+    // custom IOClient from below
+    final GoogleHttpClient client = GoogleHttpClient(authHeaders);
+    return client;
+  }
+
   static Future<String?> refreshAccessToken() async {
     final GoogleSignIn googleSignIn = GoogleSignIn(scopes: scopes);
+
+    assert(googleSignIn.currentUser != null);
+    final authHeaders = await googleSignIn.currentUser!.authHeaders;
+
+    // custom IOClient from below
+    final GoogleHttpClient client = GoogleHttpClient(authHeaders);
 
     print("Token Refresh");
     final GoogleSignInAccount? googleSignInAccount =
@@ -118,4 +138,14 @@ class GoogleAuth {
     final authUrl = Uri.parse(url);
     if (await canLaunchUrl(authUrl)) launchUrl(authUrl);
   }
+}
+
+class GoogleHttpClient extends IOClient {
+  final Map<String, String> _headers;
+
+  GoogleHttpClient(this._headers);
+
+  @override
+  Future<IOStreamedResponse> send(BaseRequest request) =>
+      super.send(request..headers.addAll(_headers));
 }

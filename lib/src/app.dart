@@ -50,16 +50,25 @@ class App extends StatelessWidget {
                   case TaskListSettingsPage.routeName:
                     return const TaskListSettingsPage();
                   default:
-                    return BlocProvider(
-                      create: (context) => TasksCubit(
-                        context.read<StorageService>(),
-                        TasksRepository.initialize(
-                          clientId: GoogleAuthIds.clientId,
-                          credentials: state.accessCredentials!,
-                        ),
-                      ),
-                      lazy: false,
-                      child: const TasksPage(),
+                    final tasksRepository = TasksRepository.initialize(
+                      clientId: GoogleAuthIds.clientId,
+                      credentials: state.accessCredentials!,
+                    );
+
+                    return FutureBuilder(
+                      future: tasksRepository,
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) return const SizedBox();
+
+                        return BlocProvider(
+                          create: (context) => TasksCubit(
+                            context.read<StorageService>(),
+                            snapshot.data as TasksRepository,
+                          ),
+                          lazy: false,
+                          child: const TasksPage(),
+                        );
+                      },
                     );
                 }
               },
