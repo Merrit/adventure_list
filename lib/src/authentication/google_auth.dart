@@ -49,7 +49,7 @@ abstract class GoogleAuthIds {
 class GoogleAuth {
   final _log = Logger('GoogleAuth');
 
-  final _scopes = [CalendarApi.calendarScope];
+  static final scopes = [CalendarApi.calendarScope];
 
   Future<AccessCredentials?> login() async {
     if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
@@ -65,7 +65,7 @@ class GoogleAuth {
     try {
       client = await clientViaUserConsent(
         GoogleAuthIds.clientId,
-        _scopes,
+        scopes,
         launchAuthUrl,
       );
     } catch (e) {
@@ -77,7 +77,7 @@ class GoogleAuth {
 
   ///
   Future<AccessCredentials?> _googleSignInAuth() async {
-    final GoogleSignIn googleSignIn = GoogleSignIn(scopes: _scopes);
+    final GoogleSignIn googleSignIn = GoogleSignIn(scopes: scopes);
 
     try {
       await googleSignIn.signIn();
@@ -93,8 +93,8 @@ class GoogleAuth {
     return client?.credentials;
   }
 
-  Future<String?> _getRefreshToken(String token) async {
-    final GoogleSignIn googleSignIn = GoogleSignIn(scopes: _scopes);
+  static Future<String?> refreshAccessToken() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn(scopes: scopes);
 
     print("Token Refresh");
     final GoogleSignInAccount? googleSignInAccount =

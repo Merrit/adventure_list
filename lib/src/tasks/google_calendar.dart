@@ -2,6 +2,7 @@ import 'package:googleapis/calendar/v3.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
 
+import '../authentication/authentication.dart';
 import 'models/models.dart' as models;
 import 'tasks.dart';
 
@@ -37,9 +38,10 @@ import 'tasks.dart';
 /// resource](https://developers.google.com/calendar/v3/reference/acl).
 
 class GoogleCalendar implements TasksRepository {
-  final CalendarApi _api;
+  CalendarApi _api;
+  AuthClient _client;
 
-  GoogleCalendar._(this._api) {
+  GoogleCalendar._(this._api, this._client) {
     getAll();
   }
 
@@ -59,12 +61,13 @@ class GoogleCalendar implements TasksRepository {
       client = authenticatedClient(Client(), credentials);
     }
 
-    return GoogleCalendar._(CalendarApi(client));
+    return GoogleCalendar._(CalendarApi(client), client);
   }
 
   @override
   Future<List<models.TaskList>> getAll() async {
     final calendarListRepository = _api.calendarList;
+
     final apiCalendarsList = await calendarListRepository.list(
       showHidden: true,
     );
@@ -87,6 +90,21 @@ class GoogleCalendar implements TasksRepository {
     }
 
     return taskLists;
+  }
+
+  Future<void> _refreshCredentials() async {
+    bool tokenExpired = _client.credentials.accessToken.hasExpired;
+    if (!tokenExpired) return;
+
+    final String? newAccessToken = await GoogleAuth.refreshAccessToken();
+    // final newClient = authenticatedClient(
+    //   Client(),
+    //   AccessCredentials(
+    //     AccessToken(type, data, expiry),
+    //     null,
+    //     GoogleAuth.scopes,
+    //   ),
+    // );
   }
 
   @override
@@ -117,6 +135,11 @@ class GoogleCalendar implements TasksRepository {
     );
 
     return createdEvent.toModel();
+  }
+
+  @override
+  Future<void> deleteList({required String id}) async {
+    await _api.calendars.delete(id);
   }
 
   @override

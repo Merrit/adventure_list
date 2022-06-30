@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:adventure_list/src/tasks/pages/tasks_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 
+import '../tasks/pages/tasks_page.dart';
 import 'cubit/authentication_cubit.dart';
 
 class LoginPage extends StatelessWidget {
@@ -24,7 +24,7 @@ class LoginPage extends StatelessWidget {
             children: [
               if (state.signedIn)
                 Builder(builder: (context) {
-                  Timer(const Duration(seconds: 5), () {
+                  Timer(const Duration(seconds: 2), () {
                     Navigator.pushReplacementNamed(
                       context,
                       TasksPage.routeName,

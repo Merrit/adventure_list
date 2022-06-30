@@ -19,7 +19,7 @@ class TasksPage extends StatelessWidget {
           }
 
           return Scaffold(
-            appBar: platformIsMobile() ? AppBar() : null,
+            appBar: platformIsMobile() ? const _TaskListAppBar() : null,
             drawer: platformIsMobile()
                 ? Drawer(
                     child: Column(
@@ -33,12 +33,36 @@ class TasksPage extends StatelessWidget {
             body: Row(
               children: [
                 if (!platformIsMobile()) const NavigationBar(),
-                const TaskListView(),
+                const TaskView(),
               ],
             ),
           );
         },
       ),
+    );
+  }
+}
+
+class _TaskListAppBar extends StatelessWidget implements PreferredSizeWidget {
+  @override
+  final preferredSize = const Size.fromHeight(kToolbarHeight);
+
+  const _TaskListAppBar({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        if (state.activeList == null) return AppBar();
+
+        final TaskList activeList = state.activeList!;
+
+        return AppBar(
+          title: Text(activeList.title),
+        );
+      },
     );
   }
 }
@@ -122,7 +146,10 @@ class ScrollingListTiles extends StatelessWidget {
                 .map((e) => ListTile(
                       title: Text(e.title),
                       selected: (state.activeList == e),
-                      onTap: () => tasksCubit.setActiveList(e.id),
+                      onTap: () {
+                        tasksCubit.setActiveList(e.id);
+                        if (platformIsMobile()) Navigator.pop(context);
+                      },
                     ))
                 .toList(),
           );
@@ -132,8 +159,8 @@ class ScrollingListTiles extends StatelessWidget {
   }
 }
 
-class TaskListView extends StatelessWidget {
-  const TaskListView({Key? key}) : super(key: key);
+class TaskView extends StatelessWidget {
+  const TaskView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -146,36 +173,47 @@ class TaskListView extends StatelessWidget {
             width: platformIsMobile() ? null : 500,
             child: Column(
               children: [
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () async {
-                    final textFieldController = TextEditingController();
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () async {
+                        final textFieldController = TextEditingController();
 
-                    await showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          content: TextField(
-                            controller: textFieldController,
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('OK'),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('CANCEL'),
-                            ),
-                          ],
+                        await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              content: TextField(
+                                controller: textFieldController,
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('OK'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('CANCEL'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                        tasksCubit.createTask(
+                          Task(title: textFieldController.text),
                         );
                       },
-                    );
-
-                    tasksCubit.createTask(
-                      Task(title: textFieldController.text),
-                    );
-                  },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.settings),
+                      onPressed: () => Navigator.pushNamed(
+                        context,
+                        TaskListSettingsPage.routeName,
+                      ),
+                    )
+                  ],
                 ),
                 Expanded(
                   child: ReorderableListView(
@@ -200,6 +238,57 @@ class TaskListView extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class TaskListSettingsPage extends StatelessWidget {
+  const TaskListSettingsPage({Key? key}) : super(key: key);
+
+  static const routeName = 'task_list_settings_page';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Center(
+        child: TextButton(
+          onPressed: () async {
+            await showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: const Text(
+                    'This will permanently delete this list. Are you sure?',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('CANCEL'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        tasksCubit.deleteList();
+                        Navigator.pushReplacementNamed(
+                          context,
+                          TasksPage.routeName,
+                        );
+                      },
+                      child: const Text('CONFIRM'),
+                    )
+                  ],
+                );
+              },
+            );
+
+            // pop to root
+          },
+          child: const Text(
+            'Delete List',
+            style: TextStyle(color: Colors.red),
+          ),
+        ),
       ),
     );
   }

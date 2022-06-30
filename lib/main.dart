@@ -17,13 +17,18 @@ void main() async {
   );
 
   runApp(
-    MultiBlocProvider(
+    MultiRepositoryProvider(
       providers: [
-        BlocProvider(
-          create: (context) => authenticationCubit,
-        ),
+        RepositoryProvider.value(value: storageService),
       ],
-      child: const App(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => authenticationCubit,
+          ),
+        ],
+        child: const App(),
+      ),
     ),
   );
 }

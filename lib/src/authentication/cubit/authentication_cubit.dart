@@ -34,6 +34,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     AccessCredentials? credentials;
     if (savedCredentials != null) {
       credentials = AccessCredentials.fromJson(jsonDecode(savedCredentials));
+      assert(!credentials.accessToken.hasExpired);
     }
 
     return AuthenticationCubit._(

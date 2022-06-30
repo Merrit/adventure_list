@@ -23,6 +23,8 @@ abstract class TasksRepository {
     required Task newTask,
   });
 
+  Future<void> deleteList({required String id});
+
   Future<Task> updateTask({
     required String calendarId,
     required Task updatedTask,

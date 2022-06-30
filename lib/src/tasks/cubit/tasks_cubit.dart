@@ -1,6 +1,8 @@
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../storage/storage_service.dart';
 import '../tasks.dart';
 
 part 'tasks_state.dart';
@@ -8,9 +10,11 @@ part 'tasks_state.dart';
 late TasksCubit tasksCubit;
 
 class TasksCubit extends Cubit<TasksState> {
+  final StorageService _storageService;
   final TasksRepository _tasksRepository;
 
   TasksCubit(
+    this._storageService,
     this._tasksRepository,
   ) : super(const TasksState(loading: true, taskLists: [])) {
     tasksCubit = this;
@@ -18,13 +22,19 @@ class TasksCubit extends Cubit<TasksState> {
   }
 
   Future<void> initialize() async {
-    final tasks = await _tasksRepository.getAll();
-    emit(state.copyWith(loading: false, taskLists: tasks));
+    final taskLists = await _tasksRepository.getAll();
+    final String? activeListId = await _storageService.getValue('activeList');
+    emit(state.copyWith(
+      activeList: taskLists.singleWhereOrNull((e) => e.id == activeListId),
+      loading: false,
+      taskLists: taskLists,
+    ));
   }
 
   void setActiveList(String id) {
     final list = state.taskLists.singleWhere((element) => element.id == id);
     emit(state.copyWith(activeList: list));
+    _storageService.saveValue(key: 'activeList', value: id);
   }
 
   Future<void> createList(String title) async {
@@ -52,6 +62,13 @@ class TasksCubit extends Cubit<TasksState> {
       ..add(updatedList);
 
     emit(state.copyWith(activeList: updatedList, taskLists: updatedTaskLists));
+  }
+
+  Future<void> deleteList() async {
+    final updatedLists = List<TaskList>.from(state.taskLists)
+      ..remove(state.activeList);
+    emit(state.copyWith(activeList: null, taskLists: updatedLists));
+    await _tasksRepository.deleteList(id: state.activeList!.id);
   }
 
   Future<void> updateTask(Task task) async {

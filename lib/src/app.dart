@@ -1,10 +1,11 @@
-import 'package:adventure_list/src/authentication/authentication.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'authentication/authentication.dart';
 import 'authentication/login_page.dart';
+import 'storage/storage_service.dart';
 import 'tasks/tasks.dart';
 
 class App extends StatelessWidget {
@@ -44,10 +45,14 @@ class App extends StatelessWidget {
                 switch (routeSettings.name) {
                   case LoginPage.routeName:
                     return const LoginPage();
-                  case TasksPage.routeName:
+                  // case TasksPage.routeName:
+                  // return const TasksPage();
+                  case TaskListSettingsPage.routeName:
+                    return const TaskListSettingsPage();
                   default:
                     return BlocProvider(
                       create: (context) => TasksCubit(
+                        context.read<StorageService>(),
                         TasksRepository.initialize(
                           clientId: GoogleAuthIds.clientId,
                           credentials: state.accessCredentials!,
