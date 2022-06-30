@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
 import '../tasks.dart';
+import 'task_details.dart';
 
 class TasksPage extends StatelessWidget {
   static const routeName = '/';
@@ -301,6 +302,12 @@ class TaskTile extends StatelessWidget {
     Key? key,
     required this.task,
   }) : super(key: key);
+
+  void onTaskTapped(BuildContext context) {
+    if (platformIsMobile()) {
+      Navigator.pushNamed(context, TaskDetails.routeName);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

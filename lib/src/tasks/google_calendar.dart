@@ -39,7 +39,7 @@ import 'tasks.dart';
 
 class GoogleCalendar implements TasksRepository {
   CalendarApi _api;
-  Client _client;
+  AuthClient _client;
 
   GoogleCalendar._(this._api, this._client) {
     getAll();
@@ -49,7 +49,7 @@ class GoogleCalendar implements TasksRepository {
     required ClientId clientId,
     required AccessCredentials credentials,
   }) async {
-    Client client;
+    AuthClient client;
     // `google_sign_in` can't get us a refresh token, so.
     if (credentials.refreshToken != null) {
       client = autoRefreshingClient(

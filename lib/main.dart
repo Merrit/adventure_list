@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:home_widget/home_widget.dart';
@@ -9,7 +11,9 @@ import 'src/storage/storage_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  HomeWidget.registerBackgroundCallback(backgroundCallback);
+  if (Platform.isAndroid) {
+    HomeWidget.registerBackgroundCallback(backgroundCallback);
+  }
   initializeLogger();
 
   final storageService = await StorageService.initialize();

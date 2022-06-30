@@ -7,6 +7,7 @@ import 'authentication/authentication.dart';
 import 'authentication/login_page.dart';
 import 'storage/storage_service.dart';
 import 'tasks/tasks.dart';
+import 'tasks/widgets/task_details.dart';
 
 class App extends StatelessWidget {
   const App({
@@ -47,6 +48,8 @@ class App extends StatelessWidget {
                     return const LoginPage();
                   // case TasksPage.routeName:
                   // return const TasksPage();
+                  case TaskDetails.routeName:
+                    return const TaskDetails();
                   case TaskListSettingsPage.routeName:
                     return const TaskListSettingsPage();
                   default:

@@ -31,18 +31,25 @@ class TasksCubit extends Cubit<TasksState> {
     ));
   }
 
-  void setActiveList(String id) {
-    final list = state.taskLists.singleWhere((element) => element.id == id);
-    emit(state.copyWith(activeList: list));
-    _storageService.saveValue(key: 'activeList', value: id);
-  }
-
   Future<void> createList(String title) async {
     final newList = await _tasksRepository.createList(title: title);
     emit(state.copyWith(
       taskLists: List<TaskList>.from(state.taskLists)..add(newList),
       activeList: newList,
     ));
+  }
+
+  Future<void> deleteList() async {
+    final updatedLists = List<TaskList>.from(state.taskLists)
+      ..remove(state.activeList);
+    emit(state.copyWith(activeList: null, taskLists: updatedLists));
+    await _tasksRepository.deleteList(id: state.activeList!.id);
+  }
+
+  void setActiveList(String id) {
+    final list = state.taskLists.singleWhere((element) => element.id == id);
+    emit(state.copyWith(activeList: list));
+    _storageService.saveValue(key: 'activeList', value: id);
   }
 
   Future<void> createTask(Task newTask) async {
@@ -62,13 +69,6 @@ class TasksCubit extends Cubit<TasksState> {
       ..add(updatedList);
 
     emit(state.copyWith(activeList: updatedList, taskLists: updatedTaskLists));
-  }
-
-  Future<void> deleteList() async {
-    final updatedLists = List<TaskList>.from(state.taskLists)
-      ..remove(state.activeList);
-    emit(state.copyWith(activeList: null, taskLists: updatedLists));
-    await _tasksRepository.deleteList(id: state.activeList!.id);
   }
 
   Future<void> updateTask(Task task) async {
