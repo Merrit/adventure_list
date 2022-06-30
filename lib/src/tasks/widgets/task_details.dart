@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helpers/helpers.dart';
 
+import '../../core/core.dart';
 import '../tasks.dart';
 
 class TaskDetails extends StatelessWidget {
@@ -17,27 +19,38 @@ class TaskDetails extends StatelessWidget {
         return Expanded(
           child: Card(
             margin: const EdgeInsets.all(6),
-            child: Stack(
-              alignment: AlignmentDirectional.topCenter,
+            child: Column(
               children: task == null
                   ? []
                   : [
-                      PositionedDirectional(
-                        end: 5,
-                        child: Card(
-                          color: Colors.grey.shade900,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () => tasksCubit.setActiveTask(null),
-                          ),
-                        ),
-                      ),
-                      Column(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          CircleButton(
+                            onPressed: () => tasksCubit.setActiveTask(null),
+                            child: const Icon(Icons.close),
+                          ),
                           Text(task.title),
+                          GestureDetector(
+                            onTapUp: (details) {
+                              showContextMenu(
+                                context: context,
+                                offset: details.globalPosition,
+                                items: [
+                                  PopupMenuItem(
+                                    child: TextButton(
+                                      onPressed: () {},
+                                      child: Text('label'),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                            child: CircleButton(
+                              // onPressed: () {},
+                              child: const Icon(Icons.more_vert),
+                            ),
+                          ),
                         ],
                       ),
                     ],
