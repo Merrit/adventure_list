@@ -54,6 +54,12 @@ class TasksCubit extends Cubit<TasksState> {
 
   Future<void> updateList(TaskList list) async {
     await _tasksRepository.updateList(list: list);
+    // TODO: Replace this remove/add with by index version once indexes are
+    // working.
+    final taskLists = List<TaskList>.from(state.taskLists)
+      ..removeWhere((element) => element.id == list.id)
+      ..add(list);
+    emit(state.copyWith(activeList: list, taskLists: taskLists));
   }
 
   Future<void> createTask(Task newTask) async {

@@ -9,6 +9,8 @@ import 'storage/storage_service.dart';
 import 'tasks/tasks.dart';
 import 'tasks/widgets/task_details.dart';
 
+TasksCubit? _tasksCubit;
+
 class App extends StatelessWidget {
   const App({
     Key? key,
@@ -51,8 +53,20 @@ class App extends StatelessWidget {
                   case TaskDetails.routeName:
                     return const TaskDetails();
                   case TaskListSettingsPage.routeName:
-                    return const TaskListSettingsPage();
+                    return BlocProvider.value(
+                      value: _tasksCubit!,
+                      child: const TaskListSettingsPage(),
+                    );
                   default:
+                    // Only create cubit once.
+                    if (_tasksCubit != null) {
+                      return BlocProvider.value(
+                        value: _tasksCubit!,
+                        child: const TasksPage(),
+                      );
+                    }
+
+                    // Cubit not created yet, create now.
                     final tasksRepository = TasksRepository.initialize(
                       clientId: GoogleAuthIds.clientId,
                       credentials: state.accessCredentials!,
@@ -63,12 +77,13 @@ class App extends StatelessWidget {
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) return const SizedBox();
 
-                        return BlocProvider(
-                          create: (context) => TasksCubit(
-                            context.read<StorageService>(),
-                            snapshot.data as TasksRepository,
-                          ),
-                          lazy: false,
+                        _tasksCubit = TasksCubit(
+                          context.read<StorageService>(),
+                          snapshot.data as TasksRepository,
+                        );
+
+                        return BlocProvider.value(
+                          value: _tasksCubit!,
                           child: const TasksPage(),
                         );
                       },

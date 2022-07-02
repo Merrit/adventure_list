@@ -180,7 +180,6 @@ extension EventHelper on Event {
       completed: (status == 'confirmed') ? false : true,
       deleted: false,
       dueDate: null,
-      etag: etag!,
       id: id!,
       title: summary ?? '',
       updated: updated!,
@@ -191,7 +190,9 @@ extension EventHelper on Event {
 extension TaskListHelper on models.TaskList {
   Calendar toGoogleCalendar() {
     return Calendar(
+      description: details.toJson(),
       id: id,
+      location: 'adventure_list',
       summary: title,
     );
   }

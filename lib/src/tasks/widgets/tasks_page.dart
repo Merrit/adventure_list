@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
+import '../../core/core.dart';
 import '../tasks.dart';
 import 'task_details.dart';
 
@@ -264,43 +265,76 @@ class TaskListSettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(
-        child: TextButton(
-          onPressed: () async {
-            await showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  content: const Text(
-                    'This will permanently delete this list. Are you sure?',
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('CANCEL'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        tasksCubit.deleteList();
-                        Navigator.pushReplacementNamed(
-                          context,
-                          TasksPage.routeName,
+      body: BlocBuilder<TasksCubit, TasksState>(
+        builder: (context, state) {
+          if (state.activeList == null) Navigator.pop(context);
+
+          final TaskList taskList = state.activeList!;
+
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 350),
+              child: Column(
+                children: [
+                  Card(
+                    child: ListTile(
+                      title: const Text('List Name'),
+                      subtitle: Text(taskList.title),
+                      trailing: const Icon(Icons.arrow_forward),
+                      onTap: () async {
+                        String? newName = await showInputDialog(
+                          context: context,
+                        );
+
+                        if (newName == null) return;
+
+                        tasksCubit.updateList(
+                          taskList.copyWith(title: newName),
                         );
                       },
-                      child: const Text('CONFIRM'),
-                    )
-                  ],
-                );
-              },
-            );
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      await showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            content: const Text(
+                              'This will permanently delete this list. Are you sure?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('CANCEL'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  tasksCubit.deleteList();
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    TasksPage.routeName,
+                                  );
+                                },
+                                child: const Text('CONFIRM'),
+                              )
+                            ],
+                          );
+                        },
+                      );
 
-            // pop to root
-          },
-          child: const Text(
-            'Delete List',
-            style: TextStyle(color: Colors.red),
-          ),
-        ),
+                      // pop to root
+                    },
+                    child: const Text(
+                      'Delete List',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
