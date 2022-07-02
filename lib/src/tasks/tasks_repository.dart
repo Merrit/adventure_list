@@ -18,12 +18,14 @@ abstract class TasksRepository {
 
   Future<TaskList> createList({required String title});
 
+  Future<void> deleteList({required String id});
+
+  Future<void> updateList({required TaskList list});
+
   Future<Task> createTask({
     required String calendarId,
     required Task newTask,
   });
-
-  Future<void> deleteList({required String id});
 
   Future<Task> updateTask({
     required String calendarId,

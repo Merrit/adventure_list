@@ -52,6 +52,10 @@ class TasksCubit extends Cubit<TasksState> {
     _storageService.saveValue(key: 'activeList', value: id);
   }
 
+  Future<void> updateList(TaskList list) async {
+    await _tasksRepository.updateList(list: list);
+  }
+
   Future<void> createTask(Task newTask) async {
     assert(state.activeList != null);
 

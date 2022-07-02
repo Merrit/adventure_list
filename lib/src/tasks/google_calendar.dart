@@ -13,11 +13,8 @@ import 'tasks.dart';
 /// An event is represented by an [Event
 /// resource](https://developers.google.com/calendar/v3/reference/events#resource-representations).
 
-/// *[Calendar](https://developers.google.com/calendar/v3/reference/calendars)*
-/// A collection of events. Each calendar has associated metadata, such as
-/// calendar description or default calendar time zone. The metadata for a
-/// single calendar is represented by a [Calendar
-/// resource](https://developers.google.com/calendar/v3/reference/calendars).
+/// [Calendar](https://developers.google.com/calendar/v3/reference/calendars)
+/// Analagous to the `TaskList`.
 
 /// *[Calendar List](https://developers.google.com/calendar/v3/reference/calendarList)* A
 /// list of all calendars on a user's calendar list in the Calendar UI. The
@@ -73,23 +70,16 @@ class GoogleCalendar implements TasksRepository {
       showHidden: true,
     );
 
-    apiCalendarsList.items?.removeWhere((element) {
-      bool? isTodoList = element.description?.contains(
-        RegExp(r'adventure_list'),
-      );
-
-      if (isTodoList == true) {
-        return false;
-      } else {
-        return true;
-      }
-    });
+    apiCalendarsList.items?.removeWhere(
+      (CalendarListEntry element) => element.location != 'adventure_list',
+    );
 
     final taskLists = <models.TaskList>[];
-    for (var calendar in apiCalendarsList.items!) {
+    for (var calendarListEntry in apiCalendarsList.items!) {
+      final calendar = await _api.calendars.get(calendarListEntry.id!);
       taskLists.add(await calendar.toModel(_api));
     }
-
+    var end;
     return taskLists;
   }
 
@@ -111,7 +101,8 @@ class GoogleCalendar implements TasksRepository {
   @override
   Future<models.TaskList> createList({required String title}) async {
     final newCalendar = await _api.calendars.insert(Calendar(
-      description: 'adventure_list_uuid',
+      description: '{}',
+      location: 'adventure_list',
       summary: title,
     ));
 
@@ -126,6 +117,19 @@ class GoogleCalendar implements TasksRepository {
   }
 
   @override
+  Future<void> deleteList({required String id}) async {
+    await _api.calendars.delete(id);
+  }
+
+  @override
+  Future<void> updateList({required TaskList list}) async {
+    await _api.calendars.update(
+      list.toGoogleCalendar(),
+      list.id,
+    );
+  }
+
+  @override
   Future<models.Task> createTask({
     required String calendarId,
     required Task newTask,
@@ -136,11 +140,6 @@ class GoogleCalendar implements TasksRepository {
     );
 
     return createdEvent.toModel();
-  }
-
-  @override
-  Future<void> deleteList({required String id}) async {
-    await _api.calendars.delete(id);
   }
 
   @override
@@ -158,14 +157,6 @@ class GoogleCalendar implements TasksRepository {
   }
 }
 
-extension CalendarListEntryHelper on CalendarListEntry {
-  Future<models.TaskList> toModel(CalendarApi api) async {
-    final calendar = await api.calendars.get(id!);
-
-    return await calendar.toModel(api);
-  }
-}
-
 extension CalendarHelper on Calendar {
   Future<models.TaskList> toModel(CalendarApi api) async {
     final apiTasks = await api.events.list(
@@ -174,6 +165,8 @@ extension CalendarHelper on Calendar {
     );
 
     return models.TaskList(
+      details: models.TaskListDetails.fromJson('{}'),
+      // details: models.TaskListDetails.fromJson(description ?? '{}'),
       id: id!,
       items: apiTasks.items!.map((e) => e.toModel()).toList(),
       title: summary ?? 'title',
@@ -191,6 +184,15 @@ extension EventHelper on Event {
       id: id!,
       title: summary ?? '',
       updated: updated!,
+    );
+  }
+}
+
+extension TaskListHelper on models.TaskList {
+  Calendar toGoogleCalendar() {
+    return Calendar(
+      id: id,
+      summary: title,
     );
   }
 }

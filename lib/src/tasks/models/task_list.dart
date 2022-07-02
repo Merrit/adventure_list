@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:equatable/equatable.dart';
 
 import '../tasks.dart';
@@ -9,41 +11,69 @@ class TaskList extends Equatable {
   /// Identifier of the calendar.
   final String id;
 
-  final int index;
-
   final List<Task> items;
+
+  final TaskListDetails details;
 
   final String title;
 
   const TaskList({
     required this.id,
-    this.index = -1,
     required this.items,
+    required this.details,
     required this.title,
   });
 
   @override
-  List<Object?> get props {
-    return [
-      id,
-      index,
-      items,
-      title,
-    ];
-  }
+  List<Object> get props => [id, items, details, title];
 
   TaskList copyWith({
-    String? description,
     String? id,
-    int? index,
     List<Task>? items,
+    TaskListDetails? details,
     String? title,
   }) {
     return TaskList(
       id: id ?? this.id,
-      index: index ?? this.index,
       items: items ?? this.items,
+      details: details ?? this.details,
       title: title ?? this.title,
     );
   }
+}
+
+class TaskListDetails extends Equatable {
+  final int index;
+
+  const TaskListDetails({
+    this.index = -1,
+  });
+
+  @override
+  List<Object> get props => [index];
+
+  TaskListDetails copyWith({
+    int? index,
+  }) {
+    return TaskListDetails(
+      index: index ?? this.index,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'index': index,
+    };
+  }
+
+  factory TaskListDetails.fromMap(Map<String, dynamic> map) {
+    return TaskListDetails(
+      index: map['index']?.toInt() ?? 0,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory TaskListDetails.fromJson(String source) =>
+      TaskListDetails.fromMap(json.decode(source));
 }

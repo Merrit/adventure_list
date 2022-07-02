@@ -181,6 +181,7 @@ class TaskView extends StatelessWidget {
                       icon: const Icon(Icons.add),
                       onPressed: () async {
                         final textFieldController = TextEditingController();
+                        String? newTaskTitle;
 
                         await showDialog(
                           context: context,
@@ -188,10 +189,17 @@ class TaskView extends StatelessWidget {
                             return AlertDialog(
                               content: TextField(
                                 controller: textFieldController,
+                                onSubmitted: (String value) {
+                                  newTaskTitle = value;
+                                  Navigator.pop(context);
+                                },
                               ),
                               actions: [
                                 TextButton(
-                                  onPressed: () => Navigator.pop(context),
+                                  onPressed: () {
+                                    newTaskTitle = textFieldController.text;
+                                    Navigator.pop(context);
+                                  },
                                   child: const Text('OK'),
                                 ),
                                 TextButton(
@@ -202,6 +210,8 @@ class TaskView extends StatelessWidget {
                             );
                           },
                         );
+
+                        if (newTaskTitle == null) return;
 
                         tasksCubit.createTask(
                           Task(title: textFieldController.text),
