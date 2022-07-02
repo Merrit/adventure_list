@@ -45,14 +45,14 @@ void main() async {
 // Called when Doing Background Work initiated from Widget
 Future<void> backgroundCallback(Uri? uri) async {
   if (uri?.host == 'updatecounter') {
-    int? _counter;
+    int? counter;
     await HomeWidget.getWidgetData<int>('_counter', defaultValue: 0)
         .then((int? value) {
       if (value == null) return;
-      _counter = value;
-      if (_counter != null) _counter = _counter! + 1;
+      counter = value;
+      if (counter != null) counter = counter! + 1;
     });
-    await HomeWidget.saveWidgetData<int>('_counter', _counter);
+    await HomeWidget.saveWidgetData<int>('_counter', counter);
     await HomeWidget.updateWidget(
         name: 'AppWidgetProvider', iOSName: 'AppWidgetProvider');
   }

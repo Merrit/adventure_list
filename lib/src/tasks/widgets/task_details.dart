@@ -40,15 +40,15 @@ class TaskDetails extends StatelessWidget {
                                   PopupMenuItem(
                                     child: TextButton(
                                       onPressed: () {},
-                                      child: Text('label'),
+                                      child: const Text('label'),
                                     ),
                                   ),
                                 ],
                               );
                             },
-                            child: CircleButton(
+                            child: const CircleButton(
                               // onPressed: () {},
-                              child: const Icon(Icons.more_vert),
+                              child: Icon(Icons.more_vert),
                             ),
                           ),
                         ],

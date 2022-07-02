@@ -79,7 +79,7 @@ class GoogleCalendar implements TasksRepository {
       final calendar = await _api.calendars.get(calendarListEntry.id!);
       taskLists.add(await calendar.toModel(_api));
     }
-    var end;
+
     return taskLists;
   }
 
