@@ -24,6 +24,11 @@ class _TaskTileState extends State<TaskTile> {
     super.initState();
   }
 
+  void _setActiveTaskCallback() {
+    String? targetId = (tasksCubit.state.activeTask == task) ? null : task.id;
+    tasksCubit.setActiveTask(targetId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TasksCubit, TasksState>(
@@ -56,7 +61,7 @@ class _TaskTileState extends State<TaskTile> {
           title: title,
           trailing: IconButton(
             icon: const Icon(Icons.arrow_forward),
-            onPressed: () => tasksCubit.setActiveTask(task.id),
+            onPressed: () => _setActiveTaskCallback(),
           ),
           children: [
             IntrinsicHeight(
@@ -86,7 +91,7 @@ class _TaskTileState extends State<TaskTile> {
           leading: checkbox,
           // trailing: ,
           subtitle: subtitle,
-          onTap: () => tasksCubit.setActiveTask(task.id),
+          onTap: () => _setActiveTaskCallback(),
         );
 
         return hasChildTasks ? expansionTile : listTile;
