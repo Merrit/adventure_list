@@ -56,6 +56,25 @@ class TaskDetails extends StatelessWidget {
                       Expanded(
                         child: ListView(
                           children: [
+                            // Description
+                            ListTile(
+                              leading: const Icon(Icons.edit),
+                              title: Text((task.description == null)
+                                  ? 'Description'
+                                  : task.description!),
+                              onTap: () async {
+                                final String? newDescription =
+                                    await showInputDialog(
+                                  context: context,
+                                );
+
+                                if (newDescription == null) return;
+
+                                tasksCubit.updateTask(
+                                  task.copyWith(description: newDescription),
+                                );
+                              },
+                            ),
                             OutlinedButton(
                               onPressed: () async {
                                 final newTaskName = await showInputDialog(
