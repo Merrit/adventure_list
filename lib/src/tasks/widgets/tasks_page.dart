@@ -35,7 +35,7 @@ class TasksPage extends StatelessWidget {
             body: Row(
               children: [
                 if (!platformIsMobile()) const NavigationBar(),
-                const TaskView(),
+                const TasksView(),
                 const TaskDetails(),
               ],
             ),
@@ -162,8 +162,8 @@ class ScrollingListTiles extends StatelessWidget {
   }
 }
 
-class TaskView extends StatelessWidget {
-  const TaskView({Key? key}) : super(key: key);
+class TasksView extends StatelessWidget {
+  const TasksView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -234,7 +234,7 @@ class TaskView extends StatelessWidget {
                     buildDefaultDragHandles: false,
                     onReorder: (oldIndex, newIndex) {},
                     children: state.activeList!.items
-                        .where((element) => !element.completed)
+                        .where((element) => element.parent == null)
                         .map((e) => TaskTile(key: ValueKey(e), task: e))
                         .toList(),
                   ),
@@ -340,7 +340,7 @@ class TaskListSettingsPage extends StatelessWidget {
   }
 }
 
-class TaskTile extends StatelessWidget {
+class TaskTile extends StatefulWidget {
   final Task task;
 
   const TaskTile({
@@ -349,26 +349,85 @@ class TaskTile extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<TaskTile> createState() => _TaskTileState();
+}
+
+class _TaskTileState extends State<TaskTile> {
+  late final Task task;
+
+  @override
+  void initState() {
+    task = widget.task;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    TextStyle titleTextStyle = TextStyle(
-      decoration: task.completed ? TextDecoration.lineThrough : null,
-      fontSize: 18,
-    );
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        TextStyle titleTextStyle = TextStyle(
+          decoration: task.completed ? TextDecoration.lineThrough : null,
+          fontSize: 18,
+        );
 
-    Widget? subtitle;
-    if (task.description != null) subtitle = Text(task.description!);
+        Widget title = Text(task.title, style: titleTextStyle);
 
-    return ListTile(
-      title: Text(task.title, style: titleTextStyle),
-      leading: Checkbox(
-        value: task.completed,
-        onChanged: (bool? value) => tasksCubit.updateTask(
-          task.copyWith(completed: value),
-        ),
-      ),
-      // subtitle: subtitle,
-      subtitle: subtitle,
-      onTap: () => tasksCubit.setActiveTask(task.id),
+        Widget checkbox = Checkbox(
+          value: task.completed,
+          onChanged: (bool? value) => tasksCubit.updateTask(
+            task.copyWith(completed: value),
+          ),
+        );
+
+        Widget? subtitle;
+        if (task.description != null) {
+          subtitle = Text(task.description!);
+        }
+
+        bool hasChildTasks = state.activeList!.items
+            .where((element) => element.parent == task.id)
+            .isNotEmpty;
+
+        final expansionTile = ExpansionTile(
+          controlAffinity: ListTileControlAffinity.leading,
+          title: title,
+          trailing: IconButton(
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: () => tasksCubit.setActiveTask(task.id),
+          ),
+          children: [
+            IntrinsicHeight(
+              child: Row(
+                children: [
+                  const SizedBox(width: 20),
+                  const VerticalDivider(thickness: 3),
+                  Expanded(
+                    child: Column(
+                      children: state.activeList!.items
+                          .where((element) => element.parent == task.id)
+                          .map(
+                            (e) => TaskTile(task: e),
+                            // (e) => ExpansionTile(title: Text(e.title)),
+                          )
+                          .toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+
+        final listTile = ListTile(
+          title: title,
+          leading: checkbox,
+          // trailing: ,
+          subtitle: subtitle,
+          onTap: () => tasksCubit.setActiveTask(task.id),
+        );
+
+        return hasChildTasks ? expansionTile : listTile;
+      },
     );
   }
 }

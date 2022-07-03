@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:equatable/equatable.dart';
 
 class Task extends Equatable {
@@ -11,7 +13,8 @@ class Task extends Equatable {
 
   final String id;
 
-  // final String? parent;
+  /// The ID of the task considered the parent, only if this task is nested.
+  final String? parent;
 
   /// Title of the task.
   final String title;
@@ -24,7 +27,7 @@ class Task extends Equatable {
     this.description,
     this.dueDate,
     this.id = '',
-    // required this.parent,
+    this.parent,
     required this.title,
     DateTime? updated,
   }) : updated = updated ?? DateTime.now();
@@ -37,7 +40,7 @@ class Task extends Equatable {
       description,
       dueDate,
       id,
-      // parent,
+      parent,
       title,
       updated,
     ];
@@ -59,9 +62,41 @@ class Task extends Equatable {
       description: description ?? this.description,
       dueDate: dueDate ?? this.dueDate,
       id: id ?? this.id,
-      // parent: parent ?? this.parent,
+      parent: parent ?? this.parent,
       title: title ?? this.title,
       updated: updated ?? this.updated,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'completed': completed,
+      'deleted': deleted,
+      'description': description,
+      'dueDate': dueDate?.millisecondsSinceEpoch,
+      'id': id,
+      'parent': parent,
+      'title': title,
+      'updated': updated.millisecondsSinceEpoch,
+    };
+  }
+
+  factory Task.fromMap(Map<String, dynamic> map) {
+    return Task(
+      completed: map['completed'] ?? false,
+      deleted: map['deleted'] ?? false,
+      description: map['description'],
+      dueDate: map['dueDate'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['dueDate'])
+          : null,
+      id: map['id'] ?? '',
+      parent: map['parent'],
+      title: map['title'] ?? '',
+      updated: DateTime.fromMillisecondsSinceEpoch(map['updated']),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory Task.fromJson(String source) => Task.fromMap(json.decode(source));
 }

@@ -166,7 +166,6 @@ extension CalendarHelper on Calendar {
 
     return models.TaskList(
       details: models.TaskListDetails.fromJson('{}'),
-      // details: models.TaskListDetails.fromJson(description ?? '{}'),
       id: id!,
       items: apiTasks.items!.map((e) => e.toModel()).toList(),
       title: summary ?? 'title',
@@ -176,14 +175,9 @@ extension CalendarHelper on Calendar {
 
 extension EventHelper on Event {
   models.Task toModel() {
-    return models.Task(
-      completed: (status == 'confirmed') ? false : true,
-      deleted: false,
-      dueDate: null,
-      id: id!,
-      title: summary ?? '',
-      updated: updated!,
-    );
+    return models.Task.fromJson(description!) //
+        // The inital task didn't have id, so grab from Event.
+        .copyWith(id: id);
   }
 }
 
@@ -201,8 +195,8 @@ extension TaskListHelper on models.TaskList {
 extension TaskHelper on models.Task {
   Event toGoogleEvent() {
     return Event(
+      description: toJson(),
       end: EventDateTime(date: DateTime(2022, 06, 27)),
-      // endTimeUnspecified: true,
       start: EventDateTime(date: DateTime(2022, 06, 27)),
       status: completed ? 'cancelled' : 'confirmed',
       summary: title,

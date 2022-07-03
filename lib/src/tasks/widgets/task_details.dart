@@ -53,6 +53,35 @@ class TaskDetails extends StatelessWidget {
                           ),
                         ],
                       ),
+                      Expanded(
+                        child: ListView(
+                          children: [
+                            OutlinedButton(
+                              onPressed: () async {
+                                final newTaskName = await showInputDialog(
+                                  context: context,
+                                );
+
+                                if (newTaskName == null) return;
+
+                                tasksCubit.createTask(
+                                  Task(
+                                    title: newTaskName,
+                                    parent: task.id,
+                                  ),
+                                );
+                              },
+                              child: const Text('Add subtask'),
+                            ),
+                            ...state.activeList!.items
+                                .where((element) => element.parent == task.id)
+                                .map((e) => ListTile(
+                                      title: Text(e.title),
+                                    ))
+                                .toList()
+                          ],
+                        ),
+                      ),
                     ],
             ),
           ),
