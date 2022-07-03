@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
-import '../../core/core.dart';
 import '../tasks.dart';
-import 'task_details.dart';
 
 class TasksPage extends StatelessWidget {
   static const routeName = '/';
