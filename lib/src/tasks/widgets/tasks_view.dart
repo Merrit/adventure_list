@@ -18,58 +18,7 @@ class TasksView extends StatelessWidget {
             width: platformIsMobile() ? null : 500,
             child: Column(
               children: [
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () async {
-                        final textFieldController = TextEditingController();
-                        String? newTaskTitle;
-
-                        await showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              content: TextField(
-                                controller: textFieldController,
-                                onSubmitted: (String value) {
-                                  newTaskTitle = value;
-                                  Navigator.pop(context);
-                                },
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    newTaskTitle = textFieldController.text;
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('OK'),
-                                ),
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('CANCEL'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-
-                        if (newTaskTitle == null) return;
-
-                        tasksCubit.createTask(
-                          Task(title: textFieldController.text),
-                        );
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.settings),
-                      onPressed: () => Navigator.pushNamed(
-                        context,
-                        TaskListSettingsPage.routeName,
-                      ),
-                    )
-                  ],
-                ),
+                const _TasksHeader(),
                 Expanded(
                   child: ReorderableListView(
                     scrollController: ScrollController(),
@@ -94,6 +43,86 @@ class TasksView extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _TasksHeader extends StatelessWidget {
+  const _TasksHeader({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () async {
+                    final textFieldController = TextEditingController();
+                    String? newTaskTitle;
+
+                    await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          content: TextField(
+                            controller: textFieldController,
+                            onSubmitted: (String value) {
+                              newTaskTitle = value;
+                              Navigator.pop(context);
+                            },
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                newTaskTitle = textFieldController.text;
+                                Navigator.pop(context);
+                              },
+                              child: const Text('OK'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('CANCEL'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    if (newTaskTitle == null) return;
+
+                    tasksCubit.createTask(
+                      Task(title: textFieldController.text),
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.settings),
+                  onPressed: () => Navigator.pushNamed(
+                    context,
+                    TaskListSettingsPage.routeName,
+                  ),
+                )
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 60, bottom: 10),
+              child: Text(
+                state.activeList!.title,
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
