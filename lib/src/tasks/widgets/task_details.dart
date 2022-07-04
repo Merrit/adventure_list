@@ -16,9 +16,10 @@ class TaskDetails extends StatelessWidget {
       builder: (context, state) {
         final Task? task = state.activeTask;
 
-        return Expanded(
-          child: Card(
-            margin: const EdgeInsets.all(6),
+        final widgetContents = Card(
+          margin: const EdgeInsets.all(6),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               children: task == null
                   ? []
@@ -54,55 +55,73 @@ class TaskDetails extends StatelessWidget {
                         ],
                       ),
                       Expanded(
-                        child: ListView(
-                          children: [
-                            // Description
-                            ListTile(
-                              leading: const Icon(Icons.edit),
-                              title: Text((task.description == null)
-                                  ? 'Description'
-                                  : task.description!),
-                              onTap: () async {
-                                final String? newDescription =
-                                    await showInputDialog(
-                                  context: context,
-                                );
+                        child: SizedBox(
+                          width: 400,
+                          child: ListView(
+                            children: [
+                              // Description
+                              ListTile(
+                                leading: const Icon(Icons.edit),
+                                title: Text((task.description == null)
+                                    ? 'Description'
+                                    : task.description!),
+                                onTap: () async {
+                                  final String? newDescription =
+                                      await showInputDialog(
+                                    context: context,
+                                  );
 
-                                if (newDescription == null) return;
+                                  if (newDescription == null) return;
 
-                                tasksCubit.updateTask(
-                                  task.copyWith(description: newDescription),
-                                );
-                              },
-                            ),
-                            OutlinedButton(
-                              onPressed: () async {
-                                final newTaskName = await showInputDialog(
-                                  context: context,
-                                );
+                                  tasksCubit.updateTask(
+                                    task.copyWith(description: newDescription),
+                                  );
+                                },
+                              ),
+                              OutlinedButton(
+                                onPressed: () async {
+                                  final newTaskName = await showInputDialog(
+                                    context: context,
+                                  );
 
-                                if (newTaskName == null) return;
+                                  if (newTaskName == null) return;
 
-                                tasksCubit.createTask(
-                                  Task(
-                                    title: newTaskName,
-                                    parent: task.id,
-                                  ),
-                                );
-                              },
-                              child: const Text('Add subtask'),
-                            ),
-                            ...state.activeList!.items
-                                .where((element) => element.parent == task.id)
-                                .map((e) => ListTile(
-                                      title: Text(e.title),
-                                    ))
-                                .toList()
-                          ],
+                                  tasksCubit.createTask(
+                                    Task(
+                                      title: newTaskName,
+                                      parent: task.id,
+                                    ),
+                                  );
+                                },
+                                child: const Text('Add subtask'),
+                              ),
+                              ...state.activeList!.items
+                                  .where((element) => element.parent == task.id)
+                                  .map((e) => ListTile(
+                                        title: Text(e.title),
+                                      ))
+                                  .toList()
+                            ],
+                          ),
                         ),
                       ),
                     ],
             ),
+          ),
+        );
+
+        return Expanded(
+          flex: (task == null) ? 0 : 1,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            reverseDuration: const Duration(milliseconds: 300),
+            transitionBuilder: (Widget child, Animation<double> animation) =>
+                ScaleTransition(
+              alignment: Alignment.centerLeft,
+              scale: animation,
+              child: child,
+            ),
+            child: (task == null) ? const SizedBox() : widgetContents,
           ),
         );
       },
