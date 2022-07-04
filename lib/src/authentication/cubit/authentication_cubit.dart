@@ -62,4 +62,13 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       value: jsonEncode(accessCredentials.toJson()),
     );
   }
+
+  Future<void> logout() async {
+    emit(state.copyWith(
+      accessCredentials: null,
+      signedIn: false,
+    ));
+
+    await _storageService.deleteValue('accessCredentials');
+  }
 }
