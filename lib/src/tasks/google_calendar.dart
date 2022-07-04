@@ -74,6 +74,14 @@ class GoogleCalendar implements TasksRepository {
       (CalendarListEntry element) => element.location != 'adventure_list',
     );
 
+    // Double check our calendars have been marked hidden,
+    // occasionally it will fail when creating the calendar.
+    for (var calendar in apiCalendarsList.items ?? <CalendarListEntry>[]) {
+      if (calendar.hidden != true) {
+        await _setListHidden(calendar.id!);
+      }
+    }
+
     final taskLists = <models.TaskList>[];
     for (var calendarListEntry in apiCalendarsList.items!) {
       final calendar = await _api.calendars.get(calendarListEntry.id!);
@@ -106,12 +114,7 @@ class GoogleCalendar implements TasksRepository {
       summary: title,
     ));
 
-    await _api.calendarList.update(
-      // Set the calendar to hidden, so it doesn't appear when the user
-      // accesses their calendars normally.
-      CalendarListEntry(hidden: true),
-      newCalendar.id!,
-    );
+    await _setListHidden(newCalendar.id!);
 
     return await newCalendar.toModel(_api);
   }
@@ -154,6 +157,15 @@ class GoogleCalendar implements TasksRepository {
     );
 
     return updatedEvent.toModel();
+  }
+
+  _setListHidden(String calendarId) async {
+    await _api.calendarList.update(
+      // Set the calendar to hidden, so it doesn't appear when the user
+      // accesses their calendars normally.
+      CalendarListEntry(hidden: true),
+      calendarId,
+    );
   }
 }
 
