@@ -66,7 +66,10 @@ class TasksCubit extends Cubit<TasksState> {
 
   void setActiveList(String id) {
     final list = state.taskLists.singleWhere((element) => element.id == id);
-    emit(state.copyWith(activeList: list));
+    emit(state.copyWith(
+      activeList: list,
+      activeTask: state.activeTask?.copyWith(id: ''),
+    ));
     _storageService.saveValue(key: 'activeList', value: id);
   }
 
