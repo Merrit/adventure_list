@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
+import '../../core/core.dart';
 import '../tasks.dart';
 
 class CustomNavigationRail extends StatelessWidget {
@@ -54,33 +55,15 @@ class _CreateListButton extends StatelessWidget {
     return IconButton(
       icon: const Icon(Icons.add),
       onPressed: () async {
-        final textFieldController = TextEditingController();
-
-        await showDialog(
+        final String? newListName = await showInputDialog(
           context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              content: TextField(
-                controller: textFieldController,
-                onSubmitted: (_) => Navigator.pop(context),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('CANCEL'),
-                ),
-              ],
-            );
-          },
+          title: 'Create New List',
+          hintText: 'Name',
         );
 
-        if (textFieldController.value.text == '') return;
+        if (newListName == null) return;
 
-        tasksCubit.createList(textFieldController.text);
+        tasksCubit.createList(newListName);
       },
     );
   }

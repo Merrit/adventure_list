@@ -17,7 +17,12 @@ class TaskListSettingsPage extends StatelessWidget {
         builder: (context, state) {
           if (state.activeList == null) Navigator.pop(context);
 
-          final TaskList taskList = state.activeList!;
+          final taskList = state.activeList;
+
+          if (taskList == null) {
+            Navigator.pop(context);
+            return const SizedBox();
+          }
 
           return Center(
             child: ConstrainedBox(

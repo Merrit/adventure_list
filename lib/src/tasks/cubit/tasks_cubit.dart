@@ -52,10 +52,16 @@ class TasksCubit extends Cubit<TasksState> {
   }
 
   Future<void> deleteList() async {
+    final String deletionListId = state.activeList!.id;
     final updatedLists = List<TaskList>.from(state.taskLists)
       ..remove(state.activeList);
-    emit(state.copyWith(activeList: null, taskLists: updatedLists));
-    await _tasksRepository.deleteList(id: state.activeList!.id);
+    emit(state.copyWith(
+      /// `copyWith` has a check, so setting `id` to `''` will remove
+      /// the active list.
+      activeList: state.activeList!.copyWith(id: ''),
+      taskLists: updatedLists,
+    ));
+    await _tasksRepository.deleteList(id: deletionListId);
   }
 
   void setActiveList(String id) {

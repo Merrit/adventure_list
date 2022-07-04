@@ -22,11 +22,14 @@ class TasksState extends Equatable {
     bool? loading,
     List<TaskList>? taskLists,
   }) {
+    activeList ??= this.activeList;
+    if (activeList?.id == '') activeList = null;
+
     activeTask ??= this.activeTask;
     if (activeTask?.id == '') activeTask = null;
 
     return TasksState(
-      activeList: activeList ?? this.activeList,
+      activeList: activeList,
       activeTask: activeTask,
       loading: loading ?? this.loading,
       taskLists: taskLists ?? this.taskLists,
