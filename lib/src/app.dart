@@ -7,7 +7,6 @@ import 'authentication/authentication.dart';
 import 'authentication/login_page.dart';
 import 'storage/storage_service.dart';
 import 'tasks/tasks.dart';
-import 'tasks/widgets/task_details.dart';
 
 TasksCubit? _tasksCubit;
 
