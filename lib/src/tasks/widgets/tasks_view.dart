@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
+import '../../core/core.dart';
 import '../tasks.dart';
 
 class TasksView extends StatelessWidget {
@@ -61,42 +62,15 @@ class _TasksHeader extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () async {
-                    final textFieldController = TextEditingController();
-                    String? newTaskTitle;
-
-                    await showDialog(
+                    final String? newTaskTitle = await showInputDialog(
                       context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          content: TextField(
-                            controller: textFieldController,
-                            onSubmitted: (String value) {
-                              newTaskTitle = value;
-                              Navigator.pop(context);
-                            },
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                newTaskTitle = textFieldController.text;
-                                Navigator.pop(context);
-                              },
-                              child: const Text('OK'),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('CANCEL'),
-                            ),
-                          ],
-                        );
-                      },
+                      title: 'New Task',
+                      hintText: 'Name',
                     );
 
                     if (newTaskTitle == null) return;
 
-                    tasksCubit.createTask(
-                      Task(title: textFieldController.text),
-                    );
+                    tasksCubit.createTask(Task(title: newTaskTitle));
                   },
                 ),
                 IconButton(
