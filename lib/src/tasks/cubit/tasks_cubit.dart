@@ -1,7 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logging/logging.dart';
 
+import '../../authentication/cubit/authentication_cubit.dart';
 import '../../storage/storage_service.dart';
 import '../tasks.dart';
 
@@ -10,6 +12,8 @@ part 'tasks_state.dart';
 late TasksCubit tasksCubit;
 
 class TasksCubit extends Cubit<TasksState> {
+  final _log = Logger('TasksCubt');
+
   final StorageService _storageService;
   final TasksRepository _tasksRepository;
 
@@ -22,7 +26,15 @@ class TasksCubit extends Cubit<TasksState> {
   }
 
   Future<void> initialize() async {
-    final taskLists = await _tasksRepository.getAll();
+    List<TaskList> taskLists;
+    try {
+      taskLists = await _tasksRepository.getAll();
+    } catch (e) {
+      _log.warning('Exception while attempting to fetch tasks: $e');
+      await authCubit.logout();
+      return;
+    }
+
     final String? activeListId = await _storageService.getValue('activeList');
     emit(state.copyWith(
       activeList: taskLists.singleWhereOrNull((e) => e.id == activeListId),
