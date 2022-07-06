@@ -17,8 +17,10 @@ class TasksView extends StatelessWidget {
         return SizedBox(
           width: platformIsMobile() ? null : 600,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const _TasksHeader(),
+              const NewTaskButton(),
               Expanded(
                 child: ReorderableListView(
                   scrollController: ScrollController(),
@@ -59,20 +61,6 @@ class _TasksHeader extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () async {
-                    final String? newTaskTitle = await showInputDialog(
-                      context: context,
-                      title: 'New Task',
-                      hintText: 'Name',
-                    );
-
-                    if (newTaskTitle == null) return;
-
-                    tasksCubit.createTask(Task(title: newTaskTitle));
-                  },
-                ),
                 IconButton(
                   icon: const Icon(Icons.settings),
                   onPressed: () => Navigator.pushNamed(
