@@ -24,35 +24,38 @@ class TaskDetails extends StatelessWidget {
               children: task == null
                   ? []
                   : [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CircleButton(
-                            onPressed: () => tasksCubit.setActiveTask(null),
-                            child: const Icon(Icons.close),
-                          ),
-                          Text(task.title),
-                          GestureDetector(
-                            onTapUp: (details) {
-                              showContextMenu(
-                                context: context,
-                                offset: details.globalPosition,
-                                items: [
-                                  PopupMenuItem(
-                                    child: TextButton(
-                                      onPressed: () {},
-                                      child: const Text('label'),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                            child: const CircleButton(
-                              // onPressed: () {},
-                              child: Icon(Icons.more_vert),
+                      Flexible(
+                        fit: FlexFit.loose,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CircleButton(
+                              onPressed: () => tasksCubit.setActiveTask(null),
+                              child: const Icon(Icons.close),
                             ),
-                          ),
-                        ],
+                            Text(task.title),
+                            GestureDetector(
+                              onTapUp: (details) {
+                                showContextMenu(
+                                  context: context,
+                                  offset: details.globalPosition,
+                                  items: [
+                                    PopupMenuItem(
+                                      child: TextButton(
+                                        onPressed: () {},
+                                        child: const Text('label'),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                              child: const CircleButton(
+                                // onPressed: () {},
+                                child: Icon(Icons.more_vert),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       Expanded(
                         child: SizedBox(

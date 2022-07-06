@@ -29,72 +29,94 @@ class _TaskTileState extends State<TaskTile> {
     tasksCubit.setActiveTask(targetId);
   }
 
+  bool expanded = true;
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
+        bool hasChildTasks = state.activeList!.items
+            .where((element) => element.parent == task.id)
+            .isNotEmpty;
+
+        Widget leadingWidget;
+        if (hasChildTasks) {
+          leadingWidget = IconButton(
+            icon: Icon(
+              expanded ? Icons.arrow_drop_down : Icons.arrow_right,
+            ),
+            onPressed: () => setState(() {
+              expanded = !expanded;
+            }),
+          );
+        } else {
+          leadingWidget = Checkbox(
+            value: task.completed,
+            onChanged: (bool? value) => tasksCubit.updateTask(
+              task.copyWith(completed: value),
+            ),
+          );
+        }
+
         TextStyle titleTextStyle = TextStyle(
           decoration: task.completed ? TextDecoration.lineThrough : null,
           fontSize: 18,
         );
 
-        Widget title = Text(task.title, style: titleTextStyle);
-
-        Widget checkbox = Checkbox(
-          value: task.completed,
-          onChanged: (bool? value) => tasksCubit.updateTask(
-            task.copyWith(completed: value),
+        Widget titleRow = InkWell(
+          onTap: () => _setActiveTaskCallback(),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              children: [
+                leadingWidget,
+                Text(task.title, style: titleTextStyle)
+              ],
+            ),
           ),
         );
 
         Widget? subtitle;
-        if (task.description != null) {
-          subtitle = Text(task.description!);
-        }
-
-        bool hasChildTasks = state.activeList!.items
-            .where((element) => element.parent == task.id)
-            .isNotEmpty;
-
-        final expansionTile = ExpansionTile(
-          controlAffinity: ListTileControlAffinity.leading,
-          title: title,
-          trailing: IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            onPressed: () => _setActiveTaskCallback(),
-          ),
-          children: [
-            IntrinsicHeight(
+        if (hasChildTasks) {
+          subtitle = Visibility(
+            visible: expanded,
+            child: IntrinsicHeight(
               child: Row(
                 children: [
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 12),
                   const VerticalDivider(thickness: 3),
                   Expanded(
                     child: Column(
-                      children: state.activeList!.items
-                          .where((element) => element.parent == task.id)
-                          .map(
-                            (e) => TaskTile(task: e),
-                            // (e) => ExpansionTile(title: Text(e.title)),
-                          )
-                          .toList(),
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (task.description != null)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20),
+                            child: Text(task.description!),
+                          ),
+                        ...state.activeList!.items
+                            .where((element) => element.parent == task.id)
+                            .map((e) => TaskTile(task: e))
+                            .toList()
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ],
-        );
+          );
+        } else {
+          if (task.description != null) {
+            subtitle = Text(task.description!);
+          }
+        }
 
         final listTile = ListTile(
-          title: title,
-          leading: checkbox,
-          // trailing: ,
+          title: titleRow,
           subtitle: subtitle,
-          onTap: () => _setActiveTaskCallback(),
         );
 
-        return hasChildTasks ? expansionTile : listTile;
+        return listTile;
       },
     );
   }
