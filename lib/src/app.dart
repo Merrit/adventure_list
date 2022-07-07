@@ -47,7 +47,7 @@ class App extends StatelessWidget {
               blendOnColors: false,
             ),
             visualDensity: FlexColorScheme.comfortablePlatformDensity,
-            useMaterial3: true,
+            // useMaterial3: true,
             fontFamily: GoogleFonts.notoSans().fontFamily,
           ),
           darkTheme: FlexThemeData.dark(
@@ -60,7 +60,7 @@ class App extends StatelessWidget {
               blendOnLevel: 30,
             ),
             visualDensity: FlexColorScheme.comfortablePlatformDensity,
-            useMaterial3: true,
+            // useMaterial3: true,
             fontFamily: GoogleFonts.notoSans().fontFamily,
           ),
           themeMode: ThemeMode.system,
