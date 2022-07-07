@@ -18,6 +18,7 @@ class CustomNavigationRail extends StatelessWidget {
         return SizedBox(
           width: 250,
           child: Card(
+            margin: const EdgeInsets.all(6),
             child: Column(
               children: const [
                 _CreateListButton(),
