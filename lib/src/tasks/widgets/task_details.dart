@@ -30,33 +30,37 @@ class TaskDetails extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             CircleButton(
+                              margin: const EdgeInsets.all(0),
                               onPressed: () => tasksCubit.setActiveTask(null),
                               child: const Icon(Icons.close),
                             ),
                             Text(task.title),
-                            GestureDetector(
-                              onTapUp: (details) {
-                                showContextMenu(
-                                  context: context,
-                                  offset: details.globalPosition,
-                                  items: [
-                                    PopupMenuItem(
-                                      child: TextButton(
-                                        onPressed: () {},
-                                        child: const Text('label'),
+                            CircleButton(
+                              margin: const EdgeInsets.all(0),
+                              child: GestureDetector(
+                                onTapUp: (details) {
+                                  showContextMenu(
+                                    context: context,
+                                    offset: details.globalPosition,
+                                    items: [
+                                      PopupMenuItem(
+                                        child: TextButton(
+                                          onPressed: () {},
+                                          child: const Text('label'),
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                );
-                              },
-                              child: const CircleButton(
-                                // onPressed: () {},
-                                child: Icon(Icons.more_vert),
+                                    ],
+                                  );
+                                },
+                                child: const Icon(Icons.more_vert),
                               ),
+                              onPressed: () {},
                             ),
                           ],
                         ),
                       ),
+                      const Divider(),
+                      const SizedBox(height: 20),
                       Expanded(
                         child: SizedBox(
                           width: 400,
