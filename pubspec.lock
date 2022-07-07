@@ -148,6 +148,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.6.5"
+  flex_color_scheme:
+    dependency: "direct main"
+    description:
+      name: flex_color_scheme
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "5.0.1"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -203,6 +210,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "9.2.0"
+  google_fonts:
+    dependency: "direct main"
+    description:
+      name: google_fonts
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.1"
   google_sign_in:
     dependency: "direct main"
     description:
@@ -567,13 +581,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.7.0"
-  window_to_front:
-    dependency: "direct main"
-    description:
-      name: window_to_front
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.3"
   xdg_directories:
     dependency: transitive
     description:
