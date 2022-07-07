@@ -2,35 +2,32 @@ import 'package:flutter/material.dart';
 
 class CircleButton extends StatelessWidget {
   /// Button color
-  final Color color;
+  final Color? color;
 
   final Widget child;
+  final double? elevation;
+  final EdgeInsetsGeometry? margin;
   final VoidCallback? onPressed;
-  final EdgeInsets padding;
-  final Color splashColor;
 
   const CircleButton({
     Key? key,
-    this.color = Colors.blue,
+    this.color,
     required this.child,
+    this.elevation,
+    this.margin,
     this.onPressed,
-    this.padding = const EdgeInsets.all(6.0),
-    this.splashColor = Colors.pink,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ClipOval(
-      child: Material(
-        color: color,
-        child: InkWell(
-          splashColor: splashColor,
-          onTap: onPressed,
-          child: Padding(
-            padding: padding,
-            child: child,
-          ),
-        ),
+    return Card(
+      elevation: elevation,
+      color: color,
+      margin: margin,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+      child: IconButton(
+        icon: child,
+        onPressed: onPressed,
       ),
     );
   }
