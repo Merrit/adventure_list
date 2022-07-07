@@ -16,25 +16,22 @@ class TaskTile extends StatefulWidget {
 }
 
 class _TaskTileState extends State<TaskTile> {
-  late final Task task;
-
-  @override
-  void initState() {
-    task = widget.task;
-    super.initState();
-  }
-
-  void _setActiveTaskCallback() {
-    String? targetId = (tasksCubit.state.activeTask == task) ? null : task.id;
-    tasksCubit.setActiveTask(targetId);
-  }
-
   bool expanded = true;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
+        final Task task = state.activeList!.items.singleWhere(
+          (element) => element.id == widget.task.id,
+        );
+
+        void _setActiveTaskCallback() {
+          String? targetId =
+              (tasksCubit.state.activeTask == task) ? null : task.id;
+          tasksCubit.setActiveTask(targetId);
+        }
+
         bool hasChildTasks = state.activeList!.items
             .where((element) => element.parent == task.id)
             .isNotEmpty;
