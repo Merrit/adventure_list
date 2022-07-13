@@ -62,7 +62,7 @@ class _CreateListButton extends StatelessWidget {
           hintText: 'Name',
         );
 
-        if (newListName == null) return;
+        if (newListName == null || newListName == '') return;
 
         tasksCubit.createList(newListName);
       },
