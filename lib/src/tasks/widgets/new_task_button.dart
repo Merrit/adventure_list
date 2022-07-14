@@ -41,6 +41,8 @@ class _NewTaskButtonState extends State<NewTaskButton> {
     });
 
     void _createTask() {
+      if (controller.text.trim() == '') return;
+
       tasksCubit.createTask(Task(title: controller.text));
       FocusManager.instance.primaryFocus?.unfocus();
     }
