@@ -22,9 +22,11 @@ class LoginPage extends StatelessWidget {
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Signed in, inform user and proceed to load app.
               if (state.signedIn)
                 Builder(builder: (context) {
                   Timer(const Duration(seconds: 2), () {
+                    // TODO: window_manager -> focus window?
                     Navigator.pushReplacementNamed(
                       context,
                       TasksPage.routeName,
@@ -42,6 +44,8 @@ class LoginPage extends StatelessWidget {
                     ),
                   );
                 }),
+
+              // Not signed in, prompt for authentication.
               Center(
                 child: SignInButton(
                   Buttons.GoogleDark,
