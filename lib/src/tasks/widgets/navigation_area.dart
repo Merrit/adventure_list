@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
 import '../../core/core.dart';
+import '../../settings/widgets/settings_page.dart';
 import '../tasks.dart';
 
 class CustomNavigationRail extends StatelessWidget {
@@ -21,7 +22,7 @@ class CustomNavigationRail extends StatelessWidget {
             margin: const EdgeInsets.all(6),
             child: Column(
               children: const [
-                _CreateListButton(),
+                _NavContents(),
                 _ScrollingListTiles(),
               ],
             ),
@@ -37,11 +38,38 @@ class CustomDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
+    return const Drawer(
+      child: _NavContents(),
+    );
+  }
+}
+
+class _NavContents extends StatelessWidget {
+  const _NavContents({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
       child: Column(
-        children: const [
-          _CreateListButton(),
-          _ScrollingListTiles(),
+        children: [
+          const _CreateListButton(),
+          const _ScrollingListTiles(),
+          ListTile(
+            title: const Text('Settings'),
+            onTap: () {
+              if (platformIsMobile()) {
+                Navigator.pushNamed(context, SettingsPage.routeName);
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return const SettingsView();
+                  },
+                );
+              }
+            },
+          ),
         ],
       ),
     );

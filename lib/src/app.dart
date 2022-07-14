@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'authentication/authentication.dart';
 import 'authentication/login_page.dart';
+import 'settings/widgets/settings_page.dart';
 import 'storage/storage_service.dart';
 import 'tasks/tasks.dart';
 
@@ -82,6 +83,8 @@ class App extends StatelessWidget {
                       value: _tasksCubit!,
                       child: const TaskListSettingsPage(),
                     );
+                  case SettingsPage.routeName:
+                    return const SettingsPage();
                   default:
                     // Only create cubit once.
                     if (_tasksCubit != null) {
