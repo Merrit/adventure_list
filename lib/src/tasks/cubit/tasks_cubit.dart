@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:logging/logging.dart';
 
 import '../../authentication/cubit/authentication_cubit.dart';
@@ -52,13 +55,16 @@ class TasksCubit extends Cubit<TasksState> {
   }
 
   Future<void> deleteList() async {
-    final String deletionListId = state.activeList!.id;
+    final TaskList? activeList = state.activeList;
+    if (activeList == null) return;
+
+    final String deletionListId = activeList.id;
     final updatedLists = List<TaskList>.from(state.taskLists)
-      ..remove(state.activeList);
+      ..remove(activeList);
     emit(state.copyWith(
       /// `copyWith` has a check, so setting `id` to `''` will remove
       /// the active list.
-      activeList: state.activeList!.copyWith(id: ''),
+      activeList: activeList.copyWith(id: ''),
       taskLists: updatedLists,
     ));
     await _tasksRepository.deleteList(id: deletionListId);
@@ -134,5 +140,18 @@ class TasksCubit extends Cubit<TasksState> {
     emit(state.copyWith(
       activeTask: state.activeList?.items.singleWhereOrNull((e) => e.id == id),
     ));
+  }
+
+  @override
+  void onChange(Change<TasksState> change) {
+    print('Updating AppWidget');
+
+    final data = change.nextState;
+    HomeWidget.saveWidgetData<String>(
+      'listNames',
+      jsonEncode(data.taskLists.map((e) => e.title).toList().toString()),
+    );
+    HomeWidget.updateWidget(name: 'HomeWidgetExampleProvider');
+    super.onChange(change);
   }
 }

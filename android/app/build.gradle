@@ -51,6 +51,7 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -60,6 +61,10 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 flutter {
@@ -68,4 +73,6 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'com.android.support:multidex:1.0.3'
 }

@@ -1,0 +1,63 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/task_widget"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<!--    style="@style/Widget.Android.AppWidget.Container"-->
+<!--    android:theme="@style/Theme.Android.AppWidgetContainer"-->
+
+   <RelativeLayout
+       android:id="@+id/widget_header"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="horizontal">
+
+       <ImageButton
+           android:id="@+id/open_app_button"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_centerVertical="true"
+           android:layout_toStartOf="@id/widget_header"
+           android:layout_toLeftOf="@id/widget_header"
+           android:background="@android:color/transparent"
+           android:contentDescription="@string/open_app_button"
+           android:scaleType="fitCenter"
+           android:src="@android:drawable/ic_menu_gallery"
+       />
+
+       <TextView
+           android:id="@+id/select_list_button"
+           android:contentDescription="@string/select_list_button"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_toRightOf="@id/open_app_button"
+           android:layout_centerVertical="true"
+           android:background="@android:color/transparent"
+           android:scaleType="fitCenter"
+           android:src="@drawable/example_appwidget_preview"
+           android:text="@string/active_list_name"
+       />
+
+       <ImageButton
+           android:id="@+id/configure_widget_button"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_alignParentEnd="true"
+           android:layout_centerVertical="true"
+           android:background="@android:color/transparent"
+           android:contentDescription="@string/configure_widget_button"
+           android:scaleType="fitCenter"
+           android:src="@android:drawable/ic_menu_manage"
+       />
+       <!--           android:src="@drawable/ic_outline_settings_24px"-->
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/task_list_view"
+        android:layout_below="@id/widget_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    />
+
+</RelativeLayout>
