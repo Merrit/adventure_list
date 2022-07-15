@@ -40,6 +40,29 @@ class TaskList extends Equatable {
       title: title ?? this.title,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'items': items.map((x) => x.toMap()).toList(),
+      'details': details.toMap(),
+      'title': title,
+    };
+  }
+
+  factory TaskList.fromMap(Map<String, dynamic> map) {
+    return TaskList(
+      id: map['id'] ?? '',
+      items: List<Task>.from(map['items']?.map((x) => Task.fromMap(x))),
+      details: TaskListDetails.fromMap(map['details']),
+      title: map['title'] ?? '',
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory TaskList.fromJson(String source) =>
+      TaskList.fromMap(json.decode(source));
 }
 
 class TaskListDetails extends Equatable {

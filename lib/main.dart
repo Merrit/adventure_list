@@ -9,7 +9,9 @@ import 'package:workmanager/workmanager.dart';
 
 import 'src/app.dart';
 import 'src/authentication/authentication.dart';
+import 'src/home_widget/home_widget.dart';
 import 'src/logs/logs.dart';
+import 'src/settings/cubit/settings_cubit.dart';
 import 'src/storage/storage_service.dart';
 
 void main() async {
@@ -28,6 +30,8 @@ void main() async {
     storageService: storageService,
   );
 
+  final _settingsCubit = await SettingsCubit.initialize(storageService);
+
   runApp(
     MultiRepositoryProvider(
       providers: [
@@ -36,9 +40,8 @@ void main() async {
       ],
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(
-            create: (context) => authenticationCubit,
-          ),
+          BlocProvider(create: (context) => authenticationCubit),
+          BlocProvider.value(value: _settingsCubit),
         ],
         child: const App(),
       ),
@@ -71,23 +74,18 @@ void callbackDispatcher() {
 
 /// Called when Doing Background Work initiated from Widget
 Future<void> backgroundCallback(Uri? data) async {
+  print('clicky?');
   print(data);
 
   if (data?.host == 'titleclicked') {
     final greetings = [
-      'Hello',
-      'Hallo',
-      'Bonjour',
-      'Hola',
-      'Ciao',
-      '哈洛',
-      '안녕하세요',
-      'xin chào'
+      'frog',
+      'fox',
+      'wolf',
+      'amaterasu',
     ];
     final selectedGreeting = greetings[Random().nextInt(greetings.length)];
 
-    await HomeWidget.saveWidgetData<String>('title', selectedGreeting);
-    await HomeWidget.updateWidget(
-        name: 'HomeWidgetExampleProvider', iOSName: 'HomeWidgetExample');
+    await updateHomeWidget('title', selectedGreeting);
   }
 }

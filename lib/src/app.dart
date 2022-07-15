@@ -7,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'authentication/authentication.dart';
 import 'authentication/login_page.dart';
+import 'home_widget/widgets/home_screen_widget.dart';
+import 'home_widget/widgets/home_widget_config_page.dart';
 import 'settings/widgets/settings_page.dart';
 import 'storage/storage_service.dart';
 import 'tasks/tasks.dart';
@@ -72,6 +74,11 @@ class App extends StatelessWidget {
                 if (!signedIn) return const LoginPage();
 
                 switch (routeSettings.name) {
+                  case HomeWidgetConfigPage.routeName:
+                    return BlocProvider.value(
+                      value: _tasksCubit!,
+                      child: const HomeWidgetConfigPage(),
+                    );
                   case LoginPage.routeName:
                     return const LoginPage();
                   // case TasksPage.routeName:
@@ -112,7 +119,9 @@ class App extends StatelessWidget {
 
                         return BlocProvider.value(
                           value: _tasksCubit!,
-                          child: const TasksPage(),
+                          child: const HomeScreenWidget(
+                            child: TasksPage(),
+                          ),
                         );
                       },
                     );

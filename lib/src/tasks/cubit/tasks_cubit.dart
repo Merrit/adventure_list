@@ -149,7 +149,7 @@ class TasksCubit extends Cubit<TasksState> {
     final data = change.nextState;
     HomeWidget.saveWidgetData<String>(
       'listNames',
-      jsonEncode(data.taskLists.map((e) => e.title).toList().toString()),
+      jsonEncode(data.taskLists.map((e) => e.title).toList()),
     );
     HomeWidget.updateWidget(name: 'HomeWidgetExampleProvider');
     super.onChange(change);
