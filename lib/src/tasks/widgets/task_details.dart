@@ -12,6 +12,27 @@ class TaskDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mobileView = Scaffold(
+      appBar: AppBar(),
+      body: const TaskDetailsView(),
+    );
+
+    final Task? task = context.watch<TasksCubit>().state.activeTask;
+
+    final largeScreenView = Expanded(
+      flex: (task == null) ? 0 : 1,
+      child: const TaskDetailsView(),
+    );
+
+    return (platformIsMobile()) ? mobileView : largeScreenView;
+  }
+}
+
+class TaskDetailsView extends StatelessWidget {
+  const TaskDetailsView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
         final Task? task = state.activeTask;
@@ -117,19 +138,16 @@ class TaskDetails extends StatelessWidget {
           ),
         );
 
-        return Expanded(
-          flex: (task == null) ? 0 : 1,
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            reverseDuration: const Duration(milliseconds: 300),
-            transitionBuilder: (Widget child, Animation<double> animation) =>
-                ScaleTransition(
-              alignment: Alignment.centerLeft,
-              scale: animation,
-              child: child,
-            ),
-            child: (task == null) ? const SizedBox() : widgetContents,
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          reverseDuration: const Duration(milliseconds: 300),
+          transitionBuilder: (Widget child, Animation<double> animation) =>
+              ScaleTransition(
+            alignment: Alignment.centerLeft,
+            scale: animation,
+            child: child,
           ),
+          child: (task == null) ? const SizedBox() : widgetContents,
         );
       },
     );

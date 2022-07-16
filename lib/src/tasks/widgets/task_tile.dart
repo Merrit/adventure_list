@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helpers/helpers.dart';
 
 import '../tasks.dart';
 
@@ -26,10 +27,21 @@ class _TaskTileState extends State<TaskTile> {
           (element) => element.id == widget.task.id,
         );
 
-        void _setActiveTaskCallback() {
-          String? targetId =
-              (tasksCubit.state.activeTask == task) ? null : task.id;
-          tasksCubit.setActiveTask(targetId);
+        Future<void> _setActiveTaskCallback() async {
+          String? taskId = (tasksCubit.state.activeTask == task) //
+              ? null
+              : task.id;
+          tasksCubit.setActiveTask(taskId);
+
+          if (platformIsMobile()) {
+            await Navigator.pushNamed(
+              context,
+              TaskDetails.routeName,
+            );
+
+            // User has returned from details page, unset active task.
+            tasksCubit.setActiveTask('');
+          }
         }
 
         bool hasChildTasks = state.activeList!.items

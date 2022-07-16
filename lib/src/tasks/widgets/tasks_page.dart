@@ -25,7 +25,7 @@ class TasksPage extends StatelessWidget {
               children: [
                 if (!platformIsMobile()) const CustomNavigationRail(),
                 const TasksView(),
-                const TaskDetails(),
+                if (!platformIsMobile()) const TaskDetails(),
               ],
             ),
           );
