@@ -13,13 +13,17 @@ import 'src/home_widget/home_widget.dart';
 import 'src/logs/logs.dart';
 import 'src/settings/cubit/settings_cubit.dart';
 import 'src/storage/storage_service.dart';
+import 'src/window/app_window.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final appWindow = await AppWindow.initialize();
+
   if (Platform.isAndroid) {
     Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
     HomeWidget.registerBackgroundCallback(backgroundCallback);
   }
+
   initializeLogger();
 
   final storageService = await StorageService.initialize();

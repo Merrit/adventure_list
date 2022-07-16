@@ -35,6 +35,7 @@ dependencies:
   logging: ^1.0.2
   path_provider: ^2.0.11
   url_launcher: ^6.1.4
+  window_manager: ^0.2.5
   workmanager: ^0.5.0
   # window_to_front: ^0.0.3
 
