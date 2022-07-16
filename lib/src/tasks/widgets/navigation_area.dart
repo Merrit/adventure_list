@@ -16,16 +16,11 @@ class CustomNavigationRail extends StatelessWidget {
         // Currently a ListView because NavigationRail doesn't allow
         // having fewer than 2 items.
         // https://github.com/flutter/flutter/pull/104914
-        return SizedBox(
+        return const SizedBox(
           width: 250,
           child: Card(
-            margin: const EdgeInsets.all(6),
-            child: Column(
-              children: const [
-                _NavContents(),
-                _ScrollingListTiles(),
-              ],
-            ),
+            margin: EdgeInsets.all(6),
+            child: _NavContents(),
           ),
         );
       },
