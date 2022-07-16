@@ -17,7 +17,8 @@ class HomeWidgetExampleProvider : HomeWidgetProvider() {
         appWidgetIds.forEach { widgetId ->
             val views = RemoteViews(context.packageName, R.layout.example_layout).apply {
 
-                // Prepare data.
+                // Prepare data --------------------------------------------------------------------
+
                 val selectedListRawJson: String? = widgetData.getString(
                     "selectedList", null,
                 )
@@ -49,28 +50,28 @@ class HomeWidgetExampleProvider : HomeWidgetProvider() {
                         )
                     }
 
+                val listNamesJson = widgetData.getString("listNames", null)
+                val listNames = jsonToList(listNamesJson)
 
-                // ---------------------------------------------------------------------------------
+                var tasksListString = ""
+                for (i in 0 until tasksList.size) {
+                    val task: Map<String, Any> = tasksList[i]
+                    tasksListString += "\n${task["title"]}"
+                }
 
-                // Open App on Widget Click
+
+                // Prepare view. -------------------------------------------------------------------
+
+                // Tapping AppWidget opens app, asking to open that list.
                 val pendingIntent = HomeWidgetLaunchIntent.getActivity(
                     context,
-                    MainActivity::class.java)
+                    MainActivity::class.java,
+                    Uri.parse("launchWidgetList"))
                 setOnClickPendingIntent(R.id.widget_container, pendingIntent)
 
-                // Swap Title Text by calling Dart Code in the Background
-//                setTextViewText(R.id.widget_title, widgetData.getString("title", null)
-//                    ?: "No Title Set")
-//                val backgroundIntent = HomeWidgetBackgroundIntent.getBroadcast(
-//                    context,
-//                    Uri.parse("homeWidgetExample://titleClicked")
-//                )
-//                setOnClickPendingIntent(R.id.widget_title, backgroundIntent)
 
                 // Tapping list name opens app, asking to open that list.
-
                 // TODO: If title == "Select List", launch list selection instead.
-
                 setTextViewText(
                     R.id.widget_title,
                     listTitle ?: "Select List",
@@ -78,22 +79,11 @@ class HomeWidgetExampleProvider : HomeWidgetProvider() {
                 val intentWithListName = HomeWidgetLaunchIntent.getActivity(
                     context,
                     MainActivity::class.java,
-                    Uri.parse("selectedListId"))
+                    Uri.parse("launchWidgetList"))
                 setOnClickPendingIntent(R.id.widget_title, intentWithListName)
 
-                val listNamesJson = widgetData.getString("listNames", null)
-                val listNames = jsonToList(listNamesJson)
-
-                var temp = ""
-                for (i in 0 until tasksList.size) {
-                    val task: Map<String, Any> = tasksList[i]
-                    temp += " ${task["title"]}"
-                }
 
                 // Tapping configure button launches widget config in main app.
-//                configure_button
-//                val jsonObject = JSONObject();
-//                jsonObject.put("name", "")
                 val configureWidgetIntent = HomeWidgetLaunchIntent.getActivity(
                     context,
                     MainActivity::class.java,
@@ -101,14 +91,9 @@ class HomeWidgetExampleProvider : HomeWidgetProvider() {
                 setOnClickPendingIntent(R.id.configure_button, configureWidgetIntent)
 
 
-                setTextViewText(R.id.widget_message, temp
-                    ?: "No Message Set")
-                // Detect App opened via Click inside Flutter
-                val pendingIntentWithData = HomeWidgetLaunchIntent.getActivity(
-                    context,
-                    MainActivity::class.java,
-                    Uri.parse("homeWidgetExample://message?message=$listNamesJson"))
-                setOnClickPendingIntent(R.id.widget_message, pendingIntentWithData)
+                // Set the tasks list text.
+                // Currently just a TextView with newlines, because ListView et al. are annoying.
+                setTextViewText(R.id.tasks_list, tasksListString)
             }
 
             appWidgetManager.updateAppWidget(widgetId, views)
@@ -118,11 +103,7 @@ class HomeWidgetExampleProvider : HomeWidgetProvider() {
     private fun jsonToList(json: String?): JSONArray {
         if (json == null) return JSONArray()
 
-        val jsonArray = JSONArray(json)
-//        val jsonObject = JSONObject(json)
-//        val jsonArray = jsonObject.toJSONArray()
-        val end = true
-        return jsonArray
+        return JSONArray(json)
     }
 
     private val defaultJsonObject: JSONObject = JSONObject()

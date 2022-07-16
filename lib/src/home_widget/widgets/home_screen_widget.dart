@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 
+import '../../settings/settings.dart';
+import '../../tasks/tasks.dart';
 import 'home_widget_config_page.dart';
 
 class HomeScreenWidget extends StatefulWidget {
@@ -31,17 +33,28 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
   void _handleAppLaunchedFromHomeWidget(Uri? uri) {
     if (uri == null) return;
 
-    if (uri.path == 'configureWidget') {
-      Navigator.pushNamed(context, HomeWidgetConfigPage.routeName);
-      return;
-    }
+    debugPrint('_HomeScreenWidgetState: uri: ${uri.path}');
 
-    showDialog(
-        context: context,
-        builder: (buildContext) => AlertDialog(
-              title: const Text('App started from HomeScreenWidget'),
-              content: Text('Here is the URI: $uri'),
-            ));
+    final navigator = Navigator.of(context);
+
+    switch (uri.path) {
+      case 'configureWidget':
+        navigator.pushReplacementNamed(HomeWidgetConfigPage.routeName);
+        return;
+      case 'launchWidgetList':
+        tasksCubit.setActiveList(settingsCubit.state.homeWidgetSelectedListId);
+        Navigator.pushReplacementNamed(context, TasksPage.routeName);
+        return;
+      default:
+        showDialog(
+          context: context,
+          builder: (buildContext) => AlertDialog(
+            title: const Text('App started from HomeScreenWidget'),
+            content: Text('Here is the URI: $uri'),
+          ),
+        );
+        return;
+    }
   }
 
   @override

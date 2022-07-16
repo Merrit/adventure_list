@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../settings/settings.dart';
@@ -50,6 +51,10 @@ class HomeWidgetConfigPage extends StatelessWidget {
             },
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => SystemNavigator.pop(),
+        label: const Text('Done'),
       ),
     );
   }

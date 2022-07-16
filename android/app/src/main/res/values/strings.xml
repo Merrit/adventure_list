@@ -8,4 +8,6 @@
     <string name="select_list_button">Select List</string>
     <string name="configure_widget_button">Configure Widget</string>
     <string name="active_list_name">Select List</string>
+    <string name="list_item">Task Name here</string>
+    <string name="tasks_list"> </string>
 </resources>

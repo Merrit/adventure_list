@@ -75,30 +75,19 @@ class App extends StatelessWidget {
 
                 switch (routeSettings.name) {
                   case HomeWidgetConfigPage.routeName:
-                    return BlocProvider.value(
-                      value: _tasksCubit!,
-                      child: const HomeWidgetConfigPage(),
-                    );
+                    return const RouteWrapper(child: HomeWidgetConfigPage());
                   case LoginPage.routeName:
                     return const LoginPage();
-                  // case TasksPage.routeName:
-                  // return const TasksPage();
                   case TaskDetails.routeName:
-                    return const TaskDetails();
+                    return const RouteWrapper(child: TaskDetails());
                   case TaskListSettingsPage.routeName:
-                    return BlocProvider.value(
-                      value: _tasksCubit!,
-                      child: const TaskListSettingsPage(),
-                    );
+                    return const RouteWrapper(child: TaskListSettingsPage());
                   case SettingsPage.routeName:
-                    return const SettingsPage();
+                    return const RouteWrapper(child: SettingsPage());
                   default:
                     // Only create cubit once.
                     if (_tasksCubit != null) {
-                      return BlocProvider.value(
-                        value: _tasksCubit!,
-                        child: const TasksPage(),
-                      );
+                      return const RouteWrapper(child: TasksPage());
                     }
 
                     // Cubit not created yet, create now.
@@ -117,12 +106,7 @@ class App extends StatelessWidget {
                           snapshot.data as TasksRepository,
                         );
 
-                        return BlocProvider.value(
-                          value: _tasksCubit!,
-                          child: const HomeScreenWidget(
-                            child: TasksPage(),
-                          ),
-                        );
+                        return const RouteWrapper(child: TasksPage());
                       },
                     );
                 }
@@ -131,6 +115,27 @@ class App extends StatelessWidget {
           },
         );
       },
+    );
+  }
+}
+
+/// Wrap all routes in a BlocProvider to the TasksCubit & the Android AppWidget
+/// manager; this way it doesn't have to be done for every route.
+class RouteWrapper extends StatelessWidget {
+  final Widget child;
+
+  const RouteWrapper({
+    Key? key,
+    required this.child,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider.value(
+      value: _tasksCubit!,
+      child: HomeScreenWidget(
+        child: child,
+      ),
     );
   }
 }
