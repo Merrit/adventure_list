@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
@@ -144,14 +145,18 @@ class TasksCubit extends Cubit<TasksState> {
 
   @override
   void onChange(Change<TasksState> change) {
-    print('Updating AppWidget');
+    if (Platform.isAndroid) {
+      print('Updating AppWidget');
 
-    final data = change.nextState;
-    HomeWidget.saveWidgetData<String>(
-      'listNames',
-      jsonEncode(data.taskLists.map((e) => e.title).toList()),
-    );
-    HomeWidget.updateWidget(name: 'HomeWidgetExampleProvider');
+      final data = change.nextState;
+      HomeWidget.saveWidgetData<String>(
+        'listNames',
+        jsonEncode(data.taskLists.map((e) => e.title).toList()),
+      );
+      HomeWidget.updateWidget(name: 'HomeWidgetExampleProvider');
+      return;
+    }
+
     super.onChange(change);
   }
 }
