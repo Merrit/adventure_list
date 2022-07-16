@@ -18,16 +18,20 @@ class TasksPage extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
+          final Widget largeBody = Row(
+            children: const [
+              CustomNavigationRail(),
+              TasksView(),
+              TaskDetails(),
+            ],
+          );
+
+          const Widget mobileBody = TasksView();
+
           return Scaffold(
             appBar: platformIsMobile() ? const _TaskListAppBar() : null,
             drawer: platformIsMobile() ? const CustomDrawer() : null,
-            body: Row(
-              children: [
-                if (!platformIsMobile()) const CustomNavigationRail(),
-                const TasksView(),
-                if (!platformIsMobile()) const TaskDetails(),
-              ],
-            ),
+            body: platformIsMobile() ? mobileBody : largeBody,
           );
         },
       ),

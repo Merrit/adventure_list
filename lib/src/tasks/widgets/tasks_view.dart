@@ -9,42 +9,40 @@ class TasksView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: BlocBuilder<TasksCubit, TasksState>(
-        builder: (context, state) {
-          if (state.activeList == null) return const SizedBox();
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        if (state.activeList == null) return const SizedBox();
 
-          return SizedBox(
-            width: platformIsMobile() ? null : 600,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const _TasksHeader(),
-                const NewTaskButton(),
-                Expanded(
-                  child: ReorderableListView(
-                    scrollController: ScrollController(),
-                    buildDefaultDragHandles: false,
-                    onReorder: (oldIndex, newIndex) {},
-                    children: state.activeList!.items
-                        .where((element) => element.parent == null)
-                        .map((e) => TaskTile(key: ValueKey(e), task: e))
-                        .toList(),
-                  ),
+        return SizedBox(
+          width: platformIsMobile() ? null : 600,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const _TasksHeader(),
+              const NewTaskButton(),
+              Expanded(
+                child: ReorderableListView(
+                  scrollController: ScrollController(),
+                  buildDefaultDragHandles: false,
+                  onReorder: (oldIndex, newIndex) {},
+                  children: state.activeList!.items
+                      .where((element) => element.parent == null)
+                      .map((e) => TaskTile(key: ValueKey(e), task: e))
+                      .toList(),
                 ),
-                // if (state.activeList!.items.any((element) => element.completed))
-                //   ExpansionTile(
-                //     title: const Text('Completed'),
-                //     children: state.activeList!.items
-                //         .where((element) => element.completed)
-                //         .map((e) => TaskTile(task: e))
-                //         .toList(),
-                //   ),
-              ],
-            ),
-          );
-        },
-      ),
+              ),
+              // if (state.activeList!.items.any((element) => element.completed))
+              //   ExpansionTile(
+              //     title: const Text('Completed'),
+              //     children: state.activeList!.items
+              //         .where((element) => element.completed)
+              //         .map((e) => TaskTile(task: e))
+              //         .toList(),
+              //   ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
