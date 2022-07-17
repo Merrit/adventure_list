@@ -2,10 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="codes.merritt.adventurelist">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="adventure_list">
+        android:label="Adventure List">
 
         <activity
             android:name=".MainActivity"
@@ -50,7 +52,8 @@
             </intent-filter>
         </receiver>
         <service android:name="es.antonborri.home_widget.HomeWidgetBackgroundService"
-            android:permission="android.permission.BIND_JOB_SERVICE" android:exported="true"/>
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true" />
         <!--
  Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java
