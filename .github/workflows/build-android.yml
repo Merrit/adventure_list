@@ -61,5 +61,5 @@ jobs:
       - name: Upload artifacts to workflow
         uses: actions/upload-artifact@v2
         with:
-          name: android
+          name: android-artifacts
           path: output/*
