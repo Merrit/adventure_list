@@ -41,9 +41,12 @@ dependencies:
   # window_to_front: ^0.0.3
 
 dev_dependencies:
+  flutter_app_builder:
+    git:
+      url: https://github.com/Merrit/flutter_app_builder.git
+      ref: 312f340a607caf3f019ec883a7e684ac4bada0cf
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^2.0.0
   change_app_package_name: ^1.1.0
 
