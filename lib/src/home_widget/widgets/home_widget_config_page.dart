@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:move_to_background/move_to_background.dart';
 
 import '../../settings/settings.dart';
 import '../../tasks/tasks.dart';
@@ -53,7 +53,12 @@ class HomeWidgetConfigPage extends StatelessWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => SystemNavigator.pop(),
+        onPressed: () async {
+          final navigator = Navigator.of(context);
+          await MoveToBackground.moveTaskToBack();
+          navigator.pushReplacementNamed(TasksPage.routeName);
+        },
+        // onPressed: () => SystemNavigator.pop(),
         label: const Text('Done'),
       ),
     );
