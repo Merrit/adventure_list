@@ -58,9 +58,7 @@ class _NavContents extends StatelessWidget {
               } else {
                 showDialog(
                   context: context,
-                  builder: (context) {
-                    return const SettingsView();
-                  },
+                  builder: (context) => const SettingsDialog(),
                 );
               }
             },

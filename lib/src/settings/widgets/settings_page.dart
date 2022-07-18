@@ -17,6 +17,20 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
+class SettingsDialog extends StatelessWidget {
+  const SettingsDialog({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const Dialog(
+      // TODO: This padding.. should maybe be calculated?
+      // Eg layoutbldr: maxWidth / 2    ?
+      insetPadding: EdgeInsets.symmetric(horizontal: 300, vertical: 24),
+      child: SettingsView(),
+    );
+  }
+}
+
 class SettingsView extends StatelessWidget {
   const SettingsView({Key? key}) : super(key: key);
 
