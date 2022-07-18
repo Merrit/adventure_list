@@ -64,11 +64,12 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   }
 
   Future<void> logout() async {
+    await _googleAuth.signOut();
+    await _storageService.deleteValue('accessCredentials');
+
     emit(state.copyWith(
       accessCredentials: null,
       signedIn: false,
     ));
-
-    await _storageService.deleteValue('accessCredentials');
   }
 }

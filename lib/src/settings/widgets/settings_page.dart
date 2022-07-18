@@ -26,9 +26,13 @@ class SettingsView extends StatelessWidget {
       child: OutlinedButton(
         onPressed: () async {
           final navigator = Navigator.of(context);
+          showDialog(
+              context: context,
+              builder: (context) {
+                return const CircularProgressIndicator();
+              });
 
           await authCubit.logout();
-
           navigator.pushReplacementNamed(LoginPage.routeName);
         },
         child: const Text('Log Out'),

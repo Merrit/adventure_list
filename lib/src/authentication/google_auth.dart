@@ -139,6 +139,12 @@ class GoogleAuth {
     final authUrl = Uri.parse(url);
     if (await canLaunchUrl(authUrl)) launchUrl(authUrl);
   }
+
+  Future<void> signOut() async {
+    final GoogleSignIn googleSignIn = GoogleSignIn(scopes: scopes);
+
+    await googleSignIn.signOut();
+  }
 }
 
 class GoogleHttpClient extends IOClient {
