@@ -141,6 +141,9 @@ class GoogleAuth {
   }
 
   Future<void> signOut() async {
+    // Specific signout only seems needed for the google_sign_in package.
+    if (!Platform.isAndroid) return;
+
     final GoogleSignIn googleSignIn = GoogleSignIn(scopes: scopes);
 
     await googleSignIn.signOut();
