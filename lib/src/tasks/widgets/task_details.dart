@@ -56,26 +56,17 @@ class TaskDetailsView extends StatelessWidget {
                               child: const Icon(Icons.close),
                             ),
                             Text(task.title),
-                            CircleButton(
-                              margin: const EdgeInsets.all(0),
-                              child: GestureDetector(
-                                onTapUp: (details) {
-                                  showContextMenu(
-                                    context: context,
-                                    offset: details.globalPosition,
-                                    items: [
-                                      PopupMenuItem(
-                                        child: TextButton(
-                                          onPressed: () {},
-                                          child: const Text('label'),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                                child: const Icon(Icons.more_vert),
-                              ),
-                              onPressed: () {},
+                            PopupMenuButton(
+                              itemBuilder: (context) {
+                                return [
+                                  PopupMenuItem(
+                                    child: TextButton(
+                                      onPressed: () {},
+                                      child: const Text('menu item'),
+                                    ),
+                                  ),
+                                ];
+                              },
                             ),
                           ],
                         ),
