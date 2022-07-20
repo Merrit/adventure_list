@@ -4,7 +4,6 @@ on:
   workflow_dispatch:
   # Verify builds succeed on pull requests
   pull_request:
-  # Build & deploy for tag events matching v*, i.e. v1.0.0, v20.15.10
 
 env:
   app-display-name: "Adventure List"
