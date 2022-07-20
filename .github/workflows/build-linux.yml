@@ -1,0 +1,55 @@
+name: Build Linux
+on:
+  # Enable manual run
+  workflow_dispatch:
+  # Verify builds succeed on pull requests
+  pull_request:
+  # Build for tag events matching v*, i.e. v1.0.0, v20.15.10
+  push:
+    tags:
+      - "v*"
+
+env:
+  app-display-name: "Adventure List"
+  author: "Merritt Codes"
+  identifier: "codes.merritt.adventurelist"
+
+jobs:
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-20.04
+
+    # ----------------------------------- Setup ------------------------------ #
+
+    steps:
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2.3.0
+
+      - name: Install Android dependencies
+        uses: actions/setup-java@v1
+        with:
+          java-version: "12.x"
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Prepare for build
+        run: |
+          flutter config --enable-linux-desktop
+          flutter upgrade
+          flutter pub get
+
+      # ----------------------------------- Build ---------------------------- #
+
+      - name: Run build script
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+        run: flutter pub run flutter_app_builder --platforms=linux
+
+      # ---------------------------------- Upload ---------------------------- #
+
+      - name: Upload artifacts to workflow
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-artifacts
+          path: output/*
