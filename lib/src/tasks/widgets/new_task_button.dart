@@ -65,7 +65,7 @@ class _NewTaskButtonState extends State<NewTaskButton> {
             title: TextField(
               controller: controller,
               focusNode: focusNode,
-              textCapitalization: TextCapitalization.words,
+              textCapitalization: TextCapitalization.sentences,
               onSubmitted: (_) => _createTask(),
             ),
             onTap: () {
