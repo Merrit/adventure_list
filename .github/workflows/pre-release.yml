@@ -16,14 +16,12 @@ concurrency:
 jobs:
   call-build-linux:
     uses: ./.github/workflows/build-linux.yml
-    concurrency: ci-pre-release-${{ github.ref }}-1
   call-build-android:
     uses: ./.github/workflows/build-android.yml
-    concurrency: ci-pre-release-${{ github.ref }}-1
 
   pre-release:
     name: "Pre Release"
-    concurrency: ci-pre-release-${{ github.ref }}-1
+    needs: [call-build-linux, call-build-android]
     runs-on: "ubuntu-latest"
 
     steps:
