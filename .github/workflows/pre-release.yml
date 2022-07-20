@@ -9,6 +9,10 @@ on:
     tags-ignore:
       - "*"
 
+concurrency:
+  group: ci-pre-release-${{ github.ref }}-1
+  cancel-in-progress: true
+
 jobs:
   call-build-linux:
     uses: ./.github/workflows/build-linux.yml
