@@ -1,13 +1,12 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:logging/logging.dart';
 
 import '../../authentication/cubit/authentication_cubit.dart';
+import '../../home_widget/home_widget_manager.dart';
 import '../../storage/storage_service.dart';
 import '../tasks.dart';
 
@@ -146,15 +145,8 @@ class TasksCubit extends Cubit<TasksState> {
   @override
   void onChange(Change<TasksState> change) {
     if (Platform.isAndroid) {
-      print('Updating AppWidget');
-
       final data = change.nextState;
-      HomeWidget.saveWidgetData<String>(
-        'listNames',
-        jsonEncode(data.taskLists.map((e) => e.title).toList()),
-      );
-      HomeWidget.updateWidget(name: 'HomeWidgetExampleProvider');
-      return;
+      updateHomeWidget('listNames', data);
     }
 
     super.onChange(change);
