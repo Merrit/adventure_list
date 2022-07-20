@@ -45,7 +45,7 @@ class _TaskTileState extends State<TaskTile> {
         }
 
         bool hasChildTasks = state.activeList!.items
-            .where((element) => element.parent == task.id)
+            .where((element) => element.parent == task.id && !element.deleted)
             .isNotEmpty;
 
         Widget leadingWidget;

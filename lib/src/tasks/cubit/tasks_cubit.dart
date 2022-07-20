@@ -142,6 +142,29 @@ class TasksCubit extends Cubit<TasksState> {
     ));
   }
 
+  Future<void> clearCompletedTasks() async {
+    // If the task is "completed", we also mark it "deleted".
+    final TaskList updatedList = state.activeList!.copyWith(
+      items: state.activeList!.items
+          .map((e) => e.copyWith(deleted: e.completed))
+          .toList(),
+    );
+
+    // TODO: Replace this remove/add with by index version once indexes are
+    // working.
+    final taskLists = List<TaskList>.from(state.taskLists)
+      ..removeWhere((element) => element.id == updatedList.id)
+      ..add(updatedList);
+    emit(state.copyWith(activeList: updatedList, taskLists: taskLists));
+
+    for (var task in updatedList.items) {
+      await _tasksRepository.updateTask(
+        calendarId: updatedList.id,
+        updatedTask: task,
+      );
+    }
+  }
+
   @override
   void onChange(Change<TasksState> change) {
     if (Platform.isAndroid) {

@@ -26,7 +26,9 @@ class TasksView extends StatelessWidget {
                   buildDefaultDragHandles: false,
                   onReorder: (oldIndex, newIndex) {},
                   children: state.activeList!.items
-                      .where((element) => element.parent == null)
+                      .where(
+                        (task) => task.parent == null && task.deleted == false,
+                      )
                       .map((e) => TaskTile(key: ValueKey(e), task: e))
                       .toList(),
                 ),
@@ -66,7 +68,19 @@ class _TasksHeader extends StatelessWidget {
                     context,
                     TaskListSettingsPage.routeName,
                   ),
-                )
+                ),
+                PopupMenuButton(
+                  itemBuilder: (context) {
+                    return [
+                      PopupMenuItem(
+                        child: TextButton(
+                          onPressed: () => tasksCubit.clearCompletedTasks(),
+                          child: const Text('Clear completed'),
+                        ),
+                      ),
+                    ];
+                  },
+                ),
               ],
             ),
             Padding(
