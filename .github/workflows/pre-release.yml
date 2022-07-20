@@ -11,15 +11,17 @@ on:
 
 jobs:
   call-build-linux:
-    uses: ./build-linux.yml@main
+    uses: ./.github/workflows/build-linux.yml@main
   call-build-android:
-    uses: ./build-android.yml@main
+    uses: ./.github/workflows/build-android.yml@main
 
   pre-release:
     name: "Pre Release"
     runs-on: "ubuntu-latest"
 
     steps:
+      - uses: actions/checkout@v2
+
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
