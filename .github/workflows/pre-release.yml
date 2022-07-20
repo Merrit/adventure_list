@@ -11,9 +11,9 @@ on:
 
 jobs:
   call-build-linux:
-    uses: ./.github/workflows/build-linux.yml@main
+    uses: ./.github/workflows/build-linux.yml
   call-build-android:
-    uses: ./.github/workflows/build-android.yml@main
+    uses: ./.github/workflows/build-android.yml
 
   pre-release:
     name: "Pre Release"
