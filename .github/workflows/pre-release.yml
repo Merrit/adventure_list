@@ -35,6 +35,12 @@ jobs:
           path: artifacts
           # name: linux-artifacts
 
+      - name: Display structure of downloaded files
+        run: ls -R
+
+      - name: Display tree of downloaded files
+        run: tree
+
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
