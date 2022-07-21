@@ -41,7 +41,6 @@ jobs:
           automatic_release_tag: "latest"
           prerelease: true
           title: "Development Build"
-          working-directory: ${{ github.workspace }}/artifacts
           files: |
-            android-artifacts/*
-            linux-artifacts/*
+            ${{ github.workspace }}/artifacts/android-artifacts/*
+            ${{ github.workspace }}/artifacts/linux-artifacts/*
