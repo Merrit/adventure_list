@@ -30,21 +30,18 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           path: artifacts
-          # name: linux-artifacts
 
-      - name: Display structure of downloaded files
-        run: ls -R
-
-      - name: Display tree of downloaded files
-        run: tree
-
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      - name: Create Development Release & Upload artifacts
+        uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
           prerelease: true
           title: "Development Build"
-          files: artifacts/*
+          working-directory: ${{ github.workspace }}/artifacts
+          files: |
+            android-artifacts/*
+            linux-artifacts/*
