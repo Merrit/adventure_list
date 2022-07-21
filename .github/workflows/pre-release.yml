@@ -1,6 +1,6 @@
 # Create a new prerelease with every push on main
 
-name: "pre-release"
+name: Pre-Release
 
 on:
   push:
@@ -16,8 +16,10 @@ concurrency:
 jobs:
   call-build-linux:
     uses: ./.github/workflows/build-linux.yml
+    secrets: inherit
   call-build-android:
     uses: ./.github/workflows/build-android.yml
+    secrets: inherit
 
   pre-release:
     name: "Pre Release"
