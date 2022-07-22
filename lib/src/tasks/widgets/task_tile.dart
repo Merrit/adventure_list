@@ -79,7 +79,7 @@ class _TaskTileState extends State<TaskTile> {
             child: Row(
               children: [
                 leadingWidget,
-                Text(task.title, style: titleTextStyle)
+                Flexible(child: Text(task.title, style: titleTextStyle)),
               ],
             ),
           ),

@@ -8,6 +8,7 @@ import 'package:home_widget/home_widget.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'src/app.dart';
+import 'src/app/cubit/app_cubit.dart';
 import 'src/authentication/authentication.dart';
 import 'src/home_widget/home_widget.dart';
 import 'src/logs/logs.dart';
@@ -44,6 +45,10 @@ void main() async {
       ],
       child: MultiBlocProvider(
         providers: [
+          BlocProvider(
+            create: (context) => AppCubit(),
+            lazy: false,
+          ),
           BlocProvider(create: (context) => authenticationCubit),
           BlocProvider.value(value: _settingsCubit),
         ],
@@ -78,9 +83,6 @@ void callbackDispatcher() {
 
 /// Called when Doing Background Work initiated from Widget
 Future<void> backgroundCallback(Uri? data) async {
-  print('clicky?');
-  print(data);
-
   if (data?.host == 'titleclicked') {
     final greetings = [
       'frog',

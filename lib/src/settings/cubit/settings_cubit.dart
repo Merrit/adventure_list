@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:self_updater/self_updater.dart';
 
+import '../../app/cubit/app_cubit.dart';
 import '../../storage/storage_service.dart';
 
 part 'settings_state.dart';
@@ -20,10 +22,21 @@ class SettingsCubit extends Cubit<SettingsState> {
       'homeWidgetSelectedListId',
     );
 
+    String? updateChannelString = await storageService.getValue(
+      'updateChannel',
+    );
+    ReleaseChannel updateChannel;
+    if (updateChannelString == null) {
+      updateChannel = ReleaseChannel.stable;
+    } else {
+      updateChannel = ReleaseChannel.values.byName(updateChannelString);
+    }
+
     return SettingsCubit(
       storageService,
       initialState: SettingsState(
         homeWidgetSelectedListId: homeWidgetSelectedListId ?? '',
+        updateChannel: updateChannel,
       ),
     );
   }
@@ -31,5 +44,13 @@ class SettingsCubit extends Cubit<SettingsState> {
   Future<void> updateHomeWidgetSelectedListId(String id) async {
     emit(state.copyWith(homeWidgetSelectedListId: id));
     await _storageService.saveValue(key: 'homeWidgetSelectedListId', value: id);
+  }
+
+  Future<void> updateUpdateChannel(ReleaseChannel? channel) async {
+    if (channel == null) return;
+
+    emit(state.copyWith(updateChannel: channel));
+    await _storageService.saveValue(key: 'updateChannel', value: channel.name);
+    appCubit.updateReleaseChannel(channel);
   }
 }

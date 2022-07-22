@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
+import '../../app/cubit/app_cubit.dart';
 import '../../core/core.dart';
 import '../../settings/widgets/settings_page.dart';
 import '../tasks.dart';
@@ -63,8 +64,94 @@ class _NavContents extends StatelessWidget {
               }
             },
           ),
+          const VersionButton(),
+          const UpdateButton(),
         ],
       ),
+    );
+  }
+}
+
+class VersionButton extends StatelessWidget {
+  const VersionButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AppCubit, AppState>(
+      builder: (context, state) {
+        return ListTile(
+          title: Opacity(
+            opacity: 0.5,
+            child: Text(
+              'Version ${state.appVersion}',
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+          ),
+          onTap: () => showDialog(
+            context: context,
+            builder: (context) => const VersionDialog(),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class VersionDialog extends StatelessWidget {
+  const VersionDialog({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // aboutdialog
+    return AlertDialog(
+      content: BlocBuilder<AppCubit, AppState>(
+        builder: (context, state) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text('Current version: ${state.appVersion}'),
+                subtitle: state.updateAvailable
+                    ? Text('Update available: ${state.updateVersion}')
+                    : const Text('No update available'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class UpdateButton extends StatelessWidget {
+  const UpdateButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AppCubit, AppState>(
+      builder: (context, state) {
+        if (!state.updateAvailable) return const SizedBox();
+
+        Widget child;
+        if (state.updateInProgress) {
+          child = Center(
+            child: CircularProgressIndicator(color: Colors.pink.shade400),
+          );
+        } else {
+          child = const Text('UPDATE');
+        }
+
+        return ListTile(
+          title: ElevatedButton(
+            onPressed: () => appCubit.startUpdate(),
+            child: child,
+          ),
+        );
+      },
     );
   }
 }
