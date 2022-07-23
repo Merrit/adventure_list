@@ -80,8 +80,12 @@ class _UpdateChannelTile extends StatelessWidget {
                           title: Text(channel.name.capitalized()),
                           value: channel,
                           groupValue: state.updateChannel,
-                          onChanged: (UpdateChannel? value) {
-                            settingsCubit.setUpdateChannel(value);
+                          onChanged: (UpdateChannel? value) async {
+                            if (value == UpdateChannel.dev) {
+                              await _showConfirmDevDialog(context);
+                            } else {
+                              settingsCubit.setUpdateChannel(value);
+                            }
                           },
                         ),
                       ))
@@ -89,6 +93,32 @@ class _UpdateChannelTile extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Future<void> _showConfirmDevDialog(BuildContext context) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: const Text('''
+Development builds are untested and may (probably will) BREAK ALL THE THINGS and/or LOSE ALL YOUR DATA.
+
+Please do not choose Dev unless you can accept these risks.'''),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('CANCEL'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final navigator = Navigator.of(context);
+              await settingsCubit.setUpdateChannel(UpdateChannel.dev);
+              navigator.pop();
+            },
+            child: const Text('My middle name is "risk".'),
+          ),
+        ],
       ),
     );
   }
