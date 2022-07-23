@@ -50,10 +50,9 @@ class TaskDetailsView extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            CircleButton(
-                              margin: const EdgeInsets.all(0),
+                            IconButton(
+                              icon: const Icon(Icons.close),
                               onPressed: () => tasksCubit.setActiveTask(null),
-                              child: const Icon(Icons.close),
                             ),
                             Text(task.title),
                             PopupMenuButton(
