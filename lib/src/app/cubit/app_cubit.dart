@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:self_updater/self_updater.dart';
 
@@ -13,6 +15,8 @@ part 'app_state.dart';
 late final AppCubit appCubit;
 
 class AppCubit extends Cubit<AppState> {
+  final _log = Logger('AppCubit');
+
   AppCubit()
       : super(const AppState(
           appVersion: '',
@@ -56,8 +60,17 @@ class AppCubit extends Cubit<AppState> {
   }
 
   Future<void> startUpdate() async {
+    if (kDebugMode) return;
+
+    assert(_updater != null);
     emit(state.copyWith(updateInProgress: true));
-    await Future.delayed(const Duration(seconds: 5));
+    _log.info('Beginning app update');
+    final String? updateArchivePath = await _updater!.downloadUpdate();
+    if (updateArchivePath == null) {
+      _log.severe('Downloading update was NOT successful.');
+      return;
+    }
+    await _updater!.installUpdate(archivePath: updateArchivePath);
     emit(state.copyWith(updateInProgress: false));
   }
 
