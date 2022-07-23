@@ -77,9 +77,19 @@ class _TaskTileState extends State<TaskTile> {
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 leadingWidget,
-                Flexible(child: Text(task.title, style: titleTextStyle)),
+                Flexible(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // SizedBox ensures text aligns with top of checkbox.
+                      const SizedBox(height: 4.5),
+                      Flexible(child: Text(task.title, style: titleTextStyle)),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
