@@ -87,7 +87,7 @@ class VersionButton extends StatelessWidget {
         String? version;
         if (dateTime != null) {
           // If appVersion is a DateTime we convert to a more readable format.
-          version = DateFormat('yyyy-mm-dd H:m').format(dateTime).toString();
+          version = DateFormat('yyyy-MM-dd H:m').format(dateTime).toString();
         }
         version ??= state.appVersion;
 
