@@ -27,7 +27,9 @@ dependencies:
   googleapis: ^9.1.0
   googleapis_auth: ^1.3.1
   helpers:
-    git: https://github.com/Merrit/helpers.git
+    git:
+      url: https://github.com/Merrit/helpers.git
+      ref: d902a7690f905bc1731a77d167a0d461c34c5f12
   hive_flutter: ^1.1.0
   home_widget: ^0.1.6
   http: ^0.13.4
@@ -36,6 +38,10 @@ dependencies:
   move_to_background: ^1.0.2
   package_info_plus: ^1.4.2
   path_provider: ^2.0.11
+  self_updater:
+    git:
+      url: https://github.com/Merrit/self_updater.git
+      ref: 09c79c5310ed92e3fc4108f644a94811af088442
   url_launcher: ^6.1.4
   window_manager: ^0.2.5
   workmanager: ^0.5.0
@@ -45,7 +51,7 @@ dev_dependencies:
   flutter_app_builder:
     git:
       url: https://github.com/Merrit/flutter_app_builder.git
-      ref: 4445c5b4ecdb15d37191968999489b2fcbd84e41
+      ref: 0cd006b9ab78c89ac5f282df449c6e94d1dd836e
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0

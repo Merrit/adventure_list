@@ -16,6 +16,8 @@ concurrency:
 jobs:
   call-build-linux:
     uses: ./.github/workflows/build-linux.yml
+    with:
+      pre-release: true
     secrets: inherit
   call-build-android:
     uses: ./.github/workflows/build-android.yml

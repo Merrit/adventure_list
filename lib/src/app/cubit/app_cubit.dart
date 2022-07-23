@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -27,18 +29,29 @@ class AppCubit extends Cubit<AppState> {
   Future<void> initialize() async {
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
+    final File buildFile = File('BUILD');
+
+    String currentVersion;
+    if (await buildFile.exists()) {
+      // Currently build file should only exist for Dev builds, which use the
+      // time of build as their "version" for updates comparison sake.
+      currentVersion = await buildFile.readAsString();
+    } else {
+      currentVersion = packageInfo.version;
+    }
+
     final updater = await Updater.initialize(
-      currentVersion: packageInfo.version,
-      releaseChannel: settingsCubit.state.updateChannel,
+      currentVersion: currentVersion,
+      updateChannel: settingsCubit.state.updateChannel,
       repoUrl: kRepoUrl,
     );
 
     _updater = updater;
 
     emit(state.copyWith(
-      appVersion: packageInfo.version,
-      updateAvailable: updater.updateAvailable(),
-      updateVersion: updater.updateVersion(),
+      appVersion: currentVersion,
+      updateAvailable: updater.updateAvailable,
+      updateVersion: updater.updateVersion,
     ));
   }
 
@@ -48,18 +61,18 @@ class AppCubit extends Cubit<AppState> {
     emit(state.copyWith(updateInProgress: false));
   }
 
-  Future<void> updateReleaseChannel(ReleaseChannel releaseChannel) async {
+  Future<void> setUpdateChannel(UpdateChannel updateChannel) async {
     final updater = await Updater.initialize(
       currentVersion: state.appVersion,
-      releaseChannel: releaseChannel,
+      updateChannel: updateChannel,
       repoUrl: kRepoUrl,
     );
 
     _updater = updater;
 
     emit(state.copyWith(
-      updateAvailable: updater.updateAvailable(),
-      updateVersion: updater.updateVersion(),
+      updateAvailable: updater.updateAvailable,
+      updateVersion: updater.updateVersion,
     ));
   }
 }

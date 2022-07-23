@@ -85,6 +85,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.2"
+  dio:
+    dependency: transitive
+    description:
+      name: dio
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.6"
   equatable:
     dependency: "direct main"
     description:
@@ -178,8 +185,8 @@ packages:
     dependency: "direct dev"
     description:
       path: "."
-      ref: "4445c5b4ecdb15d37191968999489b2fcbd84e41"
-      resolved-ref: "4445c5b4ecdb15d37191968999489b2fcbd84e41"
+      ref: "0cd006b9ab78c89ac5f282df449c6e94d1dd836e"
+      resolved-ref: "0cd006b9ab78c89ac5f282df449c6e94d1dd836e"
       url: "https://github.com/Merrit/flutter_app_builder.git"
     source: git
     version: "1.0.0"
@@ -240,6 +247,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "9.2.0"
+  github:
+    dependency: transitive
+    description:
+      name: github
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "9.4.0"
   google_fonts:
     dependency: "direct main"
     description:
@@ -300,8 +314,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: HEAD
-      resolved-ref: "811a5a519c29829a31e5553586e7425147e87ac1"
+      ref: d902a7690f905bc1731a77d167a0d461c34c5f12
+      resolved-ref: d902a7690f905bc1731a77d167a0d461c34c5f12
       url: "https://github.com/Merrit/helpers.git"
     source: git
     version: "0.0.1"
@@ -361,6 +375,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.4"
+  json_annotation:
+    dependency: transitive
+    description:
+      name: json_annotation
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.6.0"
   lints:
     dependency: transitive
     description:
@@ -564,6 +585,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.2"
+  self_updater:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: "09c79c5310ed92e3fc4108f644a94811af088442"
+      resolved-ref: "09c79c5310ed92e3fc4108f644a94811af088442"
+      url: "https://github.com/Merrit/self_updater.git"
+    source: git
+    version: "0.0.1"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -681,6 +711,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
+  version:
+    dependency: transitive
+    description:
+      name: version
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.2"
   win32:
     dependency: transitive
     description:
@@ -724,5 +761,5 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.17.3 <3.0.0"
+  dart: ">=2.17.6 <3.0.0"
   flutter: ">=3.0.0"

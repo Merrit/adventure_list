@@ -4,7 +4,7 @@ class SettingsState extends Equatable {
   /// The id of the list to show in the Android home widget / AppWidget.
   final String homeWidgetSelectedListId;
 
-  final ReleaseChannel updateChannel;
+  final UpdateChannel updateChannel;
 
   const SettingsState({
     required this.homeWidgetSelectedListId,
@@ -16,7 +16,7 @@ class SettingsState extends Equatable {
 
   SettingsState copyWith({
     String? homeWidgetSelectedListId,
-    ReleaseChannel? updateChannel,
+    UpdateChannel? updateChannel,
   }) {
     return SettingsState(
       homeWidgetSelectedListId:

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helpers/helpers.dart';
 import 'package:self_updater/self_updater.dart';
 
 import '../../authentication/cubit/authentication_cubit.dart';
@@ -72,15 +73,15 @@ class _UpdateChannelTile extends StatelessWidget {
         builder: (context, state) {
           return Column(
             children: [
-              ...ReleaseChannel.values
-                  .map((ReleaseChannel channel) => SizedBox(
+              ...UpdateChannel.values
+                  .map((UpdateChannel channel) => SizedBox(
                         width: 150,
                         child: RadioListTile(
-                          title: Text(channel.name),
+                          title: Text(channel.name.capitalized()),
                           value: channel,
                           groupValue: state.updateChannel,
-                          onChanged: (ReleaseChannel? value) {
-                            settingsCubit.updateUpdateChannel(value);
+                          onChanged: (UpdateChannel? value) {
+                            settingsCubit.setUpdateChannel(value);
                           },
                         ),
                       ))

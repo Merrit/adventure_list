@@ -25,11 +25,11 @@ class SettingsCubit extends Cubit<SettingsState> {
     String? updateChannelString = await storageService.getValue(
       'updateChannel',
     );
-    ReleaseChannel updateChannel;
+    UpdateChannel updateChannel;
     if (updateChannelString == null) {
-      updateChannel = ReleaseChannel.stable;
+      updateChannel = UpdateChannel.stable;
     } else {
-      updateChannel = ReleaseChannel.values.byName(updateChannelString);
+      updateChannel = UpdateChannel.values.byName(updateChannelString);
     }
 
     return SettingsCubit(
@@ -46,11 +46,11 @@ class SettingsCubit extends Cubit<SettingsState> {
     await _storageService.saveValue(key: 'homeWidgetSelectedListId', value: id);
   }
 
-  Future<void> updateUpdateChannel(ReleaseChannel? channel) async {
+  Future<void> setUpdateChannel(UpdateChannel? channel) async {
     if (channel == null) return;
 
     emit(state.copyWith(updateChannel: channel));
     await _storageService.saveValue(key: 'updateChannel', value: channel.name);
-    appCubit.updateReleaseChannel(channel);
+    appCubit.setUpdateChannel(channel);
   }
 }
