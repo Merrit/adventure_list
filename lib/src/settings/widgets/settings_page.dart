@@ -31,6 +31,7 @@ class SettingsDialog extends StatelessWidget {
       // TODO: This padding.. should maybe be calculated?
       // Eg layoutbldr: maxWidth / 2    ?
       insetPadding: EdgeInsets.symmetric(horizontal: 300, vertical: 24),
+      title: Text('Settings'),
       content: SettingsView(),
     );
   }
