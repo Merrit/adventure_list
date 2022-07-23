@@ -54,48 +54,58 @@ class _TasksHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TasksCubit, TasksState>(
-      builder: (context, state) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.settings),
-                  onPressed: () => Navigator.pushNamed(
-                    context,
-                    TaskListSettingsPage.routeName,
-                  ),
-                ),
-                PopupMenuButton(
-                  itemBuilder: (context) {
-                    return [
-                      PopupMenuItem(
-                        child: TextButton(
-                          onPressed: () => tasksCubit.clearCompletedTasks(),
-                          child: const Text('Clear completed'),
-                        ),
-                      ),
-                    ];
-                  },
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 60, bottom: 10),
-              child: Text(
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: 20,
+        left: 50,
+      ),
+      child: BlocBuilder<TasksCubit, TasksState>(
+        builder: (context, state) {
+          return Row(
+            children: [
+              Text(
                 state.activeList!.title,
                 style: const TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-          ],
-        );
-      },
+              Flexible(
+                child: Opacity(
+                  opacity: 0.5,
+                  child: Transform.scale(
+                    scale: 0.9,
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.settings),
+                          onPressed: () => Navigator.pushNamed(
+                            context,
+                            TaskListSettingsPage.routeName,
+                          ),
+                        ),
+                        PopupMenuButton(
+                          itemBuilder: (context) {
+                            return [
+                              PopupMenuItem(
+                                child: TextButton(
+                                  onPressed: () =>
+                                      tasksCubit.clearCompletedTasks(),
+                                  child: const Text('Clear completed'),
+                                ),
+                              ),
+                            ];
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }
