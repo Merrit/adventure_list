@@ -18,7 +18,7 @@ import 'src/window/app_window.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final appWindow = await AppWindow.initialize();
+  await AppWindow.initialize();
 
   if (Platform.isAndroid) {
     Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
@@ -35,7 +35,7 @@ void main() async {
     storageService: storageService,
   );
 
-  final _settingsCubit = await SettingsCubit.initialize(storageService);
+  final settingsCubitInstance = await SettingsCubit.initialize(storageService);
 
   runApp(
     MultiRepositoryProvider(
@@ -50,7 +50,7 @@ void main() async {
             lazy: false,
           ),
           BlocProvider(create: (context) => authenticationCubit),
-          BlocProvider.value(value: _settingsCubit),
+          BlocProvider.value(value: settingsCubitInstance),
         ],
         child: const App(),
       ),
