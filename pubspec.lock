@@ -589,8 +589,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "0594bce9a0aafce7315b3dad2c84061b5b4280fe"
-      resolved-ref: "0594bce9a0aafce7315b3dad2c84061b5b4280fe"
+      ref: "3bbdd170dc4d310262a96e7035b47267c8906270"
+      resolved-ref: "3bbdd170dc4d310262a96e7035b47267c8906270"
       url: "https://github.com/Merrit/self_updater.git"
     source: git
     version: "0.0.1"
