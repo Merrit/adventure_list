@@ -126,9 +126,12 @@ class _TaskTileState extends State<TaskTile> {
           );
         } else {
           if (task.description != null) {
-            subtitle = Padding(
-              padding: const EdgeInsets.only(left: 37),
-              child: Text(task.description!),
+            subtitle = Opacity(
+              opacity: 0.7,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 37),
+                child: Text(task.description!),
+              ),
             );
           }
         }
