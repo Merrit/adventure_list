@@ -89,8 +89,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: b63ab8224f22ffa3669301c69df36905b96035ef
-      resolved-ref: b63ab8224f22ffa3669301c69df36905b96035ef
+      ref: HEAD
+      resolved-ref: c199f3e50d43bf4d3e3278ea5135597cd543e3c3
       url: "https://github.com/Merrit/desktop_integration.git"
     source: git
     version: "0.0.1"

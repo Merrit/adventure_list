@@ -14,7 +14,6 @@ dependencies:
   desktop_integration:
     git:
       url: https://github.com/Merrit/desktop_integration.git
-      ref: b63ab8224f22ffa3669301c69df36905b96035ef
   equatable: ^2.0.3
   extension_google_sign_in_as_googleapis_auth: ^2.0.5
   firebase_auth: ^3.3.20
