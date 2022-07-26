@@ -34,13 +34,16 @@ class AppCubit extends Cubit<AppState> {
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
     final File buildFile = File('BUILD');
+    final bool buildFileExists = await buildFile.exists();
 
     String currentVersion;
-    if (await buildFile.exists()) {
+    if (buildFileExists) {
       // Currently build file should only exist for Dev builds, which use the
       // time of build as their "version" for updates comparison sake.
+      _log.info('Found BUILD file, getting version from file.');
       currentVersion = await buildFile.readAsString();
     } else {
+      _log.info('No BUILD file found, getting version from PackageInfo.');
       currentVersion = packageInfo.version;
     }
 
