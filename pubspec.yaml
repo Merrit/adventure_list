@@ -11,6 +11,10 @@ environment:
 
 dependencies:
   collection: ^1.16.0
+  desktop_integration:
+    git:
+      url: https://github.com/Merrit/desktop_integration.git
+      ref: b63ab8224f22ffa3669301c69df36905b96035ef
   equatable: ^2.0.3
   extension_google_sign_in_as_googleapis_auth: ^2.0.5
   firebase_auth: ^3.3.20
@@ -29,7 +33,7 @@ dependencies:
   helpers:
     git:
       url: https://github.com/Merrit/helpers.git
-      ref: d902a7690f905bc1731a77d167a0d461c34c5f12
+      ref: be1fcc87c81f4ebeccbaf7a1e35b2a7e15332a93
   hive_flutter: ^1.1.0
   home_widget: ^0.1.6
   http: ^0.13.4
@@ -65,8 +69,8 @@ flutter:
   generate: true
 
   assets:
-    # Add assets from the images directory to the application.
-    - assets/images/
+    - assets/icons/codes.merritt.adventurelist.svg
+    - packaging/linux/codes.merritt.adventurelist.desktop
 
 flutter_icons:
   android: true

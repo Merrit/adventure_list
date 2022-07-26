@@ -85,6 +85,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.2"
+  desktop_integration:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: b63ab8224f22ffa3669301c69df36905b96035ef
+      resolved-ref: b63ab8224f22ffa3669301c69df36905b96035ef
+      url: "https://github.com/Merrit/desktop_integration.git"
+    source: git
+    version: "0.0.1"
   dio:
     dependency: transitive
     description:
@@ -119,7 +128,7 @@ packages:
       name: ffi
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.1"
+    version: "2.0.1"
   file:
     dependency: transitive
     description:
@@ -314,8 +323,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: d902a7690f905bc1731a77d167a0d461c34c5f12
-      resolved-ref: d902a7690f905bc1731a77d167a0d461c34c5f12
+      ref: be1fcc87c81f4ebeccbaf7a1e35b2a7e15332a93
+      resolved-ref: be1fcc87c81f4ebeccbaf7a1e35b2a7e15332a93
       url: "https://github.com/Merrit/helpers.git"
     source: git
     version: "0.0.1"
@@ -437,7 +446,7 @@ packages:
       name: package_info_plus
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.4.2"
+    version: "1.4.3"
   package_info_plus_linux:
     dependency: transitive
     description:
@@ -472,7 +481,7 @@ packages:
       name: package_info_plus_windows
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.5"
+    version: "2.0.0"
   path:
     dependency: transitive
     description:
@@ -528,7 +537,7 @@ packages:
       name: path_provider_windows
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.7"
+    version: "2.1.0"
   petitparser:
     dependency: transitive
     description:
@@ -724,7 +733,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.6.1"
+    version: "2.7.0"
   window_manager:
     dependency: "direct main"
     description:

@@ -1,15 +1,18 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:desktop_integration/desktop_integration.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helpers/helpers.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'src/app.dart';
 import 'src/app/cubit/app_cubit.dart';
 import 'src/authentication/authentication.dart';
+import 'src/constants.dart';
 import 'src/home_widget/home_widget.dart';
 import 'src/logs/logs.dart';
 import 'src/settings/cubit/settings_cubit.dart';
@@ -56,6 +59,30 @@ void main() async {
       ),
     ),
   );
+
+  integrateWithDesktop();
+}
+
+/// Add the app to the user's applications menu with icon.
+Future<void> integrateWithDesktop() async {
+  if (!Platform.isLinux && !Platform.isWindows) return;
+  if (kDebugMode) return;
+
+  final desktopFile = await assetToTempDir(
+    'packaging/linux/codes.merritt.adventurelist.desktop',
+  );
+
+  final iconFile = await assetToTempDir(
+    'assets/icons/codes.merritt.adventurelist.svg',
+  );
+
+  final desktopIntegration = DesktopIntegration(
+    desktopFilePath: desktopFile.path,
+    iconPath: iconFile.path,
+    packageName: kpackageId,
+  );
+
+  await desktopIntegration.addToApplicationsMenu();
 }
 
 /// Used for Background Updates using Workmanager Plugin
