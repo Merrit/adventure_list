@@ -81,7 +81,6 @@ flutter_app_builder:
   app_display_name: "Adventure List"
   author: "Merritt Codes"
   identifier: codes.merritt.adventurelist
-  msix_identity_name:
-  msix_publisher:
+  msix_identity_name: codes.merritt.adventurelist
   msix_icon_path: assets\icons\codes.merritt.adventurelist.png
   msix_capabilities: internetClient
