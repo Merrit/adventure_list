@@ -39,6 +39,7 @@ dependencies:
   intl: ^0.17.0
   logging: ^1.0.2
   move_to_background: ^1.0.2
+  msix: ^3.6.2
   package_info_plus: ^1.4.2
   path_provider: ^2.0.11
   self_updater:
@@ -82,5 +83,5 @@ flutter_app_builder:
   identifier: codes.merritt.adventurelist
   msix_identity_name:
   msix_publisher:
-  msix_icon_path:
+  msix_icon_path: assets\icons\codes.merritt.adventurelist.png
   msix_capabilities: internetClient
