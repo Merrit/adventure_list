@@ -19,13 +19,18 @@ jobs:
     with:
       pre-release: true
     secrets: inherit
+  call-build-windows:
+    uses: ./.github/workflows/build-windows.yml
+    with:
+      pre-release: true
+    secrets: inherit
   call-build-android:
     uses: ./.github/workflows/build-android.yml
     secrets: inherit
 
   pre-release:
     name: "Pre Release"
-    needs: [call-build-linux, call-build-android]
+    needs: [call-build-linux, call-build-windows, call-build-android]
     runs-on: "ubuntu-latest"
 
     steps:
@@ -44,5 +49,6 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            ${{ github.workspace }}/artifacts/android-artifacts/*
             ${{ github.workspace }}/artifacts/linux-artifacts/*
+            ${{ github.workspace }}/artifacts/windows-artifacts/*
+            ${{ github.workspace }}/artifacts/android-artifacts/*
