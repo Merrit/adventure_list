@@ -13,9 +13,6 @@ import 'package:logging/logging.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 abstract class GoogleAuthIds {
-  static const String androidClientDebugId =
-      '478765689275-7f93tv87va9u6r0hqcdm8br9sfk624r4.apps.googleusercontent.com';
-
   static const String linuxClientIdString =
       '478765689275-iobtsda2bcjl8ol9v51k4pi75abud639.apps.googleusercontent.com';
   static const String linuxClientSecret = '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';
@@ -23,6 +20,18 @@ abstract class GoogleAuthIds {
     linuxClientIdString,
     linuxClientSecret,
   );
+
+  static const String windowsClientIdString =
+      '478765689275-vlsnua919pmsrh27gtgut52grv798goi.apps.googleusercontent.com';
+  static const String windowsClientSecret =
+      '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';
+  static final ClientId windowsClientId = ClientId(
+    windowsClientIdString,
+    windowsClientSecret,
+  );
+
+  static const String androidClientDebugId =
+      '478765689275-7f93tv87va9u6r0hqcdm8br9sfk624r4.apps.googleusercontent.com';
 
   static const String webClientId =
       '478765689275-553m3rlsl1j7lgb9dpqsqtajldr05b7d.apps.googleusercontent.com';
@@ -35,13 +44,12 @@ abstract class GoogleAuthIds {
     }
 
     switch (Platform.operatingSystem) {
-      case 'android':
-        // return ClientId(linuxClientIdString, linuxClientSecret);
-        // return ClientId(webClientId, webClientSecret);
-        return kDebugMode ? ClientId(androidClientDebugId) : ClientId('');
       case 'linux':
         return linuxClientId;
-      // return ClientId(linuxClientIdString, linuxClientSecret);
+      case 'windows':
+        return windowsClientId;
+      case 'android':
+        return kDebugMode ? ClientId(androidClientDebugId) : ClientId('');
       default:
         return ClientId('', '');
     }
