@@ -4,7 +4,7 @@ description: A new Flutter project.
 # Prevent accidental publishing to pub.dev.
 publish_to: "none"
 
-version: 0.1.0+3
+version: 0.1.0+4
 
 environment:
   sdk: ">=2.17.3 <3.0.0"
@@ -39,7 +39,6 @@ dependencies:
   intl: ^0.17.0
   logging: ^1.0.2
   move_to_background: ^1.0.2
-  msix: ^3.6.2
   package_info_plus: ^1.4.2
   path_provider: ^2.0.11
   self_updater:
@@ -52,6 +51,7 @@ dependencies:
   # window_to_front: ^0.0.3
 
 dev_dependencies:
+  change_app_package_name: ^1.1.0
   flutter_app_builder:
     git:
       url: https://github.com/Merrit/flutter_app_builder.git
@@ -59,8 +59,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
-  change_app_package_name: ^1.1.0
   flutter_launcher_icons: ^0.9.3
+  msix: ^3.6.2
 
 flutter:
   uses-material-design: true

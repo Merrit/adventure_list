@@ -462,7 +462,7 @@ packages:
     source: hosted
     version: "1.0.2"
   msix:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: msix
       url: "https://pub.dartlang.org"
