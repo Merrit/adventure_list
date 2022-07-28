@@ -31,7 +31,7 @@ abstract class GoogleAuthIds {
   );
 
   static const String androidClientDebugId =
-      '478765689275-7f93tv87va9u6r0hqcdm8br9sfk624r4.apps.googleusercontent.com';
+      '478765689275-2qneu0pfdhm2m4ej0lqdv69rm96shsg4.apps.googleusercontent.com';
 
   static const String webClientId =
       '478765689275-553m3rlsl1j7lgb9dpqsqtajldr05b7d.apps.googleusercontent.com';
