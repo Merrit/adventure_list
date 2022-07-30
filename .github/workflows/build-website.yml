@@ -38,3 +38,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ${{ github.workspace }}/website/build/web
+          cname: adventurelist.merritt.codes
