@@ -12,10 +12,13 @@ import 'authentication/login_page.dart';
 import 'home_widget/widgets/home_screen_widget.dart';
 import 'home_widget/widgets/home_widget_config_page.dart';
 import 'settings/widgets/settings_page.dart';
+import 'shortcuts/app_shortcuts.dart';
 import 'storage/storage_service.dart';
 import 'tasks/tasks.dart';
 
 TasksCubit? _tasksCubit;
+
+Future<TasksRepository>? _tasksRepository;
 
 class App extends StatelessWidget {
   const App({
@@ -24,118 +27,110 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthenticationCubit, AuthenticationState>(
-      builder: (context, state) {
-        final bool signedIn = state.signedIn;
+    return AppShortcuts(
+      child: BlocBuilder<AuthenticationCubit, AuthenticationState>(
+        builder: (context, state) {
+          final bool signedIn = state.signedIn;
 
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          restorationScopeId: 'app',
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en', ''),
-          ],
-          onGenerateTitle: (BuildContext context) =>
-              AppLocalizations.of(context)!.appTitle,
-          theme: FlexThemeData.light(
-            scheme: FlexScheme.blue,
-            surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
-            blendLevel: 20,
-            appBarOpacity: 0.95,
-            subThemesData: const FlexSubThemesData(
-              blendOnLevel: 20,
-              blendOnColors: false,
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            restorationScopeId: 'app',
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en', ''),
+            ],
+            onGenerateTitle: (BuildContext context) =>
+                AppLocalizations.of(context)!.appTitle,
+            theme: FlexThemeData.light(
+              scheme: FlexScheme.blue,
+              surfaceMode: FlexSurfaceMode.highScaffoldLowSurface,
+              blendLevel: 20,
+              appBarOpacity: 0.95,
+              subThemesData: const FlexSubThemesData(
+                blendOnLevel: 20,
+                blendOnColors: false,
+              ),
+              visualDensity: FlexColorScheme.comfortablePlatformDensity,
+              // useMaterial3: true,
+              fontFamily: GoogleFonts.notoSans().fontFamily,
             ),
-            visualDensity: FlexColorScheme.comfortablePlatformDensity,
-            // useMaterial3: true,
-            fontFamily: GoogleFonts.notoSans().fontFamily,
-          ),
-          darkTheme: FlexThemeData.dark(
-            scheme: FlexScheme.blue,
-            surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
-            blendLevel: 40,
-            appBarStyle: FlexAppBarStyle.background,
-            appBarOpacity: 0.90,
-            subThemesData: const FlexSubThemesData(
-              blendOnLevel: 30,
+            darkTheme: FlexThemeData.dark(
+              scheme: FlexScheme.blue,
+              surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
+              blendLevel: 40,
+              appBarStyle: FlexAppBarStyle.background,
+              appBarOpacity: 0.90,
+              subThemesData: const FlexSubThemesData(
+                blendOnLevel: 30,
+              ),
+              visualDensity: FlexColorScheme.comfortablePlatformDensity,
+              // useMaterial3: true,
+              fontFamily: GoogleFonts.notoSans().fontFamily,
             ),
-            visualDensity: FlexColorScheme.comfortablePlatformDensity,
-            // useMaterial3: true,
-            fontFamily: GoogleFonts.notoSans().fontFamily,
-          ),
-          themeMode: ThemeMode.system,
-          onGenerateRoute: (RouteSettings routeSettings) {
-            return MaterialPageRoute<void>(
-              settings: routeSettings,
-              builder: (BuildContext context) {
-                if (!signedIn) return const LoginPage();
+            themeMode: ThemeMode.system,
+            onGenerateRoute: (RouteSettings routeSettings) {
+              return MaterialPageRoute<void>(
+                settings: routeSettings,
+                builder: (BuildContext context) {
+                  if (!signedIn) return const LoginPage();
 
-                switch (routeSettings.name) {
-                  case HomeWidgetConfigPage.routeName:
-                    return const RouteWrapper(child: HomeWidgetConfigPage());
-                  case LoginPage.routeName:
-                    return const LoginPage();
-                  case TaskDetails.routeName:
-                    return const RouteWrapper(child: TaskDetails());
-                  case TaskListSettingsPage.routeName:
-                    return const RouteWrapper(child: TaskListSettingsPage());
-                  case SettingsPage.routeName:
-                    return const RouteWrapper(child: SettingsPage());
-                  default:
-                    // Only create cubit once.
-                    if (_tasksCubit != null) {
-                      return const RouteWrapper(child: TasksPage());
-                    }
+                  Widget child;
 
-                    // Cubit not created yet, create now.
-                    final tasksRepository = TasksRepository.initialize(
-                      clientId: GoogleAuthIds.clientId,
-                      credentials: state.accessCredentials!,
-                    );
+                  switch (routeSettings.name) {
+                    case HomeWidgetConfigPage.routeName:
+                      child = const HomeWidgetConfigPage();
+                      break;
+                    case LoginPage.routeName:
+                      child = const LoginPage();
+                      break;
+                    case TaskDetails.routeName:
+                      child = const TaskDetails();
+                      break;
+                    case TaskListSettingsPage.routeName:
+                      child = const TaskListSettingsPage();
+                      break;
+                    case SettingsPage.routeName:
+                      child = const SettingsPage();
+                      break;
+                    default:
+                      _tasksRepository ??= TasksRepository.initialize(
+                        clientId: GoogleAuthIds.clientId,
+                        credentials: state.accessCredentials!,
+                      );
+                      child = const TasksPage();
+                  }
 
-                    return FutureBuilder(
-                      future: tasksRepository,
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) return const SizedBox();
+                  return FutureBuilder(
+                    future: _tasksRepository,
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) return const SizedBox();
 
-                        _tasksCubit = TasksCubit(
-                          context.read<StorageService>(),
-                          snapshot.data as TasksRepository,
-                        );
+                      _tasksCubit ??= TasksCubit(
+                        context.read<StorageService>(),
+                        snapshot.data as TasksRepository,
+                      );
 
-                        return const RouteWrapper(child: TasksPage());
-                      },
-                    );
-                }
-              },
-            );
-          },
-        );
-      },
-    );
-  }
-}
+                      child = const TasksPage();
 
-/// Wrap all routes in a BlocProvider to the TasksCubit & the Android AppWidget
-/// manager; this way it doesn't have to be done for every route.
-class RouteWrapper extends StatelessWidget {
-  final Widget child;
-
-  const RouteWrapper({
-    Key? key,
-    required this.child,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _tasksCubit!,
-      child: Platform.isAndroid ? HomeScreenWidget(child: child) : child,
+                      return BlocProvider.value(
+                        value: _tasksCubit!,
+                        child: Platform.isAndroid
+                            ? HomeScreenWidget(child: child)
+                            : child,
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
