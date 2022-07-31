@@ -5,6 +5,7 @@ import '../../settings/settings.dart';
 import '../../tasks/tasks.dart';
 import 'home_widget_config_page.dart';
 
+/// Manages the state for the Android home screen widget / AppWidget.
 class HomeScreenWidget extends StatefulWidget {
   final Widget child;
 
