@@ -11,32 +11,32 @@ class TaskList extends Equatable {
   /// Identifier of the calendar.
   final String id;
 
-  final List<Task> items;
+  final int index;
 
-  final TaskListDetails details;
+  final List<Task> items;
 
   final String title;
 
   const TaskList({
     required this.id,
+    required this.index,
     required this.items,
-    required this.details,
     required this.title,
   });
 
   @override
-  List<Object> get props => [id, items, details, title];
+  List<Object> get props => [id, index, items, title];
 
   TaskList copyWith({
     String? id,
+    int? index,
     List<Task>? items,
-    TaskListDetails? details,
     String? title,
   }) {
     return TaskList(
       id: id ?? this.id,
+      index: index ?? this.index,
       items: items ?? this.items,
-      details: details ?? this.details,
       title: title ?? this.title,
     );
   }
@@ -44,8 +44,8 @@ class TaskList extends Equatable {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'index': index,
       'items': items.map((x) => x.toMap()).toList(),
-      'details': details.toMap(),
       'title': title,
     };
   }
@@ -53,8 +53,8 @@ class TaskList extends Equatable {
   factory TaskList.fromMap(Map<String, dynamic> map) {
     return TaskList(
       id: map['id'] ?? '',
-      items: List<Task>.from(map['items']?.map((x) => Task.fromMap(x))),
-      details: TaskListDetails.fromMap(map['details']),
+      index: map['index'] ?? -1,
+      items: map['items']?.map((x) => Task.fromMap(x)) ?? [],
       title: map['title'] ?? '',
     );
   }
@@ -63,40 +63,4 @@ class TaskList extends Equatable {
 
   factory TaskList.fromJson(String source) =>
       TaskList.fromMap(json.decode(source));
-}
-
-class TaskListDetails extends Equatable {
-  final int index;
-
-  const TaskListDetails({
-    this.index = -1,
-  });
-
-  @override
-  List<Object> get props => [index];
-
-  TaskListDetails copyWith({
-    int? index,
-  }) {
-    return TaskListDetails(
-      index: index ?? this.index,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'index': index,
-    };
-  }
-
-  factory TaskListDetails.fromMap(Map<String, dynamic> map) {
-    return TaskListDetails(
-      index: map['index']?.toInt() ?? 0,
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory TaskListDetails.fromJson(String source) =>
-      TaskListDetails.fromMap(json.decode(source));
 }

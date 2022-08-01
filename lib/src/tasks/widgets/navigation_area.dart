@@ -198,9 +198,14 @@ class _ScrollingListTiles extends StatelessWidget {
     return Expanded(
       child: BlocBuilder<TasksCubit, TasksState>(
         builder: (context, state) {
-          return ListView(
+          return ReorderableListView(
+            onReorder: (oldIndex, newIndex) => tasksCubit.reorderLists(
+              oldIndex,
+              newIndex,
+            ),
             children: state.taskLists
                 .map((e) => ListTile(
+                      key: ValueKey(e.id),
                       title: Text(e.title),
                       selected: (state.activeList == e),
                       onTap: () {

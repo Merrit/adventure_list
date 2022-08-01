@@ -1,9 +1,10 @@
+import 'dart:convert';
+
 import 'package:googleapis/calendar/v3.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
 
 import '../authentication/authentication.dart';
-import 'models/models.dart' as models;
 import 'tasks.dart';
 
 /// *[Event](https://developers.google.com/calendar/v3/reference/events)* An
@@ -63,7 +64,7 @@ class GoogleCalendar implements TasksRepository {
   }
 
   @override
-  Future<List<models.TaskList>> getAll() async {
+  Future<List<TaskList>> getAll() async {
     final calendarListRepository = _api.calendarList;
 
     final apiCalendarsList = await calendarListRepository.list(
@@ -82,7 +83,7 @@ class GoogleCalendar implements TasksRepository {
       }
     }
 
-    final taskLists = <models.TaskList>[];
+    final taskLists = <TaskList>[];
     for (var calendarListEntry in apiCalendarsList.items!) {
       final calendar = await _api.calendars.get(calendarListEntry.id!);
       taskLists.add(await calendar.toModel(_api));
@@ -107,7 +108,7 @@ class GoogleCalendar implements TasksRepository {
   // }
 
   @override
-  Future<models.TaskList> createList({required String title}) async {
+  Future<TaskList> createList({required String title}) async {
     final newCalendar = await _api.calendars.insert(Calendar(
       description: '{}',
       location: 'adventure_list',
@@ -133,7 +134,7 @@ class GoogleCalendar implements TasksRepository {
   }
 
   @override
-  Future<models.Task> createTask({
+  Future<Task> createTask({
     required String calendarId,
     required Task newTask,
   }) async {
@@ -170,33 +171,45 @@ class GoogleCalendar implements TasksRepository {
 }
 
 extension CalendarHelper on Calendar {
-  Future<models.TaskList> toModel(CalendarApi api) async {
+  Future<TaskList> toModel(CalendarApi api) async {
     final apiTasks = await api.events.list(
       id!,
       showDeleted: true,
     );
 
-    return models.TaskList(
-      details: models.TaskListDetails.fromJson('{}'),
+    final List<Task> items = apiTasks.items!.map((e) => e.toModel()).toList();
+
+    int index = -1;
+
+    if (description != null) {
+      index = jsonDecode(description!)['index'] ?? -1;
+    }
+
+    return TaskList(
       id: id!,
-      items: apiTasks.items!.map((e) => e.toModel()).toList(),
+      index: index,
+      items: items,
       title: summary ?? 'title',
     );
   }
 }
 
 extension EventHelper on Event {
-  models.Task toModel() {
-    return models.Task.fromJson(description!) //
+  Task toModel() {
+    return Task.fromJson(description!) //
         // The inital task didn't have id, so grab from Event.
         .copyWith(id: id);
   }
 }
 
-extension TaskListHelper on models.TaskList {
+extension TaskListHelper on TaskList {
   Calendar toGoogleCalendar() {
+    final map = toMap()..remove('items');
+
     return Calendar(
-      description: details.toJson(),
+      // The description field appears to have a length limit, so we definitely
+      // do not want to include the tasks, just basic info.
+      description: jsonEncode(map),
       id: id,
       location: 'adventure_list',
       summary: title,
@@ -204,7 +217,7 @@ extension TaskListHelper on models.TaskList {
   }
 }
 
-extension TaskHelper on models.Task {
+extension TaskHelper on Task {
   Event toGoogleEvent() {
     return Event(
       description: toJson(),

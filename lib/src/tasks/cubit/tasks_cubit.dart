@@ -42,8 +42,13 @@ class TasksCubit extends Cubit<TasksState> {
     emit(state.copyWith(
       activeList: taskLists.singleWhereOrNull((e) => e.id == activeListId),
       loading: false,
-      taskLists: taskLists,
+      taskLists: _listsInOrder(taskLists),
     ));
+  }
+
+  List<TaskList> _listsInOrder(List<TaskList> lists) {
+    lists.sort((a, b) => a.index.compareTo(b.index));
+    return lists;
   }
 
   Future<void> createList(String title) async {
@@ -65,9 +70,26 @@ class TasksCubit extends Cubit<TasksState> {
       /// `copyWith` has a check, so setting `id` to `''` will remove
       /// the active list.
       activeList: activeList.copyWith(id: ''),
-      taskLists: updatedLists,
+      taskLists: _listsInOrder(updatedLists),
     ));
     await _tasksRepository.deleteList(id: deletionListId);
+  }
+
+  /// Called when the user is reordering the list of TaskLists.
+  Future<void> reorderLists(int oldIndex, int newIndex) async {
+    if (oldIndex < newIndex) newIndex -= 1;
+    List<TaskList> lists = List<TaskList>.from(state.taskLists)
+      ..removeAt(oldIndex)
+      ..insert(newIndex, state.taskLists[oldIndex]);
+    for (var i = 0; i < lists.length; i++) {
+      lists[i] = lists[i].copyWith(index: i);
+    }
+    final String? activeListId = state.activeList?.id;
+    emit(state.copyWith(
+      taskLists: lists,
+      activeList: lists.singleWhereOrNull((e) => e.id == activeListId),
+    ));
+    await _updateAllLists();
   }
 
   void setActiveList(String id) {
@@ -79,14 +101,21 @@ class TasksCubit extends Cubit<TasksState> {
     _storageService.saveValue(key: 'activeList', value: id);
   }
 
+  Future<void> _updateAllLists() async {
+    for (var list in state.taskLists) {
+      await updateList(list);
+    }
+  }
+
   Future<void> updateList(TaskList list) async {
     await _tasksRepository.updateList(list: list);
-    // TODO: Replace this remove/add with by index version once indexes are
-    // working.
-    final taskLists = List<TaskList>.from(state.taskLists)
-      ..removeWhere((element) => element.id == list.id)
-      ..add(list);
-    emit(state.copyWith(activeList: list, taskLists: taskLists));
+    final taskLists = List<TaskList>.from(state.taskLists);
+    emit(state.copyWith(
+      activeList: taskLists.singleWhereOrNull(
+        (e) => e.id == state.activeList?.id,
+      ),
+      taskLists: _listsInOrder(taskLists),
+    ));
   }
 
   Future<void> createTask(Task newTask) async {
