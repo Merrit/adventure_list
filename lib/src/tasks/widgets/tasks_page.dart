@@ -11,6 +11,8 @@ class TasksPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+
     return SafeArea(
       child: BlocBuilder<TasksCubit, TasksState>(
         builder: (context, state) {
@@ -21,7 +23,7 @@ class TasksPage extends StatelessWidget {
           final Widget largeBody = Row(
             children: const [
               CustomNavigationRail(),
-              TasksView(),
+              Flexible(child: TasksView()),
               TaskDetails(),
             ],
           );
@@ -29,9 +31,9 @@ class TasksPage extends StatelessWidget {
           const Widget mobileBody = TasksView();
 
           return Scaffold(
-            appBar: platformIsMobile() ? const _TaskListAppBar() : null,
-            drawer: platformIsMobile() ? const CustomDrawer() : null,
-            body: platformIsMobile() ? mobileBody : largeBody,
+            appBar: mediaQuery.isHandset ? const _TaskListAppBar() : null,
+            drawer: mediaQuery.isHandset ? const CustomDrawer() : null,
+            body: mediaQuery.isHandset ? mobileBody : largeBody,
           );
         },
       ),

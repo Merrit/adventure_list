@@ -27,25 +27,28 @@ class SettingsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      // TODO: This padding.. should maybe be calculated?
-      // Eg layoutbldr: maxWidth / 2    ?
-      insetPadding: const EdgeInsets.symmetric(horizontal: 300, vertical: 24),
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text('Settings'),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              shape: const CircleBorder(),
-            ),
-            onPressed: () => Navigator.pop(context),
-            child: const Icon(Icons.close),
-          )
-        ],
-      ),
-      content: const SettingsView(),
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      return AlertDialog(
+        insetPadding: EdgeInsets.symmetric(
+          horizontal: constraints.maxWidth / 8,
+          vertical: 24,
+        ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Settings'),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: const CircleBorder(),
+              ),
+              onPressed: () => Navigator.pop(context),
+              child: const Icon(Icons.close),
+            )
+          ],
+        ),
+        content: const SettingsView(),
+      );
+    });
   }
 }
 
