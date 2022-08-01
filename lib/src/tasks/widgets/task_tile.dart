@@ -44,12 +44,14 @@ class _TaskTileState extends State<TaskTile> {
           }
         }
 
-        bool hasChildTasks = state.activeList!.items
+        final List<Task> childTasks = state.activeList!.items
             .where((element) => element.parent == task.id && !element.deleted)
-            .isNotEmpty;
+            .toList();
+
+        bool hasChildTasks = childTasks.isNotEmpty;
 
         Widget leadingWidget;
-        if (hasChildTasks) {
+        if (hasChildTasks && task.parent == null) {
           leadingWidget = IconButton(
             icon: Icon(
               expanded ? Icons.arrow_drop_down : Icons.arrow_right,
@@ -58,6 +60,8 @@ class _TaskTileState extends State<TaskTile> {
               expanded = !expanded;
             }),
           );
+        } else if (hasChildTasks && task.parent != null) {
+          leadingWidget = const SizedBox();
         } else {
           leadingWidget = Checkbox(
             value: task.completed,
@@ -65,6 +69,18 @@ class _TaskTileState extends State<TaskTile> {
               task.copyWith(completed: value),
             ),
           );
+        }
+
+        Widget tasksCompletedCountWidget;
+        if (hasChildTasks) {
+          final completedTasks =
+              childTasks.where((element) => element.completed).length;
+          tasksCompletedCountWidget = Padding(
+            padding: const EdgeInsets.all(6.5),
+            child: Text('($completedTasks/${childTasks.length})'),
+          );
+        } else {
+          tasksCompletedCountWidget = const SizedBox();
         }
 
         TextStyle titleTextStyle = TextStyle(
@@ -90,13 +106,14 @@ class _TaskTileState extends State<TaskTile> {
                     ],
                   ),
                 ),
+                tasksCompletedCountWidget,
               ],
             ),
           ),
         );
 
         Widget? subtitle;
-        if (hasChildTasks) {
+        if (hasChildTasks && task.parent == null) {
           subtitle = Visibility(
             visible: expanded,
             child: IntrinsicHeight(
@@ -115,7 +132,7 @@ class _TaskTileState extends State<TaskTile> {
                           ),
                         ...state.activeList!.items
                             .where((element) => element.parent == task.id)
-                            .map((e) => TaskTile(task: e))
+                            .map((e) => Flexible(child: TaskTile(task: e)))
                             .toList()
                       ],
                     ),
