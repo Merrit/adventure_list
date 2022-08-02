@@ -105,14 +105,13 @@ class GoogleAuth {
 
   static Future<AuthClient> refreshAuthClient() async {
     final GoogleSignIn googleSignIn = GoogleSignIn(scopes: scopes);
-    await googleSignIn.signInSilently();
-    final client = await googleSignIn.authenticatedClient();
+    final GoogleSignInAccount? googleSignInAccount =
+        await googleSignIn.signInSilently();
 
-    // assert(googleSignIn.currentUser != null);
-    // final authHeaders = await googleSignIn.currentUser!.authHeaders;
+    if (googleSignInAccount == null) await GoogleAuth().login();
 
-    // // custom IOClient from below
-    // final GoogleHttpClient client = GoogleHttpClient(authHeaders);
+    final AuthClient? client = await googleSignIn.authenticatedClient();
+
     return client!;
   }
 
