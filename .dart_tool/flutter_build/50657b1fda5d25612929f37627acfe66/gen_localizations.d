@@ -1,0 +1,1 @@
+ /home/merritt/Development/adventure_list/.dart_tool/flutter_gen/gen_l10n/app_localizations_en.dart /home/merritt/Development/adventure_list/.dart_tool/flutter_gen/gen_l10n/app_localizations.dart:  /home/merritt/Development/adventure_list/l10n.yaml /home/merritt/Development/adventure_list/lib/src/localization/app_en.arb
