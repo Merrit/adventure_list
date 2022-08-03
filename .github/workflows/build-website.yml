@@ -1,3 +1,13 @@
+on:
+  push:
+    branches:
+      - disabledworkflow
+
+jobs:
+  nonejob:
+    runs-on: ubuntu-20.04
+    steps:
+      - run: donothingdisabled
 # Currently resides in and manages by the `website` branch.
 
 # # Automatically build and deploy website to GitHub Pages.
