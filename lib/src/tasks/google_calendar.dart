@@ -41,10 +41,9 @@ import 'tasks.dart';
 /// by an [ACL resource](https://developers.google.com/calendar/v3/reference/acl).
 
 class GoogleCalendar implements TasksRepository {
-  CalendarApi _api;
-  AuthClient _client;
+  final CalendarApi _api;
 
-  GoogleCalendar._(this._api, this._client) {
+  GoogleCalendar._(this._api) {
     getAll();
   }
 
@@ -61,11 +60,10 @@ class GoogleCalendar implements TasksRepository {
         Client(),
       );
     } else {
-      // client = authenticatedClient(Client(), credentials);
       client = await GoogleAuth.refreshAuthClient();
     }
 
-    return GoogleCalendar._(CalendarApi(client), client);
+    return GoogleCalendar._(CalendarApi(client));
   }
 
   @override
@@ -96,21 +94,6 @@ class GoogleCalendar implements TasksRepository {
 
     return taskLists;
   }
-
-  // Future<void> _refreshCredentials() async {
-  //   bool tokenExpired = _client.credentials.accessToken.hasExpired;
-  //   if (!tokenExpired) return;
-
-  //   final String? newAccessToken = await GoogleAuth.refreshAccessToken();
-  //   // final newClient = authenticatedClient(
-  //   //   Client(),
-  //   //   AccessCredentials(
-  //   //     AccessToken(type, data, expiry),
-  //   //     null,
-  //   //     GoogleAuth.scopes,
-  //   //   ),
-  //   // );
-  // }
 
   @override
   Future<TaskList> createList({required String title}) async {
