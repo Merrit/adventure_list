@@ -7,33 +7,38 @@ import 'package:http/http.dart';
 import '../authentication/authentication.dart';
 import 'tasks.dart';
 
-/// *[Event](https://developers.google.com/calendar/v3/reference/events)* An
-/// event on a calendar containing information such as the title, start and end
-/// times, and attendees. Events can be either single events or [recurring
+/// Notes on interfacing with the Google Calendar API.
+
+/// [Event](https://developers.google.com/calendar/v3/reference/events)
+/// Analagous to a [Task].
+///
+/// An event on a calendar containing information such as the title, start and
+/// end times, and attendees. Events can be either single events or [recurring
 /// events](https://developers.google.com/calendar/concepts/events-calendars#recurring_events).
 /// An event is represented by an [Event
 /// resource](https://developers.google.com/calendar/v3/reference/events#resource-representations).
 
 /// [Calendar](https://developers.google.com/calendar/v3/reference/calendars)
-/// Analagous to the `TaskList`.
+/// Analagous to a `TaskList`.
 
-/// *[Calendar List](https://developers.google.com/calendar/v3/reference/calendarList)* A
-/// list of all calendars on a user's calendar list in the Calendar UI. The
+/// [Calendar List](https://developers.google.com/calendar/v3/reference/calendarList)
+///
+/// A list of all calendars on a user's calendar list in the Calendar UI. The
 /// metadata for a single calendar that appears on the calendar list is
-/// represented by a [CalendarListEntry
-/// resource](https://developers.google.com/calendar/v3/reference/calendarList).
+/// represented by a [CalendarListEntry resource](https://developers.google.com/calendar/v3/reference/calendarList).
 /// This metadata includes user-specific properties of the calendar, such as its
 /// color or notifications for new events.
 
-/// *[Setting](https://developers.google.com/calendar/v3/reference/settings)* A
-/// user preference from the Calendar UI, such as the user's time zone. A single
-/// user preference is represented by a [Setting
-/// Resource](https://developers.google.com/calendar/v3/reference/settings).
+/// [Setting](https://developers.google.com/calendar/v3/reference/settings)
+///
+/// A user preference from the Calendar UI, such as the user's time zone. A
+/// single user preference is represented by a [Setting Resource](https://developers.google.com/calendar/v3/reference/settings).
 
-/// *[ACL](https://developers.google.com/calendar/v3/reference/acl)* An access
-/// control rule granting a user (or a group of users) a specified level of
-/// access to a calendar. A single access control rule is represented by an [ACL
-/// resource](https://developers.google.com/calendar/v3/reference/acl).
+/// [ACL](https://developers.google.com/calendar/v3/reference/acl)
+///
+/// An access control rule granting a user (or a group of users) a specified
+/// level of access to a calendar. A single access control rule is represented
+/// by an [ACL resource](https://developers.google.com/calendar/v3/reference/acl).
 
 class GoogleCalendar implements TasksRepository {
   CalendarApi _api;
