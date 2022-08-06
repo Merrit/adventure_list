@@ -351,8 +351,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: be1fcc87c81f4ebeccbaf7a1e35b2a7e15332a93
-      resolved-ref: be1fcc87c81f4ebeccbaf7a1e35b2a7e15332a93
+      ref: c95b618b1e22c70d1375d1eb0a00a1dbd529bd18
+      resolved-ref: c95b618b1e22c70d1375d1eb0a00a1dbd529bd18
       url: "https://github.com/Merrit/helpers.git"
     source: git
     version: "0.0.1"
@@ -640,8 +640,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: df474fe341b156be3f0352ca8027ff65bfb5c665
-      resolved-ref: df474fe341b156be3f0352ca8027ff65bfb5c665
+      ref: e5e46a070572390689726fdd5d11d3f9cd078edd
+      resolved-ref: e5e46a070572390689726fdd5d11d3f9cd078edd
       url: "https://github.com/Merrit/self_updater.git"
     source: git
     version: "0.0.1"

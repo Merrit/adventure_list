@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helpers/helpers.dart';
 import 'package:logging/logging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:self_updater/self_updater.dart';
@@ -33,7 +34,9 @@ class AppCubit extends Cubit<AppState> {
   Future<void> initialize() async {
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
-    final File buildFile = File('BUILD');
+    final File buildFile = File(
+      '${applicationDirectory.path}${Platform.pathSeparator}BUILD',
+    );
     final bool buildFileExists = await buildFile.exists();
 
     String currentVersion;
