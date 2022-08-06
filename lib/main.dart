@@ -68,18 +68,24 @@ Future<void> integrateWithDesktop() async {
   if (!Platform.isLinux && !Platform.isWindows) return;
   if (kDebugMode) return;
 
-  final desktopFile = await assetToTempDir(
-    'packaging/linux/codes.merritt.adventurelist.desktop',
-  );
+  File? desktopFile;
+  if (Platform.isLinux) {
+    desktopFile = await assetToTempDir(
+      'packaging/linux/codes.merritt.adventurelist.desktop',
+    );
+  }
+
+  final iconFileSuffix = Platform.isWindows ? 'ico' : 'svg';
 
   final iconFile = await assetToTempDir(
-    'assets/icons/codes.merritt.adventurelist.svg',
+    'assets/icons/codes.merritt.adventurelist.$iconFileSuffix',
   );
 
   final desktopIntegration = DesktopIntegration(
-    desktopFilePath: desktopFile.path,
+    desktopFilePath: desktopFile?.path ?? '',
     iconPath: iconFile.path,
     packageName: kpackageId,
+    linkFileName: 'Adventure List',
   );
 
   await desktopIntegration.addToApplicationsMenu();
