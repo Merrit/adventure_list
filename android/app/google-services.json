@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "478765689275",
+    "project_id": "adventure-list-354516",
+    "storage_bucket": "adventure-list-354516.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:478765689275:android:751873c2d07e57e0da3c9e",
+        "android_client_info": {
+          "package_name": "codes.merritt.adventurelist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "478765689275-2qneu0pfdhm2m4ej0lqdv69rm96shsg4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "codes.merritt.adventurelist",
+            "certificate_hash": "8124b413662fe1254ce85357f68cae94eea91de2"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFYBvnQaRl6szsW6_unb2Xhi0H_IJOy8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
