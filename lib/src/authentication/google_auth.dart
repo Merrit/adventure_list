@@ -30,8 +30,9 @@ abstract class GoogleAuthIds {
     windowsClientSecret,
   );
 
-  static const String androidClientDebugId =
+  static const String androidClientIdString =
       '478765689275-2qneu0pfdhm2m4ej0lqdv69rm96shsg4.apps.googleusercontent.com';
+  static final ClientId androidClientId = ClientId(androidClientIdString);
 
   static const String webClientId =
       '478765689275-553m3rlsl1j7lgb9dpqsqtajldr05b7d.apps.googleusercontent.com';
@@ -49,7 +50,7 @@ abstract class GoogleAuthIds {
       case 'windows':
         return windowsClientId;
       case 'android':
-        return kDebugMode ? ClientId(androidClientDebugId) : ClientId('');
+        return androidClientId;
       default:
         return ClientId('', '');
     }
