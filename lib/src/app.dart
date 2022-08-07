@@ -115,8 +115,6 @@ class App extends StatelessWidget {
                         snapshot.data as TasksRepository,
                       );
 
-                      child = const TasksPage();
-
                       return BlocProvider.value(
                         value: _tasksCubit!,
                         child: Platform.isAndroid
