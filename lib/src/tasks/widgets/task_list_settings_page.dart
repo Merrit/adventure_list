@@ -15,12 +15,9 @@ class TaskListSettingsPage extends StatelessWidget {
       appBar: AppBar(),
       body: BlocBuilder<TasksCubit, TasksState>(
         builder: (context, state) {
-          if (state.activeList == null) Navigator.pop(context);
-
           final taskList = state.activeList;
 
           if (taskList == null) {
-            Navigator.pop(context);
             return const SizedBox();
           }
 
@@ -49,7 +46,9 @@ class TaskListSettingsPage extends StatelessWidget {
                   ),
                   TextButton(
                     onPressed: () async {
-                      await showDialog(
+                      final navigator = Navigator.of(context);
+
+                      final bool? deleted = await showDialog(
                         context: context,
                         builder: (context) {
                           return AlertDialog(
@@ -64,10 +63,7 @@ class TaskListSettingsPage extends StatelessWidget {
                               TextButton(
                                 onPressed: () {
                                   tasksCubit.deleteList();
-                                  Navigator.pushReplacementNamed(
-                                    context,
-                                    TasksPage.routeName,
-                                  );
+                                  Navigator.pop(context, true);
                                 },
                                 child: const Text('CONFIRM'),
                               )
@@ -76,7 +72,9 @@ class TaskListSettingsPage extends StatelessWidget {
                         },
                       );
 
-                      // pop to root
+                      if (deleted == true) {
+                        navigator.pushReplacementNamed(TasksPage.routeName);
+                      }
                     },
                     child: const Text(
                       'Delete List',
