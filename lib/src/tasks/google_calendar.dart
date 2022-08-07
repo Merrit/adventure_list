@@ -41,6 +41,7 @@ import 'tasks.dart';
 /// by an [ACL resource](https://developers.google.com/calendar/v3/reference/acl).
 
 class GoogleCalendar implements TasksRepository {
+  /// The Google Calendar API.
   final CalendarApi _api;
 
   GoogleCalendar._(this._api) {
