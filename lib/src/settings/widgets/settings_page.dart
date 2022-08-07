@@ -66,6 +66,7 @@ class SettingsView extends StatelessWidget {
             child: ListView(
               children: const [
                 _UpdateChannelTile(),
+                _LogToFileWidget(),
               ],
             ),
           ),
@@ -136,6 +137,23 @@ Please do not choose Dev unless you can accept these risks.'''),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _LogToFileWidget extends StatelessWidget {
+  const _LogToFileWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, state) {
+        return SwitchListTile(
+          title: const Text('Save logs to disk'),
+          value: state.logToFile,
+          onChanged: (value) => settingsCubit.updateLogToFile(value),
+        );
+      },
     );
   }
 }

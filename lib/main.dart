@@ -28,7 +28,7 @@ void main() async {
     HomeWidget.registerBackgroundCallback(backgroundCallback);
   }
 
-  initializeLogger();
+  await initializeLogger();
 
   final storageService = await StorageService.initialize();
 
