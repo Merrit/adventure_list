@@ -59,7 +59,7 @@ class SettingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: double.maxFinite,
-      width: double.maxFinite,
+      width: 400,
       child: Column(
         children: [
           Expanded(
