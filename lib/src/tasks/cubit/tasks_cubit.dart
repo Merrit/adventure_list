@@ -7,6 +7,7 @@ import 'package:logging/logging.dart';
 
 import '../../authentication/cubit/authentication_cubit.dart';
 import '../../home_widget/home_widget_manager.dart';
+import '../../settings/settings.dart';
 import '../../storage/storage_service.dart';
 import '../tasks.dart';
 
@@ -198,7 +199,15 @@ class TasksCubit extends Cubit<TasksState> {
   void onChange(Change<TasksState> change) {
     if (Platform.isAndroid) {
       final data = change.nextState;
-      updateHomeWidget('listNames', data);
+      final selectedListId = settingsCubit.state.homeWidgetSelectedListId;
+      final selectedList = data //
+          .taskLists
+          .singleWhereOrNull(
+        (taskList) => taskList.id == selectedListId,
+      );
+      if (selectedList != null) {
+        updateHomeWidget('listNames', selectedList.toJson());
+      }
     }
 
     super.onChange(change);
