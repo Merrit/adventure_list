@@ -37,9 +37,16 @@ class SettingsCubit extends Cubit<SettingsState> {
       initialState: SettingsState(
         homeWidgetSelectedListId: homeWidgetSelectedListId ?? '',
         logToFile: await storageService.getValue('logToFile') ?? false,
+        updateAutomatically:
+            await storageService.getValue('updateAutomatically') ?? false,
         updateChannel: updateChannel,
       ),
     );
+  }
+
+  Future<void> updateAutomaticUpdatesSetting(bool value) async {
+    emit(state.copyWith(updateAutomatically: value));
+    await _storageService.saveValue(key: 'updateAutomatically', value: value);
   }
 
   Future<void> updateHomeWidgetSelectedListId(String id) async {

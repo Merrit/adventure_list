@@ -65,6 +65,7 @@ class SettingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     const updatesSection = [
       _VersionTile(),
+      _AutomaticUpdatesTile(),
       _UpdateChannelTile(),
     ];
 
@@ -147,6 +148,25 @@ class _VersionTile extends StatelessWidget {
             subtitle: (state.updateAvailable)
                 ? Text('Update available: ${state.updateVersion}')
                 : null,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _AutomaticUpdatesTile extends StatelessWidget {
+  const _AutomaticUpdatesTile({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, state) {
+        return SwitchListTile(
+          title: const Text('Update automatically'),
+          value: state.updateAutomatically,
+          onChanged: (value) => settingsCubit.updateAutomaticUpdatesSetting(
+            value,
           ),
         );
       },

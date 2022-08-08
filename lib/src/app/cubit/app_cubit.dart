@@ -17,20 +17,21 @@ part 'app_state.dart';
 late final AppCubit appCubit;
 
 class AppCubit extends Cubit<AppState> {
-  AppCubit()
+  AppCubit(SettingsCubit settingsCubit)
       : super(const AppState(
           appVersion: '',
+          updateAutomatically: false,
           updateAvailable: false,
           updateVersion: '',
           updateInProgress: false,
         )) {
     appCubit = this;
-    initialize();
+    initialize(settingsCubit: settingsCubit);
   }
 
   Updater? _updater;
 
-  Future<void> initialize() async {
+  Future<void> initialize({required SettingsCubit settingsCubit}) async {
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
     final File buildFile = File(
@@ -62,6 +63,7 @@ current version: $currentVersion''');
 
     emit(state.copyWith(
       appVersion: currentVersion,
+      updateAutomatically: settingsCubit.state.updateAutomatically,
       updateAvailable: updater.updateAvailable,
       updateVersion: updater.updateVersion,
     ));

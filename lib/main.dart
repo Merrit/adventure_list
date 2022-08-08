@@ -49,7 +49,7 @@ void main() async {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => AppCubit(),
+            create: (context) => AppCubit(settingsCubitInstance),
             lazy: false,
           ),
           BlocProvider(create: (context) => authenticationCubit),
