@@ -29,6 +29,11 @@ class SettingsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       return AlertDialog(
+        contentPadding: const EdgeInsets.only(
+          top: 20,
+          left: 10,
+          right: 10,
+        ),
         insetPadding: EdgeInsets.symmetric(
           horizontal: constraints.maxWidth / 8,
           vertical: 24,
@@ -57,6 +62,14 @@ class SettingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const updatesSection = [
+      _UpdateChannelTile(),
+    ];
+
+    const troubleshootingSection = [
+      _LogToFileWidget(),
+    ];
+
     return SizedBox(
       height: double.maxFinite,
       width: 400,
@@ -65,12 +78,49 @@ class SettingsView extends StatelessWidget {
           Expanded(
             child: ListView(
               children: const [
-                _UpdateChannelTile(),
-                _LogToFileWidget(),
+                _SectionWidget(
+                  title: 'Version and updates',
+                  children: updatesSection,
+                ),
+                _SectionWidget(
+                  title: 'Troubleshooting',
+                  children: troubleshootingSection,
+                ),
               ],
             ),
           ),
           const _SignOutButton(),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionWidget extends StatelessWidget {
+  final String title;
+  final List<Widget> children;
+
+  const _SectionWidget({
+    Key? key,
+    required this.title,
+    required this.children,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Column(
+        children: [
+          ListTile(
+            title: Text(
+              title,
+              style: TextStyle(
+                color: Theme.of(context).primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          ...children,
         ],
       ),
     );
@@ -84,33 +134,28 @@ class _UpdateChannelTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: const Center(child: Text('Update channel')),
-      subtitle: BlocBuilder<SettingsCubit, SettingsState>(
-        builder: (context, state) {
-          return Column(
-            children: [
-              ...UpdateChannel.values
-                  .map((UpdateChannel channel) => SizedBox(
-                        width: 150,
-                        child: RadioListTile(
-                          title: Text(channel.name.capitalized()),
-                          value: channel,
-                          groupValue: state.updateChannel,
-                          onChanged: (UpdateChannel? value) async {
-                            if (value == UpdateChannel.dev) {
-                              await _showConfirmDevDialog(context);
-                            } else {
-                              settingsCubit.setUpdateChannel(value);
-                            }
-                          },
-                        ),
-                      ))
-                  .toList(),
-            ],
-          );
-        },
-      ),
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, state) {
+        return Column(
+          children: [
+            const ListTile(title: Text('Update channel')),
+            ...UpdateChannel.values
+                .map((UpdateChannel channel) => RadioListTile(
+                      title: Text(channel.name.capitalized()),
+                      value: channel,
+                      groupValue: state.updateChannel,
+                      onChanged: (UpdateChannel? value) async {
+                        if (value == UpdateChannel.dev) {
+                          await _showConfirmDevDialog(context);
+                        } else {
+                          settingsCubit.setUpdateChannel(value);
+                        }
+                      },
+                    ))
+                .toList(),
+          ],
+        );
+      },
     );
   }
 
