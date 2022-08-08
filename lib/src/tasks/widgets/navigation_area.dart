@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
-import 'package:intl/intl.dart';
 
 import '../../app/cubit/app_cubit.dart';
 import '../../core/core.dart';
@@ -66,72 +65,8 @@ class _NavContents extends StatelessWidget {
               }
             },
           ),
-          const VersionButton(),
           const UpdateButton(),
         ],
-      ),
-    );
-  }
-}
-
-class VersionButton extends StatelessWidget {
-  const VersionButton({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<AppCubit, AppState>(
-      builder: (context, state) {
-        final dateTime = DateTime.tryParse(state.appVersion);
-        String? version;
-        if (dateTime != null) {
-          // If appVersion is a DateTime we convert to a more readable format.
-          version = DateFormat('yyyy-MM-dd H:m').format(dateTime).toString();
-        }
-        version ??= state.appVersion;
-
-        return ListTile(
-          title: Opacity(
-            opacity: 0.5,
-            child: Text(
-              'Version $version',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-          ),
-          onTap: () => showDialog(
-            context: context,
-            builder: (context) => const VersionDialog(),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class VersionDialog extends StatelessWidget {
-  const VersionDialog({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // aboutdialog
-    return AlertDialog(
-      content: BlocBuilder<AppCubit, AppState>(
-        builder: (context, state) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text('Current version: ${state.appVersion}'),
-                subtitle: state.updateAvailable
-                    ? Text('Update available: ${state.updateVersion}')
-                    : const Text('No update available'),
-              ),
-            ],
-          );
-        },
       ),
     );
   }

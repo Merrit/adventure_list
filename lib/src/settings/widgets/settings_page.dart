@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 import 'package:self_updater/self_updater.dart';
 
+import '../../app/cubit/app_cubit.dart';
 import '../../authentication/cubit/authentication_cubit.dart';
 import '../../authentication/login_page.dart';
 import '../settings.dart';
@@ -63,6 +64,7 @@ class SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const updatesSection = [
+      _VersionTile(),
       _UpdateChannelTile(),
     ];
 
@@ -127,6 +129,31 @@ class _SectionWidget extends StatelessWidget {
   }
 }
 
+/* -------------------------------------------------------------------------- */
+/*                             Version and updates                            */
+/* -------------------------------------------------------------------------- */
+
+class _VersionTile extends StatelessWidget {
+  const _VersionTile({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<AppCubit, AppState>(
+      builder: (context, state) {
+        return Opacity(
+          opacity: 0.6,
+          child: ListTile(
+            title: Text('Version ${state.appVersion}'),
+            subtitle: (state.updateAvailable)
+                ? Text('Update available: ${state.updateVersion}')
+                : null,
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _UpdateChannelTile extends StatelessWidget {
   const _UpdateChannelTile({
     Key? key,
@@ -185,6 +212,10 @@ Please do not choose Dev unless you can accept these risks.'''),
     );
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/*                               Troubleshooting                              */
+/* -------------------------------------------------------------------------- */
 
 class _LogToFileWidget extends StatelessWidget {
   const _LogToFileWidget({Key? key}) : super(key: key);
