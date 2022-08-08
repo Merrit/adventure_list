@@ -426,6 +426,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
+  logger:
+    dependency: transitive
+    description:
+      name: logger
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   logging:
     dependency: "direct main"
     description:
@@ -640,8 +647,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "6d2b68a7d599555f4ad8b2664b195ce334a5ef00"
-      resolved-ref: "6d2b68a7d599555f4ad8b2664b195ce334a5ef00"
+      ref: "65bb56cb5c3c9e8cd9d41012bf6ba5d7a04533a4"
+      resolved-ref: "65bb56cb5c3c9e8cd9d41012bf6ba5d7a04533a4"
       url: "https://github.com/Merrit/self_updater.git"
     source: git
     version: "0.0.1"
