@@ -179,26 +179,26 @@ packages:
     source: hosted
     version: "3.3.17"
   firebase_core:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: firebase_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.18.0"
+    version: "1.20.0"
   firebase_core_platform_interface:
     dependency: transitive
     description:
       name: firebase_core_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.4.1"
+    version: "4.5.0"
   firebase_core_web:
     dependency: transitive
     description:
       name: firebase_core_web
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.6.5"
+    version: "1.7.1"
   flex_color_scheme:
     dependency: "direct main"
     description:
@@ -427,14 +427,14 @@ packages:
     source: hosted
     version: "2.0.0"
   logger:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: logger
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
   logging:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: logging
       url: "https://pub.dartlang.org"
@@ -647,8 +647,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "65bb56cb5c3c9e8cd9d41012bf6ba5d7a04533a4"
-      resolved-ref: "65bb56cb5c3c9e8cd9d41012bf6ba5d7a04533a4"
+      ref: "27fc2adcc7ffd7489785b6930ce5fb06ff6660d5"
+      resolved-ref: "27fc2adcc7ffd7489785b6930ce5fb06ff6660d5"
       url: "https://github.com/Merrit/self_updater.git"
     source: git
     version: "0.0.1"

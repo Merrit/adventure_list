@@ -4,11 +4,12 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
-import 'package:logging/logging.dart';
+
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:self_updater/self_updater.dart';
 
 import '../../constants.dart';
+import '../../logs/logs.dart';
 import '../../settings/settings.dart';
 
 part 'app_state.dart';
@@ -16,8 +17,6 @@ part 'app_state.dart';
 late final AppCubit appCubit;
 
 class AppCubit extends Cubit<AppState> {
-  final _log = Logger('AppCubit');
-
   AppCubit()
       : super(const AppState(
           appVersion: '',
@@ -43,10 +42,10 @@ class AppCubit extends Cubit<AppState> {
     if (buildFileExists) {
       // Currently build file should only exist for Dev builds, which use the
       // time of build as their "version" for updates comparison sake.
-      _log.info('Found BUILD file, getting version from file.');
+      logger.i('Found BUILD file, getting version from file.');
       currentVersion = await buildFile.readAsString();
     } else {
-      _log.info('No BUILD file found, getting version from PackageInfo.');
+      logger.i('No BUILD file found, getting version from PackageInfo.');
       currentVersion = packageInfo.version;
     }
 
@@ -70,7 +69,7 @@ class AppCubit extends Cubit<AppState> {
 
     assert(_updater != null);
     emit(state.copyWith(updateInProgress: true));
-    _log.info('Beginning app update');
+    logger.i('Beginning app update');
 
     // TODO: Should we download the update *before* prompting the user? Doing so
     // would negate the time required to download, not bother the user until a
@@ -78,7 +77,7 @@ class AppCubit extends Cubit<AppState> {
     // update appear essentially instant.
     final String? updateArchivePath = await _updater!.downloadUpdate();
     if (updateArchivePath == null) {
-      _log.severe('Downloading update was NOT successful.');
+      logger.e('Downloading update was NOT successful.');
       return;
     }
 

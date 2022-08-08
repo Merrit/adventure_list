@@ -39,7 +39,7 @@ dependencies:
   home_widget: ^0.1.6
   http: ^0.13.4
   intl: ^0.17.0
-  logging: ^1.0.2
+  logger: ^1.1.0
   move_to_background: ^1.0.2
   package_info_plus: ^1.4.2
   path_provider: ^2.0.11

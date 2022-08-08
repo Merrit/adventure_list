@@ -2,11 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:logging/logging.dart';
 
+import '../logs/logs.dart';
 import 'shortcuts_manager.dart';
-
-final _log = Logger('AppShortcuts');
 
 /// Shortcuts that are available everywhere in the app.
 ///
@@ -53,7 +51,7 @@ class QuitIntent extends Intent {
 class QuitAction extends Action<QuitIntent> {
   @override
   Object? invoke(QuitIntent intent) {
-    _log.info('Quit requested, exiting.');
+    logger.i('Quit requested, exiting.');
     exit(0);
   }
 }

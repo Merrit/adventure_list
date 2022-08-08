@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:logging/logging.dart';
 
 import '../../authentication/cubit/authentication_cubit.dart';
 import '../../home_widget/home_widget_manager.dart';
+import '../../logs/logs.dart';
 import '../../settings/settings.dart';
 import '../../storage/storage_service.dart';
 import '../tasks.dart';
@@ -16,8 +16,6 @@ part 'tasks_state.dart';
 late TasksCubit tasksCubit;
 
 class TasksCubit extends Cubit<TasksState> {
-  final _log = Logger('TasksCubt');
-
   final StorageService _storageService;
   final TasksRepository _tasksRepository;
 
@@ -34,7 +32,7 @@ class TasksCubit extends Cubit<TasksState> {
     try {
       taskLists = await _tasksRepository.getAll();
     } catch (e) {
-      _log.warning('Exception while attempting to fetch tasks: $e');
+      logger.w('Exception while attempting to fetch tasks: $e');
       await authCubit.logout();
       return;
     }

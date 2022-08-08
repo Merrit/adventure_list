@@ -9,8 +9,10 @@ import 'package:googleapis/calendar/v3.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
 import 'package:http/io_client.dart';
-import 'package:logging/logging.dart';
+
 import 'package:url_launcher/url_launcher.dart';
+
+import '../logs/logs.dart';
 
 abstract class GoogleAuthIds {
   static const String linuxClientIdString =
@@ -58,8 +60,6 @@ abstract class GoogleAuthIds {
 }
 
 class GoogleAuth {
-  final _log = Logger('GoogleAuth');
-
   static final scopes = [CalendarApi.calendarScope];
 
   Future<AccessCredentials?> login() async {
@@ -80,7 +80,7 @@ class GoogleAuth {
         launchAuthUrl,
       );
     } catch (e) {
-      _log.warning('Unable to login: $e');
+      logger.w('Unable to login: $e');
     }
 
     return client?.credentials;
@@ -93,7 +93,7 @@ class GoogleAuth {
     try {
       await googleSignIn.signIn();
     } on PlatformException catch (e) {
-      _log.warning('Failed to sign in with google_sign_in: $e');
+      logger.w('Failed to sign in with google_sign_in: $e');
     }
 
     final client = await googleSignIn.authenticatedClient();

@@ -1,23 +1,30 @@
-import 'package:flutter/foundation.dart';
-import 'package:intl/intl.dart';
-import 'package:logging/logging.dart';
+import 'dart:io';
 
-import 'file_logger.dart';
+/// `FileOutput` import needed due to bug in package.
+/// https://github.com/leisim/logger/issues/94
+// ignore: implementation_imports
+import 'package:logger/src/outputs/file_output.dart';
 
-/// Print log messages.
+import 'package:logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
+
+late final Logger logger;
+
 Future<void> initializeLogger() async {
-  final fileLogger = await FileLogger.initialize();
-  Logger.root.level = Level.ALL;
+  final dataDir = await getApplicationSupportDirectory();
+  final logFile = File('${dataDir.path}${Platform.pathSeparator}log.txt');
+  if (await logFile.exists()) await logFile.delete();
+  await logFile.create();
 
-  Logger.root.onRecord.listen((record) async {
-    final String time = DateFormat('h:mm:ss a').format(record.time);
-
-    var msg = '${record.level.name}: $time: '
-        '${record.loggerName}: ${record.message}';
-
-    if (record.error != null) msg += '\nError: ${record.error}';
-
-    debugPrint(msg);
-    await fileLogger.write(msg);
-  });
+  logger = Logger(
+    filter: ProductionFilter(),
+    printer: PrettyPrinter(
+      colors: stdout.supportsAnsiEscapes,
+      lineLength: (stdout.hasTerminal) ? stdout.terminalColumns : 120,
+    ),
+    output: MultiOutput([
+      ConsoleOutput(),
+      FileOutput(file: logFile),
+    ]),
+  );
 }
