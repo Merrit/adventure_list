@@ -37,9 +37,6 @@ class AppCubit extends Cubit<AppState> {
       '${applicationDirectory.path}${Platform.pathSeparator}BUILD',
     );
     final bool buildFileExists = await buildFile.exists();
-    logger.i('''
-BUILD file path would be: ${buildFile.path}
-build file exists: $buildFileExists''');
 
     String currentVersion;
     if (buildFileExists) {
@@ -49,6 +46,11 @@ build file exists: $buildFileExists''');
     } else {
       currentVersion = packageInfo.version;
     }
+
+    logger.i('''
+BUILD file path would be: ${buildFile.path}
+build file exists: $buildFileExists
+current version: $currentVersion''');
 
     final updater = await Updater.initialize(
       currentVersion: currentVersion,
