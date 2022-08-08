@@ -24,7 +24,7 @@ Future<void> initializeLogger() async {
     ),
     output: MultiOutput([
       ConsoleOutput(),
-      FileOutput(file: logFile),
+      FileOutput(file: logFile), // TODO: Connect with user preference.
     ]),
   );
 }
