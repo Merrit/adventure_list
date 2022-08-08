@@ -11,8 +11,8 @@ class AppWindow {
     await windowManager.ensureInitialized();
 
     WindowOptions windowOptions = const WindowOptions(
-      title: 'Adventure List',
-    );
+        //
+        );
 
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       // await windowManager.show();
