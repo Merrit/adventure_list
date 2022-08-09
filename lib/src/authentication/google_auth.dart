@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -104,6 +103,8 @@ class GoogleAuth {
     return client?.credentials;
   }
 
+  /// google_sign_in doesn't provide us with a refresh token, so this is a
+  /// workaround to refresh authentication for platforms that use google_sign_in
   static Future<AuthClient> refreshAuthClient() async {
     final GoogleSignIn googleSignIn = GoogleSignIn(scopes: scopes);
     final GoogleSignInAccount? googleSignInAccount =
@@ -116,32 +117,33 @@ class GoogleAuth {
     return client!;
   }
 
-  static Future<String?> refreshAccessToken() async {
-    final GoogleSignIn googleSignIn = GoogleSignIn(scopes: scopes);
+  // Commented code left until we are sure current implementation works.
+  // static Future<String?> refreshAccessToken() async {
+  //   final GoogleSignIn googleSignIn = GoogleSignIn(scopes: scopes);
 
-    assert(googleSignIn.currentUser != null);
-    final authHeaders = await googleSignIn.currentUser!.authHeaders;
+  //   assert(googleSignIn.currentUser != null);
 
-    // custom IOClient from below
-    final GoogleHttpClient client = GoogleHttpClient(authHeaders);
+  //   // final authHeaders = await googleSignIn.currentUser!.authHeaders;
+  //   // custom IOClient from below
+  //   // final GoogleHttpClient client = GoogleHttpClient(authHeaders);
 
-    print("Token Refresh");
-    final GoogleSignInAccount? googleSignInAccount =
-        await googleSignIn.signInSilently();
-    if (googleSignInAccount == null) return null;
+  //   logger.i('Refreshing auth token.');
+  //   final GoogleSignInAccount? googleSignInAccount =
+  //       await googleSignIn.signInSilently();
+  //   if (googleSignInAccount == null) return null;
 
-    final GoogleSignInAuthentication googleSignInAuthentication =
-        await googleSignInAccount.authentication;
+  //   final GoogleSignInAuthentication googleSignInAuthentication =
+  //       await googleSignInAccount.authentication;
 
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleSignInAuthentication.accessToken,
-      idToken: googleSignInAuthentication.idToken,
-    );
-    // final authResult = await signInWithCredential(credential);
+  //   final credential = GoogleAuthProvider.credential(
+  //     accessToken: googleSignInAuthentication.accessToken,
+  //     idToken: googleSignInAuthentication.idToken,
+  //   );
+  //   // final authResult = await signInWithCredential(credential);
 
-    return credential.accessToken;
-    return googleSignInAuthentication.accessToken; // New refreshed token
-  }
+  //   return credential.accessToken;
+  //   // return googleSignInAuthentication.accessToken; // New refreshed token
+  // }
 
   Future<void> launchAuthUrl(String url) async {
     final authUrl = Uri.parse(url);
