@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -144,17 +146,64 @@ class _ScrollingListTiles extends StatelessWidget {
               oldIndex,
               newIndex,
             ),
+            buildDefaultDragHandles: Platform.isAndroid || Platform.isIOS,
             children: state.taskLists
-                .map((e) => ListTile(
+                .map((TaskList e) => _TaskListTile(
                       key: ValueKey(e.id),
-                      title: Text(e.title),
-                      selected: (state.activeList == e),
-                      onTap: () {
-                        tasksCubit.setActiveList(e.id);
-                        if (platformIsMobile()) Navigator.pop(context);
-                      },
+                      taskList: e,
                     ))
                 .toList(),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _TaskListTile extends StatefulWidget {
+  final TaskList taskList;
+
+  const _TaskListTile({
+    Key? key,
+    required this.taskList,
+  }) : super(key: key);
+
+  @override
+  State<_TaskListTile> createState() => __TaskListTileState();
+}
+
+class __TaskListTileState extends State<_TaskListTile> {
+  late TaskList taskList;
+
+  @override
+  void initState() {
+    super.initState();
+    taskList = widget.taskList;
+  }
+
+  bool isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => isHovered = true),
+      onExit: (_) => setState(() => isHovered = false),
+      child: BlocBuilder<TasksCubit, TasksState>(
+        builder: (context, state) {
+          return ListTile(
+            key: ValueKey(taskList.id),
+            title: Text(taskList.title),
+            selected: (state.activeList == taskList),
+            trailing: isHovered
+                ? ReorderableDragStartListener(
+                    index: taskList.index,
+                    child: const Icon(Icons.drag_handle),
+                  )
+                : null,
+            onTap: () {
+              tasksCubit.setActiveList(taskList.id);
+              if (platformIsMobile()) Navigator.pop(context);
+            },
           );
         },
       ),
