@@ -22,6 +22,7 @@ class AppCubit extends Cubit<AppState> {
           appVersion: '',
           updateAutomatically: false,
           updateAvailable: false,
+          updateDownloaded: false,
           updateVersion: '',
           updateInProgress: false,
         )) {
@@ -67,27 +68,42 @@ current version: $currentVersion''');
       updateAvailable: updater.updateAvailable,
       updateVersion: updater.updateVersion,
     ));
+
+    if (settingsCubit.state.updateAutomatically) downloadUpdate();
   }
 
-  Future<void> startUpdate() async {
+  String? updateArchivePath;
+
+  Future<void> downloadUpdate() async {
     if (kDebugMode) return;
-
     assert(_updater != null);
-    emit(state.copyWith(updateInProgress: true));
-    logger.i('Beginning app update');
+    if (!state.updateAvailable) return;
 
-    // TODO: Should we download the update *before* prompting the user? Doing so
-    // would negate the time required to download, not bother the user until a
-    // successful download occurred in case of temporary issues, and make the
-    // update appear essentially instant.
-    final String? updateArchivePath = await _updater!.downloadUpdate();
+    logger.i('Downloading update.');
+    emit(state.copyWith(updateInProgress: true));
+
+    updateArchivePath = await _updater!.downloadUpdate();
     if (updateArchivePath == null) {
       logger.e('Downloading update was NOT successful.');
       return;
     }
 
+    emit(state.copyWith(updateDownloaded: true, updateInProgress: false));
+  }
+
+  Future<void> startUpdate() async {
+    if (kDebugMode) return;
+    assert(_updater != null);
+    if (updateArchivePath == null) {
+      logger.e('Update archive path is null!');
+      return;
+    }
+
+    logger.i('Installing app update.');
+    emit(state.copyWith(updateInProgress: true));
+
     await _updater!.installUpdate(
-      archivePath: updateArchivePath,
+      archivePath: updateArchivePath!,
       relaunchApp: true,
     );
 

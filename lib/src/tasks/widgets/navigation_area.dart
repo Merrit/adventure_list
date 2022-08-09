@@ -86,15 +86,21 @@ class UpdateButton extends StatelessWidget {
         Widget child;
         if (state.updateInProgress) {
           child = Center(
-            child: CircularProgressIndicator(color: Colors.pink.shade400),
+            child: Transform.scale(
+              scale: 0.8,
+              child: CircularProgressIndicator(color: Colors.pink.shade400),
+            ),
           );
         } else {
-          child = const Text('UPDATE');
+          final text = (state.updateDownloaded) ? 'RESTART' : 'DOWNLOAD UPDATE';
+          child = Text(text);
         }
 
         return ListTile(
           title: ElevatedButton(
-            onPressed: () => appCubit.startUpdate(),
+            onPressed: () => (state.updateDownloaded)
+                ? appCubit.startUpdate()
+                : appCubit.downloadUpdate(),
             child: child,
           ),
         );

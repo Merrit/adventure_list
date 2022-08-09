@@ -4,6 +4,7 @@ class AppState extends Equatable {
   final String appVersion;
   final bool updateAutomatically;
   final bool updateAvailable;
+  final bool updateDownloaded;
   final String updateVersion;
   final bool updateInProgress;
 
@@ -11,6 +12,7 @@ class AppState extends Equatable {
     required this.appVersion,
     required this.updateAutomatically,
     required this.updateAvailable,
+    required this.updateDownloaded,
     required this.updateVersion,
     required this.updateInProgress,
   });
@@ -21,6 +23,7 @@ class AppState extends Equatable {
       appVersion,
       updateAutomatically,
       updateAvailable,
+      updateDownloaded,
       updateVersion,
       updateInProgress,
     ];
@@ -30,6 +33,7 @@ class AppState extends Equatable {
     String? appVersion,
     bool? updateAutomatically,
     bool? updateAvailable,
+    bool? updateDownloaded,
     String? updateVersion,
     bool? updateInProgress,
   }) {
@@ -37,6 +41,7 @@ class AppState extends Equatable {
       appVersion: appVersion ?? this.appVersion,
       updateAutomatically: updateAutomatically ?? this.updateAutomatically,
       updateAvailable: updateAvailable ?? this.updateAvailable,
+      updateDownloaded: updateDownloaded ?? this.updateDownloaded,
       updateVersion: updateVersion ?? this.updateVersion,
       updateInProgress: updateInProgress ?? this.updateInProgress,
     );
