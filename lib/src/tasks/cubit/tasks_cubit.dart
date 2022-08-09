@@ -17,17 +17,18 @@ late TasksCubit tasksCubit;
 
 class TasksCubit extends Cubit<TasksState> {
   final StorageService _storageService;
-  final TasksRepository _tasksRepository;
 
-  TasksCubit(
-    this._storageService,
-    this._tasksRepository,
-  ) : super(const TasksState(loading: true, taskLists: [])) {
+  TasksCubit(this._storageService) : super(TasksState.empty()) {
     tasksCubit = this;
-    initialize();
   }
 
-  Future<void> initialize() async {
+  late TasksRepository _tasksRepository;
+
+  Future<void> initialize(TasksRepository tasksRepository) async {
+    _tasksRepository = tasksRepository;
+
+    emit(state.copyWith(loading: true));
+
     List<TaskList> taskLists;
     try {
       taskLists = await _tasksRepository.getAll();

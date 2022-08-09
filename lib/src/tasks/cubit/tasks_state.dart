@@ -13,6 +13,13 @@ class TasksState extends Equatable {
     required this.taskLists,
   });
 
+  factory TasksState.empty() {
+    return const TasksState(
+      loading: false,
+      taskLists: [],
+    );
+  }
+
   @override
   List<Object?> get props => [activeList, activeTask, loading, taskLists];
 

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
 
 import '../../storage/storage_service.dart';
+import '../../tasks/tasks.dart';
 import '../google_auth.dart';
 
 part 'authentication_state.dart';
@@ -21,6 +22,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     required AuthenticationState initialState,
   }) : super(initialState) {
     authCubit = this;
+    if (state.signedIn) _initializeTasksCubit();
   }
 
   static Future<AuthenticationCubit> initialize({
@@ -71,5 +73,20 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       accessCredentials: null,
       signedIn: false,
     ));
+  }
+
+  @override
+  void onChange(Change<AuthenticationState> change) {
+    if (change.nextState.signedIn) _initializeTasksCubit();
+    super.onChange(change);
+  }
+
+  Future<void> _initializeTasksCubit() async {
+    final tasksRepository = await GoogleCalendar.initialize(
+      clientId: GoogleAuthIds.clientId,
+      credentials: state.accessCredentials!,
+    );
+
+    tasksCubit.initialize(tasksRepository);
   }
 }

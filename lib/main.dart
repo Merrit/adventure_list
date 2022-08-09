@@ -17,6 +17,7 @@ import 'src/home_widget/home_widget.dart';
 import 'src/logs/logs.dart';
 import 'src/settings/cubit/settings_cubit.dart';
 import 'src/storage/storage_service.dart';
+import 'src/tasks/tasks.dart';
 import 'src/window/app_window.dart';
 
 void main() async {
@@ -32,6 +33,7 @@ void main() async {
 
   await initializeLogger(storageService);
 
+  final tasksCubit = TasksCubit(storageService);
   final googleAuth = GoogleAuth();
   final authenticationCubit = await AuthenticationCubit.initialize(
     googleAuth: googleAuth,
@@ -54,6 +56,7 @@ void main() async {
           ),
           BlocProvider(create: (context) => authenticationCubit),
           BlocProvider.value(value: settingsCubitInstance),
+          BlocProvider.value(value: tasksCubit),
         ],
         child: const App(),
       ),

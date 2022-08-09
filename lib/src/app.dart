@@ -13,12 +13,7 @@ import 'home_widget/widgets/home_screen_widget.dart';
 import 'home_widget/widgets/home_widget_config_page.dart';
 import 'settings/widgets/settings_page.dart';
 import 'shortcuts/app_shortcuts.dart';
-import 'storage/storage_service.dart';
 import 'tasks/tasks.dart';
-
-TasksCubit? _tasksCubit;
-
-Future<TasksRepository>? _tasksRepository;
 
 class App extends StatelessWidget {
   const App({
@@ -98,31 +93,12 @@ class App extends StatelessWidget {
                       child = const SettingsPage();
                       break;
                     default:
-                      _tasksRepository ??= GoogleCalendar.initialize(
-                        clientId: GoogleAuthIds.clientId,
-                        credentials: state.accessCredentials!,
-                      );
                       child = const TasksPage();
                   }
 
-                  return FutureBuilder(
-                    future: _tasksRepository,
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) return const SizedBox();
-
-                      _tasksCubit ??= TasksCubit(
-                        context.read<StorageService>(),
-                        snapshot.data as TasksRepository,
-                      );
-
-                      return BlocProvider.value(
-                        value: _tasksCubit!,
-                        child: Platform.isAndroid
-                            ? HomeScreenWidget(child: child)
-                            : child,
-                      );
-                    },
-                  );
+                  return Platform.isAndroid
+                      ? HomeScreenWidget(child: child)
+                      : child;
                 },
               );
             },
