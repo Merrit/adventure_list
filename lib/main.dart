@@ -28,9 +28,9 @@ void main() async {
     HomeWidget.registerBackgroundCallback(backgroundCallback);
   }
 
-  await initializeLogger();
-
   final storageService = await StorageService.initialize();
+
+  await initializeLogger(storageService);
 
   final googleAuth = GoogleAuth();
   final authenticationCubit = await AuthenticationCubit.initialize(

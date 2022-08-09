@@ -1,10 +1,9 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:helpers/helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-
-import '../logs/logs.dart';
 
 /// Interfaces with the host OS to store & retrieve data from disk.
 class StorageService {
@@ -73,7 +72,7 @@ class StorageService {
     try {
       return await Hive.openBox(storageAreaName ?? _generalBox);
     } on Exception catch (e) {
-      logger.e('Unable to access storage; is another app instance '
+      debugPrint('Unable to access storage; is another app instance '
           'already running? \n$e');
       exit(1);
     }

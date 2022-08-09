@@ -8,13 +8,23 @@ import 'package:logger/src/outputs/file_output.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../storage/storage_service.dart';
+
 late final Logger logger;
 
-Future<void> initializeLogger() async {
+Future<void> initializeLogger(StorageService storageService) async {
+  final bool? logToFile = await storageService.getValue('logToFile');
+
   final dataDir = await getApplicationSupportDirectory();
   final logFile = File('${dataDir.path}${Platform.pathSeparator}log.txt');
   if (await logFile.exists()) await logFile.delete();
   await logFile.create();
+
+  final List<LogOutput> outputs = [
+    ConsoleOutput(),
+  ];
+
+  if (logToFile == true) outputs.add(FileOutput(file: logFile));
 
   logger = Logger(
     filter: ProductionFilter(),
@@ -22,9 +32,6 @@ Future<void> initializeLogger() async {
       colors: stdout.supportsAnsiEscapes,
       lineLength: (stdout.hasTerminal) ? stdout.terminalColumns : 120,
     ),
-    output: MultiOutput([
-      ConsoleOutput(),
-      FileOutput(file: logFile), // TODO: Connect with user preference.
-    ]),
+    output: MultiOutput(outputs),
   );
 }
