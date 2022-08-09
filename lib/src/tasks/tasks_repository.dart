@@ -35,13 +35,13 @@ abstract class TasksRepository {
 
   /// Create a new [Task].
   Future<Task> createTask({
-    required String calendarId, // TODO: Genericize this for non-calendar.
+    required String taskListId,
     required Task newTask,
   });
 
   /// Update the provided [Task] in the repository.
   Future<Task> updateTask({
-    required String calendarId, // TODO: Genericize this for non-calendar.
+    required String taskListId,
     required Task updatedTask,
   });
 }

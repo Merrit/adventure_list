@@ -124,12 +124,12 @@ class GoogleCalendar implements TasksRepository {
 
   @override
   Future<Task> createTask({
-    required String calendarId,
+    required String taskListId,
     required Task newTask,
   }) async {
     final createdEvent = await _api.events.insert(
       newTask.toGoogleEvent(),
-      calendarId,
+      taskListId,
     );
 
     return createdEvent.toModel();
@@ -137,12 +137,12 @@ class GoogleCalendar implements TasksRepository {
 
   @override
   Future<Task> updateTask({
-    required String calendarId,
+    required String taskListId,
     required Task updatedTask,
   }) async {
     final updatedEvent = await _api.events.update(
       updatedTask.toGoogleEvent(),
-      calendarId,
+      taskListId,
       updatedTask.id,
     );
 

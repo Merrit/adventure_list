@@ -121,7 +121,7 @@ class TasksCubit extends Cubit<TasksState> {
     assert(state.activeList != null);
 
     newTask = await _tasksRepository.createTask(
-      calendarId: state.activeList!.id,
+      taskListId: state.activeList!.id,
       newTask: newTask,
     );
 
@@ -153,7 +153,7 @@ class TasksCubit extends Cubit<TasksState> {
     emit(state.copyWith(activeList: state.activeList!.copyWith(items: items)));
 
     final updatedTaskFromRepo = await _tasksRepository.updateTask(
-      calendarId: state.activeList!.id,
+      taskListId: state.activeList!.id,
       updatedTask: task,
     );
 
@@ -192,7 +192,7 @@ class TasksCubit extends Cubit<TasksState> {
 
     for (var task in updatedList.items) {
       await _tasksRepository.updateTask(
-        calendarId: updatedList.id,
+        taskListId: updatedList.id,
         updatedTask: task,
       );
     }
