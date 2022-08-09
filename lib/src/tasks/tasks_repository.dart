@@ -1,26 +1,7 @@
-import 'package:googleapis_auth/googleapis_auth.dart';
-
-import '../authentication/authentication.dart';
 import 'tasks.dart';
 
 /// Abstract interface for task repositories.
-///
-/// Currently supports [GoogleCalendar].
-///
-/// Support for a local-only repository is being considered.
 abstract class TasksRepository {
-  // TODO: Genericize this initializer for non-calendar.
-  // Maybe just have the initializer in the concrete classes.
-  static Future<TasksRepository> initialize({
-    required ClientId clientId,
-    required AccessCredentials credentials,
-  }) async {
-    return await GoogleCalendar.initialize(
-      clientId: GoogleAuthIds.clientId,
-      credentials: credentials,
-    );
-  }
-
   /// Fetch all of the user's [TaskList]s.
   Future<List<TaskList>> getAll();
 

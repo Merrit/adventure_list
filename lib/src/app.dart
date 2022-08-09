@@ -98,7 +98,7 @@ class App extends StatelessWidget {
                       child = const SettingsPage();
                       break;
                     default:
-                      _tasksRepository ??= TasksRepository.initialize(
+                      _tasksRepository ??= GoogleCalendar.initialize(
                         clientId: GoogleAuthIds.clientId,
                         credentials: state.accessCredentials!,
                       );
