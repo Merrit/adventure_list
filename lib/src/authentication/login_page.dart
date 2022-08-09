@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
+import 'package:window_to_front/window_to_front.dart';
 
 import '../tasks/tasks.dart';
 import 'cubit/authentication_cubit.dart';
@@ -25,8 +27,12 @@ class LoginPage extends StatelessWidget {
               // Signed in, inform user and proceed to load app.
               if (state.signedIn)
                 Builder(builder: (context) {
+                  if (Platform.isLinux || Platform.isWindows) {
+                    // Focus app window after authentication.
+                    WindowToFront.activate();
+                  }
+
                   Timer(const Duration(seconds: 2), () {
-                    // TODO: window_manager -> focus window?
                     Navigator.pushReplacementNamed(
                       context,
                       TasksPage.routeName,
@@ -51,12 +57,6 @@ class LoginPage extends StatelessWidget {
                   Buttons.GoogleDark,
                   onPressed: () async {
                     await authCubit.login();
-
-                    // if (state.signedIn) {
-                    //   print('signed in!');
-                    // } else {
-                    //   print('sign in failed!');
-                    // }
                   },
                 ),
               ),

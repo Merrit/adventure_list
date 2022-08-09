@@ -790,6 +790,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.5"
+  window_to_front:
+    dependency: "direct main"
+    description:
+      name: window_to_front
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.3"
   workmanager:
     dependency: "direct main"
     description:
