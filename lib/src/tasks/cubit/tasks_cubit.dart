@@ -133,7 +133,10 @@ class TasksCubit extends Cubit<TasksState> {
       ..remove(state.activeList)
       ..add(updatedList);
 
-    emit(state.copyWith(activeList: updatedList, taskLists: updatedTaskLists));
+    emit(state.copyWith(
+      activeList: updatedList,
+      taskLists: _listsInOrder(updatedTaskLists),
+    ));
   }
 
   Future<void> updateTask(Task task) async {
@@ -178,12 +181,14 @@ class TasksCubit extends Cubit<TasksState> {
           .toList(),
     );
 
-    // TODO: Replace this remove/add with by index version once indexes are
-    // working.
     final taskLists = List<TaskList>.from(state.taskLists)
       ..removeWhere((element) => element.id == updatedList.id)
       ..add(updatedList);
-    emit(state.copyWith(activeList: updatedList, taskLists: taskLists));
+
+    emit(state.copyWith(
+      activeList: updatedList,
+      taskLists: _listsInOrder(taskLists),
+    ));
 
     for (var task in updatedList.items) {
       await _tasksRepository.updateTask(
