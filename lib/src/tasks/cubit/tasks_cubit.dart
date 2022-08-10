@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:googleapis_auth/googleapis_auth.dart';
 
 import '../../authentication/authentication.dart';
 import '../../home_widget/home_widget_manager.dart';
@@ -23,17 +24,28 @@ class TasksCubit extends Cubit<TasksState> {
     this._storageService,
   ) : super(TasksState.empty()) {
     tasksCubit = this;
-    authCubit.stream.listen((AuthenticationState authState) async {
-      if (authState.signedIn) {
-        final tasksRepository = await GoogleCalendar.initialize(
-          clientId: GoogleAuthIds.clientId,
-          credentials: authState.accessCredentials!,
-        );
 
-        // This should be injected so we can do mocks / tests.
-        initialize(tasksRepository);
+    // If already signed in, initialize the tasks.
+    if (authCubit.state.signedIn) {
+      _getTasksRepo(authCubit.state.accessCredentials!);
+    }
+
+    authCubit.stream.listen((AuthenticationState authState) async {
+      // If sign in happens after cubit is created, initialize the tasks.
+      if (authState.signedIn) {
+        _getTasksRepo(authCubit.state.accessCredentials!);
       }
     });
+  }
+
+  // This should be injected so we can do mocks / tests.
+  Future<void> _getTasksRepo(AccessCredentials credentials) async {
+    final tasksRepository = await GoogleCalendar.initialize(
+      clientId: GoogleAuthIds.clientId,
+      credentials: credentials,
+    );
+
+    initialize(tasksRepository);
   }
 
   late TasksRepository _tasksRepository;
