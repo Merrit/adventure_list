@@ -34,7 +34,7 @@ dependencies:
   helpers:
     git:
       url: https://github.com/Merrit/helpers.git
-      ref: c95b618b1e22c70d1375d1eb0a00a1dbd529bd18
+      ref: 40f734a473be0e06e23d95551d87defb4a79aaf7
   hive_flutter: ^1.1.0
   home_widget: ^0.1.6
   http: ^0.13.4
