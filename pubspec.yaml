@@ -48,7 +48,7 @@ dependencies:
   self_updater:
     git:
       url: https://github.com/Merrit/self_updater.git
-      ref: 9b8f85d3e26de724a303bf9a6f4cbcf7d6a9d133
+      ref: 1b82a01047a129a12b0a23c8948b1e4270385bd4
   url_launcher: ^6.1.4
   window_manager: ^0.2.5
   workmanager: ^0.5.0
