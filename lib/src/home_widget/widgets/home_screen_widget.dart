@@ -43,8 +43,15 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
         navigator.pushReplacementNamed(HomeWidgetConfigPage.routeName);
         return;
       case 'launchWidgetList':
-        tasksCubit.setActiveList(settingsCubit.state.homeWidgetSelectedListId);
-        Navigator.pushReplacementNamed(context, TasksPage.routeName);
+        final selectedListId = settingsCubit.state.homeWidgetSelectedListId;
+        if (selectedListId == '') {
+          // No selected list, launch selection dialog.
+          navigator.pushReplacementNamed(HomeWidgetConfigPage.routeName);
+        } else {
+          tasksCubit
+              .setActiveList(settingsCubit.state.homeWidgetSelectedListId);
+          Navigator.pushReplacementNamed(context, TasksPage.routeName);
+        }
         return;
       default:
         showDialog(
