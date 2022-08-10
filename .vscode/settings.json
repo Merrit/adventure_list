@@ -1,4 +1,5 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
-    "git.detectSubmodules": false
+    "git.detectSubmodules": false,
+    "git.pullTags": false
 }
