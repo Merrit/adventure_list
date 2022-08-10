@@ -77,6 +77,9 @@ class UpdateButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (kDebugMode) return const SizedBox();
+    // Only show on Linux. Mobile / web don't need self_updater and Windows is
+    // being persistently borken.
+    if (!Platform.isLinux) return const SizedBox();
 
     return BlocBuilder<AppCubit, AppState>(
       builder: (context, state) {
