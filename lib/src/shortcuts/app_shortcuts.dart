@@ -17,10 +17,10 @@ class AppShortcuts extends StatelessWidget {
     required this.child,
   }) : super(key: key);
 
-  final _shortcuts = <LogicalKeySet, Intent>{
-    LogicalKeySet(
-      LogicalKeyboardKey.control,
+  final _shortcuts = <ShortcutActivator, Intent>{
+    const SingleActivator(
       LogicalKeyboardKey.keyQ,
+      control: true,
     ): const QuitIntent(),
   };
 
