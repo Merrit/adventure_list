@@ -19,7 +19,7 @@ class TasksView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const _TasksHeader(),
-              const NewTaskButton(),
+              const _NewTaskButton(),
               Expanded(
                 child: ReorderableListView(
                   scrollController: ScrollController(),
@@ -106,6 +106,21 @@ class _TasksHeader extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+/// Button for creating new tasks.
+class _NewTaskButton extends StatelessWidget {
+  const _NewTaskButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextInputListTile(
+      debugLabel: 'NewTaskButton FocusNode',
+      leading: const Icon(Icons.add),
+      placeholderText: 'New Task',
+      callback: (value) => tasksCubit.createTask(Task(title: value)),
     );
   }
 }

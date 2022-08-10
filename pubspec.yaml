@@ -34,7 +34,6 @@ dependencies:
   helpers:
     git:
       url: https://github.com/Merrit/helpers.git
-      ref: 40f734a473be0e06e23d95551d87defb4a79aaf7
   hive_flutter: ^1.1.0
   home_widget: ^0.1.6
   http: ^0.13.4
@@ -48,7 +47,6 @@ dependencies:
   self_updater:
     git:
       url: https://github.com/Merrit/self_updater.git
-      ref: 103b4a1d522173bb6ed739e232892b62728857fb
   url_launcher: ^6.1.4
   window_manager: ^0.2.5
   workmanager: ^0.5.0
