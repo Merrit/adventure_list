@@ -48,28 +48,25 @@ class _NavContents extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          const _CreateListButton(),
-          const _ScrollingListTiles(),
-          ListTile(
-            title: const Text('Settings'),
-            onTap: () {
-              if (platformIsMobile()) {
-                Navigator.pushNamed(context, SettingsPage.routeName);
-              } else {
-                showDialog(
-                  context: context,
-                  builder: (context) => const SettingsDialog(),
-                );
-              }
-            },
-          ),
-          const UpdateButton(),
-        ],
-      ),
+    return Column(
+      children: [
+        const _CreateListButton(),
+        const _ScrollingListTiles(),
+        ListTile(
+          title: const Text('Settings'),
+          onTap: () {
+            if (platformIsMobile()) {
+              Navigator.pushNamed(context, SettingsPage.routeName);
+            } else {
+              showDialog(
+                context: context,
+                builder: (context) => const SettingsDialog(),
+              );
+            }
+          },
+        ),
+        const UpdateButton(),
+      ],
     );
   }
 }
