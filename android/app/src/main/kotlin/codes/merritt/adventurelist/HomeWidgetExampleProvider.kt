@@ -50,8 +50,8 @@ class HomeWidgetExampleProvider : HomeWidgetProvider() {
                         )
                     }
 
-                val listNamesJson = widgetData.getString("listNames", null)
-                val listNames = jsonToList(listNamesJson)
+                // val listNamesJson = widgetData.getString("listNames", null)
+                // val listNames = jsonToList(listNamesJson)
 
                 var tasksListString = ""
                 for (i in 0 until tasksList.size) {

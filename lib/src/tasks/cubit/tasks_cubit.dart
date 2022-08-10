@@ -210,7 +210,7 @@ class TasksCubit extends Cubit<TasksState> {
         (taskList) => taskList.id == selectedListId,
       );
       if (selectedList != null) {
-        updateHomeWidget('listNames', selectedList.toJson());
+        updateHomeWidget('selectedList', selectedList.toJson());
       }
     }
 
