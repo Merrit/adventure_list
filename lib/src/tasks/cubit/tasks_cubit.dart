@@ -4,7 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../authentication/cubit/authentication_cubit.dart';
+import '../../authentication/authentication.dart';
 import '../../home_widget/home_widget_manager.dart';
 import '../../logs/logs.dart';
 import '../../settings/settings.dart';
@@ -18,8 +18,22 @@ late TasksCubit tasksCubit;
 class TasksCubit extends Cubit<TasksState> {
   final StorageService _storageService;
 
-  TasksCubit(this._storageService) : super(TasksState.empty()) {
+  TasksCubit(
+    AuthenticationCubit authCubit,
+    this._storageService,
+  ) : super(TasksState.empty()) {
     tasksCubit = this;
+    authCubit.stream.listen((AuthenticationState authState) async {
+      if (authState.signedIn) {
+        final tasksRepository = await GoogleCalendar.initialize(
+          clientId: GoogleAuthIds.clientId,
+          credentials: authState.accessCredentials!,
+        );
+
+        // This should be injected so we can do mocks / tests.
+        initialize(tasksRepository);
+      }
+    });
   }
 
   late TasksRepository _tasksRepository;

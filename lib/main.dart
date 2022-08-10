@@ -33,13 +33,13 @@ void main() async {
 
   await initializeLogger(storageService);
 
-  final tasksCubit = TasksCubit(storageService);
   final googleAuth = GoogleAuth();
   final authenticationCubit = await AuthenticationCubit.initialize(
     googleAuth: googleAuth,
     storageService: storageService,
   );
 
+  final tasksCubit = TasksCubit(authenticationCubit, storageService);
   final settingsCubitInstance = await SettingsCubit.initialize(storageService);
 
   runApp(
