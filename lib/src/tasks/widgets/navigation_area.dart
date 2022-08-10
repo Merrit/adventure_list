@@ -113,19 +113,23 @@ class _CreateListButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.add),
-      onPressed: () async {
-        final String? newListName = await showInputDialog(
-          context: context,
-          title: 'Create New List',
-          hintText: 'Name',
-        );
+    return Opacity(
+      opacity: 0.5,
+      child: ListTile(
+        leading: const Icon(Icons.add),
+        title: const Text('New List'),
+        onTap: () async {
+          final String? newListName = await showInputDialog(
+            context: context,
+            title: 'Create New List',
+            hintText: 'Name',
+          );
 
-        if (newListName == null || newListName == '') return;
+          if (newListName == null || newListName == '') return;
 
-        tasksCubit.createList(newListName);
-      },
+          tasksCubit.createList(newListName);
+        },
+      ),
     );
   }
 }
