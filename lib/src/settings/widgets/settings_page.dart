@@ -186,6 +186,8 @@ class _UpdateChannelTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!Platform.isLinux && !Platform.isWindows) return const SizedBox();
+
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, state) {
         return Column(
