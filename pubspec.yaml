@@ -40,6 +40,8 @@ dependencies:
   http: ^0.13.4
   intl: ^0.17.0
   logger: ^1.1.0
+  # move_to_background sends the Android app to background when user exits
+  # instead of the app closing entirely.
   move_to_background: ^1.0.2
   package_info_plus: ^1.4.2
   path_provider: ^2.0.11
