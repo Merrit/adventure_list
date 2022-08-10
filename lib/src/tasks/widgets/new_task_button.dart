@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../tasks.dart';
 
@@ -47,30 +48,37 @@ class _NewTaskButtonState extends State<NewTaskButton> {
       FocusManager.instance.primaryFocus?.unfocus();
     }
 
-    return Opacity(
-      opacity: opacity,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Theme(
-          data: Theme.of(context).copyWith(
-            inputDecorationTheme: const InputDecorationTheme(
-              border: InputBorder.none,
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.escape): () {
+          focusNode.unfocus();
+        },
+      },
+      child: Opacity(
+        opacity: opacity,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              inputDecorationTheme: const InputDecorationTheme(
+                border: InputBorder.none,
+              ),
             ),
-          ),
-          child: ListTile(
-            hoverColor: Colors.transparent,
-            focusColor: Colors.transparent,
-            leading: const Icon(Icons.add),
-            // title: child,
-            title: TextField(
-              controller: controller,
-              focusNode: focusNode,
-              textCapitalization: TextCapitalization.sentences,
-              onSubmitted: (_) => _createTask(),
+            child: ListTile(
+              hoverColor: Colors.transparent,
+              focusColor: Colors.transparent,
+              leading: const Icon(Icons.add),
+              // title: child,
+              title: TextField(
+                controller: controller,
+                focusNode: focusNode,
+                textCapitalization: TextCapitalization.sentences,
+                onSubmitted: (_) => _createTask(),
+              ),
+              onTap: () {
+                focusNode.requestFocus();
+              },
             ),
-            onTap: () {
-              focusNode.requestFocus();
-            },
           ),
         ),
       ),
