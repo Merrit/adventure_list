@@ -170,23 +170,32 @@ class TasksCubit extends Cubit<TasksState> {
     // If the task is unchanged, don't do anything.
     if (state.activeList!.items.contains(task)) return;
 
+    final activeTask = (state.activeTask?.id == task.id) ? task : null;
     final int index = state.activeList!.items.indexWhere(
       (element) => element.id == task.id,
     );
 
+    // Update local state immediately.
     var items = List<Task>.from(state.activeList!.items)
       ..removeAt(index)
       ..insert(index, task);
-    emit(state.copyWith(activeList: state.activeList!.copyWith(items: items)));
+    emit(state.copyWith(
+      activeList: state.activeList!.copyWith(items: items),
+      activeTask: activeTask,
+    ));
 
     final updatedTaskFromRepo = await _tasksRepository.updateTask(
       taskListId: state.activeList!.id,
       updatedTask: task,
     );
 
+    // Update local state with final remote changes.
     items.removeAt(index);
     items.insert(index, updatedTaskFromRepo);
-    emit(state.copyWith(activeList: state.activeList!.copyWith(items: items)));
+    emit(state.copyWith(
+      activeList: state.activeList!.copyWith(items: items),
+      activeTask: activeTask,
+    ));
   }
 
   void setActiveTask(String? id) {

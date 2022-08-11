@@ -48,13 +48,14 @@ class TaskDetailsView extends StatelessWidget {
                       Flexible(
                         fit: FlexFit.loose,
                         child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             IconButton(
                               icon: const Icon(Icons.close),
                               onPressed: () => tasksCubit.setActiveTask(null),
                             ),
-                            Text(task.title),
+                            const Flexible(child: _TaskNameWidget()),
                             PopupMenuButton(
                               itemBuilder: (context) {
                                 return [
@@ -138,6 +139,32 @@ class TaskDetailsView extends StatelessWidget {
             child: child,
           ),
           child: (task == null) ? const SizedBox() : widgetContents,
+        );
+      },
+    );
+  }
+}
+
+class _TaskNameWidget extends StatelessWidget {
+  const _TaskNameWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        if (state.activeTask == null) return const SizedBox();
+
+        return TextInputListTile(
+          key: ValueKey(state.activeTask),
+          placeholderText: state.activeTask!.title,
+          editingPlaceholderText: true,
+          textAlign: TextAlign.center,
+          unfocusedOpacity: 1.0,
+          callback: (String value) => tasksCubit.updateTask(
+            state.activeTask!.copyWith(
+              title: value,
+            ),
+          ),
         );
       },
     );
