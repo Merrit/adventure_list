@@ -119,15 +119,16 @@ void callbackDispatcher() {
 
 /// Called when Doing Background Work initiated from Widget
 Future<void> backgroundCallback(Uri? data) async {
-  if (data?.host == 'titleclicked') {
-    final greetings = [
-      'frog',
-      'fox',
-      'wolf',
-      'amaterasu',
-    ];
-    final selectedGreeting = greetings[Random().nextInt(greetings.length)];
+  // Not currently used.
+  // if (data?.host == 'titleclicked') {
+  //   final greetings = [
+  //     'frog',
+  //     'fox',
+  //     'wolf',
+  //     'amaterasu',
+  //   ];
+  //   final selectedGreeting = greetings[Random().nextInt(greetings.length)];
 
-    await updateHomeWidget('title', selectedGreeting);
-  }
+  //   await updateHomeWidget('title', selectedGreeting);
+  // }
 }
