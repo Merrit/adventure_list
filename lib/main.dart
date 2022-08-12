@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:desktop_integration/desktop_integration.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,11 +9,11 @@ import 'package:helpers/helpers.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:workmanager/workmanager.dart';
 
+import 'firebase_options.dart';
 import 'src/app.dart';
 import 'src/app/cubit/app_cubit.dart';
 import 'src/authentication/authentication.dart';
 import 'src/constants.dart';
-import 'src/home_widget/home_widget.dart';
 import 'src/logs/logs.dart';
 import 'src/settings/cubit/settings_cubit.dart';
 import 'src/storage/storage_service.dart';
@@ -23,6 +23,8 @@ import 'src/window/app_window.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppWindow.initialize();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   if (Platform.isAndroid) {
     Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
