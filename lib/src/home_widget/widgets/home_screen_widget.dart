@@ -20,15 +20,9 @@ class HomeScreenWidget extends StatefulWidget {
 
 class _HomeScreenWidgetState extends State<HomeScreenWidget> {
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _checkForWidgetLaunch();
+  void initState() {
+    super.initState();
     HomeWidget.widgetClicked.listen(_handleAppLaunchedFromHomeWidget);
-  }
-
-  void _checkForWidgetLaunch() {
-    HomeWidget.initiallyLaunchedFromHomeWidget()
-        .then(_handleAppLaunchedFromHomeWidget);
   }
 
   void _handleAppLaunchedFromHomeWidget(Uri? uri) {
