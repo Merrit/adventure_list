@@ -277,7 +277,7 @@ class _SignOutButton extends StatelessWidget {
               return const CircularProgressIndicator();
             });
 
-        await authCubit.logout();
+        await authCubit.signOut();
         navigator.pushReplacementNamed(SignInPage.routeName);
       },
       child: const Text('Sign Out'),

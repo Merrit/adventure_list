@@ -60,7 +60,8 @@ class TasksCubit extends Cubit<TasksState> {
       taskLists = await _tasksRepository.getAll();
     } catch (e) {
       logger.w('Exception while attempting to fetch tasks: $e');
-      await authCubit.logout();
+      // Do we want to sign out??
+      // await authCubit.signOut();
       return;
     }
 

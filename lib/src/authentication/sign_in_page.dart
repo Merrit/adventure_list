@@ -56,7 +56,7 @@ class SignInPage extends StatelessWidget {
                 child: SignInButton(
                   Buttons.GoogleDark,
                   onPressed: () async {
-                    await authCubit.login();
+                    await authCubit.signIn();
                   },
                 ),
               ),

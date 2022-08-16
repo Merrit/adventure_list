@@ -46,7 +46,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     );
   }
 
-  Future<void> login() async {
+  Future<void> signIn() async {
     assert(!state.signedIn);
 
     final accessCredentials = await _googleAuth.login();
@@ -63,7 +63,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     );
   }
 
-  Future<void> logout() async {
+  Future<void> signOut() async {
     await _googleAuth.signOut();
     await _storageService.deleteValue('accessCredentials');
 
