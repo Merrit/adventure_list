@@ -7,7 +7,7 @@ import 'package:self_updater/self_updater.dart';
 
 import '../../app/cubit/app_cubit.dart';
 import '../../authentication/cubit/authentication_cubit.dart';
-import '../../authentication/login_page.dart';
+import '../../authentication/sign_in_page.dart';
 import '../settings.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -278,7 +278,7 @@ class _SignOutButton extends StatelessWidget {
             });
 
         await authCubit.logout();
-        navigator.pushReplacementNamed(LoginPage.routeName);
+        navigator.pushReplacementNamed(SignInPage.routeName);
       },
       child: const Text('Sign Out'),
     );

@@ -10,10 +10,10 @@ import 'package:window_to_front/window_to_front.dart';
 import '../tasks/tasks.dart';
 import 'cubit/authentication_cubit.dart';
 
-class LoginPage extends StatelessWidget {
+class SignInPage extends StatelessWidget {
   static const routeName = '/login_page';
 
-  const LoginPage({Key? key}) : super(key: key);
+  const SignInPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

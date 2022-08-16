@@ -8,7 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'authentication/authentication.dart';
-import 'authentication/login_page.dart';
+import 'authentication/sign_in_page.dart';
 import 'home_widget/widgets/home_screen_widget.dart';
 import 'home_widget/widgets/home_widget_config_page.dart';
 import 'settings/widgets/settings_page.dart';
@@ -72,7 +72,7 @@ class App extends StatelessWidget {
               return MaterialPageRoute<void>(
                 settings: routeSettings,
                 builder: (BuildContext context) {
-                  if (!signedIn) return const LoginPage();
+                  if (!signedIn) return const SignInPage();
 
                   Widget child;
 
@@ -80,8 +80,8 @@ class App extends StatelessWidget {
                     case HomeWidgetConfigPage.routeName:
                       child = const HomeWidgetConfigPage();
                       break;
-                    case LoginPage.routeName:
-                      child = const LoginPage();
+                    case SignInPage.routeName:
+                      child = const SignInPage();
                       break;
                     case TaskDetails.routeName:
                       child = const TaskDetails();
