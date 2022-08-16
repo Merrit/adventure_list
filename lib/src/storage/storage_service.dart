@@ -46,6 +46,15 @@ class StorageService {
     await box.put(key, value);
   }
 
+  /// Save all values to disk.
+  Future<void> saveStorageAreaValues({
+    required String storageArea,
+    required Map<dynamic, dynamic> entries,
+  }) async {
+    final Box box = await _getBox(storageArea);
+    await box.putAll(entries);
+  }
+
   /// Get a value from local disk storage.
   ///
   /// If the [key] doesn't exist, `null` is returned.
