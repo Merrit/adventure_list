@@ -24,7 +24,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppWindow.initialize();
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Firebase not available on Linux & Windows.
+  if (!Platform.isLinux && !Platform.isWindows) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
 
   if (Platform.isAndroid) {
     Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
