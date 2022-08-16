@@ -53,8 +53,8 @@ class TaskList extends Equatable {
   factory TaskList.fromMap(Map<String, dynamic> map) {
     return TaskList(
       id: map['id'] ?? '',
-      index: map['index'] ?? -1,
-      items: map['items']?.map((x) => Task.fromMap(x)) ?? [],
+      index: map['index']?.toInt() ?? -1,
+      items: List<Task>.from(map['items']?.map((x) => Task.fromMap(x))),
       title: map['title'] ?? '',
     );
   }
