@@ -25,6 +25,8 @@ class TasksCubit extends Cubit<TasksState> {
   ) : super(TasksState.empty()) {
     tasksCubit = this;
 
+    _getCachedData();
+
     // If already signed in, initialize the tasks.
     if (authCubit.state.signedIn) {
       _getTasksRepo(authCubit.state.accessCredentials!);
@@ -36,6 +38,24 @@ class TasksCubit extends Cubit<TasksState> {
         _getTasksRepo(authCubit.state.accessCredentials!);
       }
     });
+  }
+
+  Future<void> _getCachedData() async {
+    final List<String> cache = List<String>.from(
+      await _storageService.getStorageAreaValues('cache'),
+    );
+
+    final List<TaskList> taskLists = cache //
+        .map((e) => TaskList.fromJson(e))
+        .toList();
+
+    final String? activeListId = await _storageService.getValue('activeList');
+
+    emit(state.copyWith(
+      activeList: taskLists.singleWhereOrNull((e) => e.id == activeListId),
+      loading: false,
+      taskLists: _listsInOrder(taskLists),
+    ));
   }
 
   // This should be injected so we can do mocks / tests.
@@ -237,19 +257,34 @@ class TasksCubit extends Cubit<TasksState> {
 
   @override
   void onChange(Change<TasksState> change) {
-    if (Platform.isAndroid) {
-      final data = change.nextState;
-      final selectedListId = settingsCubit.state.homeWidgetSelectedListId;
-      final selectedList = data //
-          .taskLists
-          .singleWhereOrNull(
-        (taskList) => taskList.id == selectedListId,
-      );
-      if (selectedList != null) {
-        updateHomeWidget('selectedList', selectedList.toJson());
-      }
-    }
+    _cacheData(change.nextState);
+
+    if (Platform.isAndroid) _updateAndroidWidget(change.nextState);
 
     super.onChange(change);
+  }
+
+  Future<void> _cacheData(TasksState state) async {
+    final entries = {};
+    for (var taskList in state.taskLists) {
+      entries[taskList.id] = taskList.toJson();
+    }
+
+    await _storageService.saveStorageAreaValues(
+      storageArea: 'cache',
+      entries: entries,
+    );
+  }
+
+  void _updateAndroidWidget(TasksState data) {
+    final selectedListId = settingsCubit.state.homeWidgetSelectedListId;
+    final selectedList = data //
+        .taskLists
+        .singleWhereOrNull(
+      (taskList) => taskList.id == selectedListId,
+    );
+    if (selectedList != null) {
+      updateHomeWidget('selectedList', selectedList.toJson());
+    }
   }
 }
