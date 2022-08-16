@@ -78,25 +78,7 @@ class TaskDetailsView extends StatelessWidget {
                           width: 400,
                           child: ListView(
                             children: [
-                              // Description
-                              ListTile(
-                                leading: const Icon(Icons.edit),
-                                title: Text((task.description == null)
-                                    ? 'Description'
-                                    : task.description!),
-                                onTap: () async {
-                                  final String? newDescription =
-                                      await showInputDialog(
-                                    context: context,
-                                  );
-
-                                  if (newDescription == null) return;
-
-                                  tasksCubit.updateTask(
-                                    task.copyWith(description: newDescription),
-                                  );
-                                },
-                              ),
+                              const _DescriptionWidget(),
                               OutlinedButton(
                                 onPressed: () async {
                                   final newTaskName = await showInputDialog(
@@ -165,6 +147,36 @@ class _TaskNameWidget extends StatelessWidget {
               title: value,
             ),
           ),
+        );
+      },
+    );
+  }
+}
+
+class _DescriptionWidget extends StatelessWidget {
+  const _DescriptionWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        final task = state.activeTask;
+        if (task == null) return const SizedBox();
+
+        return ListTile(
+          leading: const Icon(Icons.edit),
+          title: Text(task.description ?? 'Description'),
+          onTap: () async {
+            final String? newDescription = await showInputDialog(
+              context: context,
+            );
+
+            if (newDescription == null) return;
+
+            tasksCubit.updateTask(
+              task.copyWith(description: newDescription),
+            );
+          },
         );
       },
     );
