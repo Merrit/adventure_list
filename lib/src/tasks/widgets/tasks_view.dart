@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide PopupMenuButton, PopupMenuItem;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
+import '../../core/core.dart';
 import '../tasks.dart';
 
 class TasksView extends StatelessWidget {
