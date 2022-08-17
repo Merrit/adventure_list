@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
-import '../../core/core.dart';
 import '../tasks.dart';
 
 class TaskDetails extends StatelessWidget {
@@ -46,7 +45,7 @@ class TaskDetailsView extends StatelessWidget {
                   ? []
                   : [
                       Flexible(
-                        fit: FlexFit.loose,
+                        flex: 0,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -71,40 +70,47 @@ class TaskDetailsView extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const Divider(),
+                      const Flexible(
+                        flex: 0,
+                        child: Divider(),
+                      ),
                       const SizedBox(height: 20),
-                      Expanded(
-                        child: SizedBox(
-                          width: 400,
-                          child: ListView(
-                            children: [
-                              const _DescriptionWidget(),
-                              const SizedBox(height: 15),
-                              OutlinedButton(
-                                onPressed: () async {
-                                  final newTaskName = await showInputDialog(
-                                    context: context,
-                                  );
-
-                                  if (newTaskName == null) return;
-
-                                  tasksCubit.createTask(
-                                    Task(
-                                      title: newTaskName,
-                                      parent: task.id,
-                                    ),
-                                  );
-                                },
-                                child: const Text('Add subtask'),
-                              ),
-                              ...state.activeList!.items
-                                  .where((element) => element.parent == task.id)
-                                  .map((e) => ListTile(
-                                        title: Text(e.title),
-                                      ))
-                                  .toList()
-                            ],
-                          ),
+                      Flexible(
+                        child: ListView(
+                          padding: const EdgeInsets.all(12.0),
+                          controller: ScrollController(),
+                          children: [
+                            const _DescriptionWidget(),
+                            const SizedBox(height: 20),
+                            const Text('Sub-tasks'),
+                            ...state.activeList!.items
+                                .where((element) => element.parent == task.id)
+                                .map((Task e) => ListTile(
+                                      leading: Checkbox(
+                                        onChanged: (value) {
+                                          tasksCubit.updateTask(
+                                            e.copyWith(completed: value),
+                                          );
+                                        },
+                                        value: e.completed,
+                                      ),
+                                      title: Text(
+                                        e.title,
+                                        style: TextStyle(
+                                          decoration: e.completed
+                                              ? TextDecoration.lineThrough
+                                              : null,
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        tasksCubit.updateTask(
+                                          e.copyWith(completed: !e.completed),
+                                        );
+                                      },
+                                    ))
+                                .toList(),
+                            _AddSubTaskWidget(parentTask: task),
+                          ],
                         ),
                       ),
                     ],
@@ -256,6 +262,32 @@ class _DescriptionWidgetState extends State<_DescriptionWidget> {
           ],
         );
       },
+    );
+  }
+}
+
+class _AddSubTaskWidget extends StatelessWidget {
+  final Task parentTask;
+
+  const _AddSubTaskWidget({
+    Key? key,
+    required this.parentTask,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextInputListTile(
+      placeholderText: 'Add sub-task',
+      leading: const Icon(Icons.add),
+      callback: (String value) {
+        tasksCubit.createTask(
+          Task(
+            title: value,
+            parent: parentTask.id,
+          ),
+        );
+      },
+      retainFocus: true,
     );
   }
 }
