@@ -79,6 +79,7 @@ class TaskDetailsView extends StatelessWidget {
                           child: ListView(
                             children: [
                               const _DescriptionWidget(),
+                              const SizedBox(height: 15),
                               OutlinedButton(
                                 onPressed: () async {
                                   final newTaskName = await showInputDialog(
@@ -112,6 +113,7 @@ class TaskDetailsView extends StatelessWidget {
         );
 
         return AnimatedSwitcher(
+          key: ValueKey(task),
           duration: const Duration(milliseconds: 300),
           reverseDuration: const Duration(milliseconds: 300),
           transitionBuilder: (Widget child, Animation<double> animation) =>
@@ -153,8 +155,42 @@ class _TaskNameWidget extends StatelessWidget {
   }
 }
 
-class _DescriptionWidget extends StatelessWidget {
+class _DescriptionWidget extends StatefulWidget {
   const _DescriptionWidget({Key? key}) : super(key: key);
+
+  @override
+  State<_DescriptionWidget> createState() => _DescriptionWidgetState();
+}
+
+class _DescriptionWidgetState extends State<_DescriptionWidget> {
+  @override
+  void initState() {
+    super.initState();
+    final Task? task = tasksCubit.state.activeTask;
+    if (task == null) return;
+
+    controller.text = task.description ?? '';
+    updatedDescription = task.description ?? '';
+
+    focusNode.addListener(() {
+      if (focusNode.hasFocus) {
+        setState(() {
+          showControls = true;
+          descriptionBorder = const OutlineInputBorder();
+        });
+      } else {
+        setState(() {
+          descriptionBorder = InputBorder.none;
+        });
+      }
+    });
+  }
+
+  final controller = TextEditingController();
+  final focusNode = FocusNode();
+  InputBorder descriptionBorder = InputBorder.none;
+  bool showControls = false;
+  late String updatedDescription;
 
   @override
   Widget build(BuildContext context) {
@@ -163,20 +199,61 @@ class _DescriptionWidget extends StatelessWidget {
         final task = state.activeTask;
         if (task == null) return const SizedBox();
 
-        return ListTile(
-          leading: const Icon(Icons.edit),
-          title: Text(task.description ?? 'Description'),
-          onTap: () async {
-            final String? newDescription = await showInputDialog(
-              context: context,
-            );
-
-            if (newDescription == null) return;
-
-            tasksCubit.updateTask(
-              task.copyWith(description: newDescription),
-            );
-          },
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                fillColor: Colors.transparent,
+                enabledBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(
+                    style: BorderStyle.none,
+                  ),
+                ),
+                focusedBorder: Theme.of(context)
+                    .inputDecorationTheme
+                    .focusedBorder
+                    ?.copyWith(),
+                label: const Text('Description'),
+              ),
+              enableInteractiveSelection: true,
+              focusNode: focusNode,
+              maxLines: null,
+              onChanged: (value) {
+                controller.text = value;
+                updatedDescription = value;
+              },
+            ),
+            const SizedBox(height: 5),
+            if (showControls)
+              Flexible(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        setState(() => showControls = false);
+                        controller.text = task.description ?? '';
+                        updatedDescription = task.description ?? '';
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                    const SizedBox(width: 10),
+                    ElevatedButton(
+                      onPressed: () {
+                        tasksCubit.updateTask(
+                          task.copyWith(description: updatedDescription),
+                        );
+                        setState(() => showControls = false);
+                      },
+                      child: const Text('Save'),
+                    ),
+                  ],
+                ),
+              ),
+          ],
         );
       },
     );

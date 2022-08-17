@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
 import '../../app/cubit/app_cubit.dart';
-import '../../core/core.dart';
 import '../../settings/widgets/settings_page.dart';
 import '../tasks.dart';
 
