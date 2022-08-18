@@ -1,14 +1,22 @@
-import 'package:flutter/material.dart' hide PopupMenuButton, PopupMenuItem;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
-import '../../core/core.dart';
-import '../tasks.dart';
+import '../../tasks.dart';
+import 'task_details_header.dart';
 
 class TaskDetails extends StatelessWidget {
   static const routeName = 'task_details';
 
   const TaskDetails({Key? key}) : super(key: key);
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+
+    properties.add(DiagnosticsProperty('task', tasksCubit.state.activeTask));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,37 +53,10 @@ class TaskDetailsView extends StatelessWidget {
               children: task == null
                   ? []
                   : [
-                      Flexible(
-                        flex: 0,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.close),
-                              onPressed: () => tasksCubit.setActiveTask(null),
-                            ),
-                            const Flexible(child: _TaskNameWidget()),
-                            PopupMenuButton(
-                              itemBuilder: (context) {
-                                return [
-                                  PopupMenuItem(
-                                    child: TextButton(
-                                      onPressed: () {},
-                                      child: const Text('menu item'),
-                                    ),
-                                  ),
-                                ];
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
                       const Flexible(
                         flex: 0,
-                        child: Divider(),
+                        child: TaskDetailsHeader(),
                       ),
-                      const SizedBox(height: 20),
                       Flexible(
                         child: ListView(
                           padding: const EdgeInsets.all(12.0),
@@ -85,7 +66,7 @@ class TaskDetailsView extends StatelessWidget {
                             const SizedBox(height: 20),
                             const Text('Sub-tasks'),
                             ...state.activeList!.items
-                                .where((element) => element.parent == task.id)
+                                .where((e) => e.parent == task.id && !e.deleted)
                                 .map((Task e) => ListTile(
                                       leading: Checkbox(
                                         onChanged: (value) {
@@ -130,32 +111,6 @@ class TaskDetailsView extends StatelessWidget {
             child: child,
           ),
           child: (task == null) ? const SizedBox() : widgetContents,
-        );
-      },
-    );
-  }
-}
-
-class _TaskNameWidget extends StatelessWidget {
-  const _TaskNameWidget({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<TasksCubit, TasksState>(
-      builder: (context, state) {
-        if (state.activeTask == null) return const SizedBox();
-
-        return TextInputListTile(
-          key: ValueKey(state.activeTask),
-          placeholderText: state.activeTask!.title,
-          editingPlaceholderText: true,
-          textAlign: TextAlign.center,
-          unfocusedOpacity: 1.0,
-          callback: (String value) => tasksCubit.updateTask(
-            state.activeTask!.copyWith(
-              title: value,
-            ),
-          ),
         );
       },
     );

@@ -21,21 +21,28 @@ class TasksCubit extends Cubit<TasksState> {
 
   TasksCubit(
     AuthenticationCubit authCubit,
-    this._storageService,
-  ) : super(TasksState.empty()) {
+    this._storageService, {
+    TasksRepository? tasksRepository,
+  }) : super(TasksState.empty()) {
     tasksCubit = this;
 
     _getCachedData();
 
     // If already signed in, initialize the tasks.
     if (authCubit.state.signedIn) {
-      _getTasksRepo(authCubit.state.accessCredentials!);
+      _getTasksRepo(
+        credentials: authCubit.state.accessCredentials!,
+        tasksRepository: tasksRepository,
+      );
     }
 
     authCubit.stream.listen((AuthenticationState authState) async {
       // If sign in happens after cubit is created, initialize the tasks.
       if (authState.signedIn) {
-        _getTasksRepo(authCubit.state.accessCredentials!);
+        _getTasksRepo(
+          credentials: authCubit.state.accessCredentials!,
+          tasksRepository: tasksRepository,
+        );
       }
     });
   }
@@ -58,9 +65,12 @@ class TasksCubit extends Cubit<TasksState> {
     ));
   }
 
-  // This should be injected so we can do mocks / tests.
-  Future<void> _getTasksRepo(AccessCredentials credentials) async {
-    final tasksRepository = await GoogleCalendar.initialize(
+  Future<void> _getTasksRepo({
+    required AccessCredentials credentials,
+    TasksRepository? tasksRepository,
+  }) async {
+    /// If [tasksRepository] is non-null it was passed in as a mock.
+    tasksRepository ??= await GoogleCalendar.initialize(
       clientId: GoogleAuthIds.clientId,
       credentials: credentials,
     );
@@ -165,7 +175,7 @@ class TasksCubit extends Cubit<TasksState> {
     ));
   }
 
-  Future<void> createTask(Task newTask) async {
+  Future<Task> createTask(Task newTask) async {
     assert(state.activeList != null);
 
     newTask = await _tasksRepository.createTask(
@@ -185,6 +195,8 @@ class TasksCubit extends Cubit<TasksState> {
       activeList: updatedList,
       taskLists: _listsInOrder(updatedTaskLists),
     ));
+
+    return newTask;
   }
 
   Future<void> updateTask(Task task) async {
@@ -230,17 +242,36 @@ class TasksCubit extends Cubit<TasksState> {
     ));
   }
 
-  Future<void> clearCompletedTasks() async {
-    // If the task is "completed", we also mark it "deleted".
-    final TaskList updatedList = state.activeList!.copyWith(
-      items: state.activeList!.items
-          .map((e) => e.copyWith(deleted: e.completed))
-          .toList(),
-    );
+  Future<void> clearCompletedTasks([String? parentId]) async {
+    // A task is marked "completed" when it is checked, but this does not remove
+    // it from the list. By "clearing" we are also setting the "deleted"
+    // property to true - which doesn't *actually* delete it, but hides it. This
+    // gives us the option of retrieving "deleted" items.
+
+    List<Task> tasks = state.activeList!.items.map((Task task) {
+      // Not completed.
+      if (!task.completed) return task;
+
+      // Completed top-level tasks.
+      if (parentId == null && task.parent == null) {
+        return task.copyWith(deleted: true);
+      }
+
+      // Completed sub-tasks.
+      if (parentId != null && task.parent == parentId) {
+        return task.copyWith(deleted: true);
+      }
+
+      // Default.
+      return task;
+    }).toList();
+
+    final TaskList updatedList = state.activeList!.copyWith(items: tasks);
+    final int index = state.taskLists.indexWhere((e) => e.id == updatedList.id);
 
     final taskLists = List<TaskList>.from(state.taskLists)
-      ..removeWhere((element) => element.id == updatedList.id)
-      ..add(updatedList);
+      ..removeAt(index)
+      ..insert(index, updatedList);
 
     emit(state.copyWith(
       activeList: updatedList,

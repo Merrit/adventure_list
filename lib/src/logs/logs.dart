@@ -8,11 +8,17 @@ import 'package:logger/src/outputs/file_output.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../core/core.dart';
 import '../storage/storage_service.dart';
 
 late final Logger logger;
 
 Future<void> initializeLogger(StorageService storageService) async {
+  if (testing) {
+    logger = Logger();
+    return;
+  }
+
   final bool? logToFile = await storageService.getValue('logToFile');
 
   final dataDir = await getApplicationSupportDirectory();

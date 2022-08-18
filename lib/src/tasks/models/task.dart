@@ -13,6 +13,8 @@ class Task extends Equatable {
 
   final String id;
 
+  final int index;
+
   /// The ID of the task considered the parent, only if this task is nested.
   final String? parent;
 
@@ -27,6 +29,7 @@ class Task extends Equatable {
     this.description,
     this.dueDate,
     this.id = '',
+    this.index = -1,
     this.parent,
     required this.title,
     DateTime? updated,
@@ -40,6 +43,7 @@ class Task extends Equatable {
       description,
       dueDate,
       id,
+      index,
       parent,
       title,
       updated,
@@ -52,6 +56,7 @@ class Task extends Equatable {
     String? description,
     DateTime? dueDate,
     String? id,
+    int? index,
     String? parent,
     String? title,
     DateTime? updated,
@@ -62,6 +67,7 @@ class Task extends Equatable {
       description: description ?? this.description,
       dueDate: dueDate ?? this.dueDate,
       id: id ?? this.id,
+      index: index ?? this.index,
       parent: parent ?? this.parent,
       title: title ?? this.title,
       updated: updated ?? this.updated,
@@ -75,6 +81,7 @@ class Task extends Equatable {
       'description': description,
       'dueDate': dueDate?.millisecondsSinceEpoch,
       'id': id,
+      'index': index,
       'parent': parent,
       'title': title,
       'updated': updated.millisecondsSinceEpoch,
@@ -90,6 +97,7 @@ class Task extends Equatable {
           ? DateTime.fromMillisecondsSinceEpoch(map['dueDate'])
           : null,
       id: map['id'] ?? '',
+      index: map['index']?.toInt() ?? -1,
       parent: map['parent'],
       title: map['title'] ?? '',
       updated: DateTime.fromMillisecondsSinceEpoch(map['updated']),

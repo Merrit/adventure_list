@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
@@ -18,6 +19,13 @@ class TaskTile extends StatefulWidget {
 
 class _TaskTileState extends State<TaskTile> {
   bool expanded = true;
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+
+    properties.add(DiagnosticsProperty<bool>('expanded', expanded));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +139,8 @@ class _TaskTileState extends State<TaskTile> {
                             child: Text(task.description!),
                           ),
                         ...state.activeList!.items
-                            .where((element) => element.parent == task.id)
+                            .where((element) =>
+                                (element.parent == task.id) && !element.deleted)
                             .map((e) => Flexible(child: TaskTile(task: e)))
                             .toList()
                       ],
