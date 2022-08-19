@@ -49,6 +49,8 @@ class App extends StatelessWidget {
               subThemesData: const FlexSubThemesData(
                 blendOnLevel: 20,
                 blendOnColors: false,
+                dialogRadius: 14.0,
+                timePickerDialogRadius: 14.0,
               ),
               visualDensity: FlexColorScheme.comfortablePlatformDensity,
               // useMaterial3: true,
@@ -62,6 +64,8 @@ class App extends StatelessWidget {
               appBarOpacity: 0.90,
               subThemesData: const FlexSubThemesData(
                 blendOnLevel: 30,
+                dialogRadius: 14.0,
+                timePickerDialogRadius: 14.0,
               ),
               visualDensity: FlexColorScheme.comfortablePlatformDensity,
               // useMaterial3: true,
