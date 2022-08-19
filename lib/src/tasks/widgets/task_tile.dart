@@ -58,27 +58,6 @@ class _TaskTileState extends State<TaskTile> {
 
         bool hasChildTasks = childTasks.isNotEmpty;
 
-        Widget leadingWidget;
-        if (hasChildTasks && task.parent == null) {
-          leadingWidget = IconButton(
-            icon: Icon(
-              expanded ? Icons.arrow_drop_down : Icons.arrow_right,
-            ),
-            onPressed: () => setState(() {
-              expanded = !expanded;
-            }),
-          );
-        } else if (hasChildTasks && task.parent != null) {
-          leadingWidget = const SizedBox();
-        } else {
-          leadingWidget = Checkbox(
-            value: task.completed,
-            onChanged: (bool? value) => tasksCubit.updateTask(
-              task.copyWith(completed: value),
-            ),
-          );
-        }
-
         Widget tasksCompletedCountWidget;
         if (hasChildTasks) {
           final completedTasks =
@@ -103,7 +82,28 @@ class _TaskTileState extends State<TaskTile> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                leadingWidget,
+                Opacity(
+                  opacity: 0.6,
+                  child: IconButton(
+                    icon: Icon(
+                      expanded
+                          ? Icons.keyboard_arrow_down
+                          : Icons.keyboard_arrow_right,
+                    ),
+                    disabledColor: Colors.transparent,
+                    onPressed: hasChildTasks
+                        ? () => setState(() {
+                              expanded = !expanded;
+                            })
+                        : null,
+                  ),
+                ),
+                Checkbox(
+                  value: task.completed,
+                  onChanged: (bool? value) => tasksCubit.updateTask(
+                    task.copyWith(completed: value),
+                  ),
+                ),
                 Flexible(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -121,7 +121,7 @@ class _TaskTileState extends State<TaskTile> {
         );
 
         Widget? subtitle;
-        if (hasChildTasks && task.parent == null) {
+        if (hasChildTasks) {
           subtitle = Visibility(
             visible: expanded,
             child: IntrinsicHeight(
