@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
+import '../../core/core.dart';
 import '../tasks.dart';
 
 class TaskTile extends StatefulWidget {
@@ -26,6 +28,8 @@ class _TaskTileState extends State<TaskTile> {
 
     properties.add(DiagnosticsProperty<bool>('expanded', expanded));
   }
+
+  double subtitleHeight = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -72,76 +76,93 @@ class _TaskTileState extends State<TaskTile> {
 
         TextStyle titleTextStyle = TextStyle(
           decoration: task.completed ? TextDecoration.lineThrough : null,
-          fontSize: 18,
+          fontWeight: (task.parent == null) ? FontWeight.w600 : null,
         );
 
         Widget titleRow = InkWell(
           onTap: () => _setActiveTaskCallback(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Opacity(
-                  opacity: 0.6,
-                  child: IconButton(
-                    icon: Icon(
-                      expanded
-                          ? Icons.keyboard_arrow_down
-                          : Icons.keyboard_arrow_right,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Opacity(
+                opacity: 0.6,
+                child: IconButton(
+                  icon: Icon(
+                    expanded
+                        ? Icons.keyboard_arrow_down
+                        : Icons.keyboard_arrow_right,
+                  ),
+                  disabledColor: Colors.transparent,
+                  onPressed: hasChildTasks
+                      ? () => setState(() {
+                            expanded = !expanded;
+                          })
+                      : null,
+                ),
+              ),
+              Checkbox(
+                value: task.completed,
+                onChanged: (bool? value) => tasksCubit.updateTask(
+                  task.copyWith(completed: value),
+                ),
+              ),
+              Flexible(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // SizedBox ensures text aligns with top of checkbox.
+                    const SizedBox(height: 5.5),
+                    Flexible(
+                      child: Text(task.title, style: titleTextStyle),
                     ),
-                    disabledColor: Colors.transparent,
-                    onPressed: hasChildTasks
-                        ? () => setState(() {
-                              expanded = !expanded;
-                            })
-                        : null,
-                  ),
+                  ],
                 ),
-                Checkbox(
-                  value: task.completed,
-                  onChanged: (bool? value) => tasksCubit.updateTask(
-                    task.copyWith(completed: value),
-                  ),
-                ),
-                Flexible(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // SizedBox ensures text aligns with top of checkbox.
-                      const SizedBox(height: 4.5),
-                      Flexible(child: Text(task.title, style: titleTextStyle)),
-                    ],
-                  ),
-                ),
-                tasksCompletedCountWidget,
-              ],
-            ),
+              ),
+              tasksCompletedCountWidget,
+            ],
           ),
         );
 
-        Widget? subtitle;
-        if (hasChildTasks) {
-          subtitle = Visibility(
-            visible: expanded,
-            child: IntrinsicHeight(
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: titleRow,
+            ),
+            MeasureSize(
+              onChange: (size) {
+                if (hasChildTasks && task.parent == null) {
+                  setState(() => subtitleHeight = size.height);
+                }
+              },
               child: Row(
                 children: [
-                  const SizedBox(width: 12),
-                  const VerticalDivider(thickness: 3),
-                  Expanded(
+                  if (hasChildTasks && task.parent == null)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 30),
+                      child: SizedBox(
+                        height: subtitleHeight,
+                        child: const VerticalDivider(thickness: 3),
+                      ),
+                    ),
+                  Flexible(
+                    fit: FlexFit.loose,
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (task.description != null)
                           Padding(
-                            padding: const EdgeInsets.only(left: 20),
+                            padding: const EdgeInsets.only(left: 80),
                             child: Text(task.description!),
                           ),
                         ...state.activeList!.items
                             .where((element) =>
                                 (element.parent == task.id) && !element.deleted)
-                            .map((e) => Flexible(child: TaskTile(task: e)))
+                            .map((e) => Flexible(
+                                  fit: FlexFit.loose,
+                                  child: TaskTile(task: e),
+                                ))
                             .toList()
                       ],
                     ),
@@ -149,25 +170,8 @@ class _TaskTileState extends State<TaskTile> {
                 ],
               ),
             ),
-          );
-        } else {
-          if (task.description != null) {
-            subtitle = Opacity(
-              opacity: 0.7,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 37),
-                child: Text(task.description!),
-              ),
-            );
-          }
-        }
-
-        final listTile = ListTile(
-          title: titleRow,
-          subtitle: subtitle,
+          ],
         );
-
-        return listTile;
       },
     );
   }

@@ -12,7 +12,8 @@ class TasksView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
-        if (state.activeList == null) return const SizedBox();
+        final TaskList? activeList = state.activeList;
+        if (activeList == null) return const SizedBox();
 
         return SizedBox(
           width: platformIsMobile() ? null : 600,
@@ -26,7 +27,7 @@ class TasksView extends StatelessWidget {
                   scrollController: ScrollController(),
                   buildDefaultDragHandles: false,
                   onReorder: (oldIndex, newIndex) {},
-                  children: state.activeList!.items
+                  children: activeList.items
                       .where(
                         (task) => task.parent == null && task.deleted == false,
                       )
