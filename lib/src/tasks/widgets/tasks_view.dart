@@ -62,10 +62,13 @@ class _TasksHeader extends StatelessWidget {
       ),
       child: BlocBuilder<TasksCubit, TasksState>(
         builder: (context, state) {
+          final TaskList? taskList = state.activeList;
+          if (taskList == null) return const SizedBox();
+
           return Row(
             children: [
               Text(
-                state.activeList!.title,
+                taskList.title,
                 style: const TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
@@ -80,10 +83,41 @@ class _TasksHeader extends StatelessWidget {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.settings),
-                          onPressed: () => Navigator.pushNamed(
-                            context,
-                            TaskListSettingsPage.routeName,
-                          ),
+                          onPressed: () {
+                            if (MediaQuery.of(context).isHandset) {
+                              Navigator.pushNamed(
+                                context,
+                                TaskListSettingsPage.routeName,
+                              );
+                            } else {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  final mediaQuery = MediaQuery.of(context);
+
+                                  return AlertDialog(
+                                    title: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: const [
+                                        SizedBox(),
+                                        Text('List Settings'),
+                                        CloseButton(),
+                                      ],
+                                    ),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 20.0,
+                                      horizontal: 100.0,
+                                    ),
+                                    content: SizedBox(
+                                      width: mediaQuery.size.width / 2,
+                                      child: const TaskListSettingsView(),
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          },
                         ),
                         PopupMenuButton(
                           itemBuilder: (context) {
