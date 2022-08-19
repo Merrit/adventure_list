@@ -184,7 +184,6 @@ class _DescriptionWidgetState extends State<_DescriptionWidget> {
               focusNode: focusNode,
               maxLines: null,
               onChanged: (value) {
-                controller.text = value;
                 updatedDescription = value;
               },
             ),
