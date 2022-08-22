@@ -15,6 +15,12 @@ class TasksView extends StatelessWidget {
         final TaskList? activeList = state.activeList;
         if (activeList == null) return const SizedBox();
 
+        final tasks = activeList.items
+            .where(
+              (task) => task.parent == null && task.deleted == false,
+            )
+            .toList();
+
         return SizedBox(
           width: platformIsMobile() ? null : 600,
           child: Column(
@@ -23,16 +29,40 @@ class TasksView extends StatelessWidget {
               const _TasksHeader(),
               const _NewTaskButton(),
               Expanded(
-                child: ReorderableListView(
-                  scrollController: ScrollController(),
+                child: CustomReorderableListView.separated(
                   buildDefaultDragHandles: false,
+                  padding: const EdgeInsets.only(bottom: 100),
+                  itemCount: tasks.length,
+                  separatorBuilder: (_, __) => const Divider(height: 16),
+                  itemBuilder: (_, int index) {
+                    final task = tasks[index];
+
+                    return TaskTile(key: ValueKey(task), task: task);
+                  },
+                  shrinkWrap: true,
                   onReorder: (oldIndex, newIndex) {},
-                  children: activeList.items
-                      .where(
-                        (task) => task.parent == null && task.deleted == false,
-                      )
-                      .map((e) => TaskTile(key: ValueKey(e), task: e))
-                      .toList(),
+                  scrollController: ScrollController(),
+                  // proxyDecorator: (Widget child, _, animation) {
+                  //   return AnimatedBuilder(
+                  //     child: child,
+                  //     animation: animation,
+                  //     builder: (BuildContext context, Widget? child) {
+                  //       final animValue =
+                  //           Curves.easeInOut.transform(animation.value);
+                  //       final scale = lerpDouble(1, 1.05, animValue)!;
+                  //       final elevation = lerpDouble(0, 6, animValue)!;
+                  //       return Transform.scale(
+                  //         scale: scale,
+                  //         child: Material(
+                  //           elevation: elevation,
+                  //           // borderRadius: allSmallBorderRadius,
+                  //           color: Colors.transparent,
+                  //           child: child,
+                  //         ),
+                  //       );
+                  //     },
+                  //   );
+                  // },
                 ),
               ),
               // if (state.activeList!.items.any((element) => element.completed))

@@ -1,13 +1,61 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
-import '../../core/core.dart';
 import '../tasks.dart';
 
-class TaskTile extends StatefulWidget {
+class TaskTileCubit extends Cubit<TaskTileState> {
+  TaskTileCubit(
+    Task task, {
+    required List<Task> childTasks,
+  }) : super(
+          TaskTileState(
+            childTasks: childTasks,
+            hasChildTasks: childTasks.isNotEmpty,
+            isHovered: false,
+            task: task,
+          ),
+        );
+
+  void updateIsHovered(bool value) {
+    emit(state.copyWith(isHovered: value));
+  }
+}
+
+class TaskTileState extends Equatable {
+  final List<Task> childTasks;
+  final bool hasChildTasks;
+  final bool isHovered;
+  final Task task;
+
+  const TaskTileState({
+    required this.childTasks,
+    required this.hasChildTasks,
+    required this.isHovered,
+    required this.task,
+  });
+
+  @override
+  List<Object> get props => [childTasks, hasChildTasks, isHovered, task];
+
+  TaskTileState copyWith({
+    List<Task>? childTasks,
+    bool? hasChildTasks,
+    bool? isHovered,
+    Task? task,
+  }) {
+    return TaskTileState(
+      childTasks: childTasks ?? this.childTasks,
+      hasChildTasks: hasChildTasks ?? this.hasChildTasks,
+      isHovered: isHovered ?? this.isHovered,
+      task: task ?? this.task,
+    );
+  }
+}
+
+class TaskTile extends StatelessWidget {
   final Task task;
 
   const TaskTile({
@@ -16,28 +64,20 @@ class TaskTile extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<TaskTile> createState() => _TaskTileState();
-}
-
-class _TaskTileState extends State<TaskTile> {
-  bool expanded = true;
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-
-    properties.add(DiagnosticsProperty<bool>('expanded', expanded));
-  }
-
-  double subtitleHeight = 0.0;
-
-  @override
   Widget build(BuildContext context) {
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
-        final Task task = state.activeList!.items.singleWhere(
-          (element) => element.id == widget.task.id,
-        );
+        final TaskList? activeList = state.activeList;
+
+        if (activeList == null) return const SizedBox();
+
+        final childTasks = state.activeList!.items
+            .where((element) => element.parent == task.id && !element.deleted)
+            .toList();
+
+        final completedTasks = childTasks //
+            .where((element) => element.completed)
+            .length;
 
         Future<void> _setActiveTaskCallback() async {
           String? taskId = (tasksCubit.state.activeTask == task) //
@@ -56,118 +96,90 @@ class _TaskTileState extends State<TaskTile> {
           }
         }
 
-        final List<Task> childTasks = state.activeList!.items
-            .where((element) => element.parent == task.id && !element.deleted)
-            .toList();
+        return BlocProvider(
+          create: (context) => TaskTileCubit(
+            task,
+            childTasks: childTasks,
+          ),
+          child: Builder(
+            builder: (context) {
+              final stateCubit = context.read<TaskTileCubit>();
 
-        bool hasChildTasks = childTasks.isNotEmpty;
-
-        Widget tasksCompletedCountWidget;
-        if (hasChildTasks) {
-          final completedTasks =
-              childTasks.where((element) => element.completed).length;
-          tasksCompletedCountWidget = Padding(
-            padding: const EdgeInsets.all(6.5),
-            child: Text('($completedTasks/${childTasks.length})'),
-          );
-        } else {
-          tasksCompletedCountWidget = const SizedBox();
-        }
-
-        TextStyle titleTextStyle = TextStyle(
-          decoration: task.completed ? TextDecoration.lineThrough : null,
-          fontWeight: (task.parent == null) ? FontWeight.w600 : null,
-        );
-
-        Widget titleRow = InkWell(
-          onTap: () => _setActiveTaskCallback(),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Opacity(
-                opacity: 0.6,
-                child: IconButton(
-                  icon: Icon(
-                    expanded
-                        ? Icons.keyboard_arrow_down
-                        : Icons.keyboard_arrow_right,
+              return InkWell(
+                hoverColor: Colors.transparent,
+                onTap: () => _setActiveTaskCallback(),
+                child: MouseRegion(
+                  onEnter: (_) => stateCubit.updateIsHovered(true),
+                  onExit: (_) => stateCubit.updateIsHovered(false),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const _TitleRow(),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 62),
+                        child: Opacity(
+                          opacity: 0.8,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (childTasks.isNotEmpty)
+                                Text('($completedTasks/${childTasks.length})'),
+                              if (task.description != null)
+                                Text(task.description!),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  disabledColor: Colors.transparent,
-                  onPressed: hasChildTasks
-                      ? () => setState(() {
-                            expanded = !expanded;
-                          })
-                      : null,
                 ),
-              ),
-              Checkbox(
-                value: task.completed,
-                onChanged: (bool? value) => tasksCubit.updateTask(
-                  task.copyWith(completed: value),
-                ),
-              ),
-              Flexible(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // SizedBox ensures text aligns with top of checkbox.
-                    const SizedBox(height: 5.5),
-                    Flexible(
-                      child: Text(task.title, style: titleTextStyle),
-                    ),
-                  ],
-                ),
-              ),
-              tasksCompletedCountWidget,
-            ],
+              );
+            },
           ),
         );
+      },
+    );
+  }
+}
 
-        return Column(
-          mainAxisSize: MainAxisSize.min,
+class _TitleRow extends StatelessWidget {
+  const _TitleRow({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // final stateCubit = context.read<TaskTileCubit>();
+
+    return BlocBuilder<TaskTileCubit, TaskTileState>(
+      builder: (context, state) {
+        TextStyle titleTextStyle = TextStyle(
+          decoration: state.task.completed ? TextDecoration.lineThrough : null,
+        );
+
+        Widget dragHandle;
+        if (defaultTargetPlatform == TargetPlatform.android ||
+            defaultTargetPlatform == TargetPlatform.iOS) {
+          dragHandle = const SizedBox();
+        } else {
+          dragHandle = Opacity(
+            opacity: state.isHovered ? 0.5 : 0.0,
+            child: const Icon(Icons.drag_indicator),
+          );
+        }
+
+        return Row(
           children: [
-            ListTile(
-              title: titleRow,
+            dragHandle,
+            Checkbox(
+              value: state.task.completed,
+              onChanged: (bool? value) => tasksCubit.updateTask(
+                state.task.copyWith(completed: value),
+              ),
             ),
-            MeasureSize(
-              onChange: (size) {
-                if (hasChildTasks && task.parent == null) {
-                  setState(() => subtitleHeight = size.height);
-                }
-              },
-              child: Row(
-                children: [
-                  if (hasChildTasks && task.parent == null)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 30),
-                      child: SizedBox(
-                        height: subtitleHeight,
-                        child: const VerticalDivider(thickness: 3),
-                      ),
-                    ),
-                  Flexible(
-                    fit: FlexFit.loose,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (task.description != null)
-                          Padding(
-                            padding: const EdgeInsets.only(left: 80),
-                            child: Text(task.description!),
-                          ),
-                        ...state.activeList!.items
-                            .where((element) =>
-                                (element.parent == task.id) && !element.deleted)
-                            .map((e) => Flexible(
-                                  fit: FlexFit.loose,
-                                  child: TaskTile(task: e),
-                                ))
-                            .toList()
-                      ],
-                    ),
-                  ),
-                ],
+            Flexible(
+              child: Text(
+                state.task.title,
+                style: titleTextStyle,
               ),
             ),
           ],
