@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
@@ -154,38 +155,55 @@ class _DescriptionWidgetState extends State<_DescriptionWidget> {
   bool showControls = false;
   late String updatedDescription;
 
+  void _submitUpdatedDescription() {
+    tasksCubit.updateTask(
+      task!.copyWith(description: updatedDescription),
+    );
+    setState(() => showControls = false);
+  }
+
+  Task? task;
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
-        final task = state.activeTask;
+        task = state.activeTask;
         if (task == null) return const SizedBox();
 
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                border: const OutlineInputBorder(),
-                fillColor: Colors.transparent,
-                enabledBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    style: BorderStyle.none,
-                  ),
-                ),
-                focusedBorder: Theme.of(context)
-                    .inputDecorationTheme
-                    .focusedBorder
-                    ?.copyWith(),
-                label: const Text('Description'),
-              ),
-              enableInteractiveSelection: true,
-              focusNode: focusNode,
-              maxLines: null,
-              onChanged: (value) {
-                updatedDescription = value;
+            CallbackShortcuts(
+              bindings: {
+                const SingleActivator(
+                  LogicalKeyboardKey.enter,
+                  control: true,
+                ): () => _submitUpdatedDescription(),
               },
+              child: TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  fillColor: Colors.transparent,
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(
+                      style: BorderStyle.none,
+                    ),
+                  ),
+                  focusedBorder: Theme.of(context)
+                      .inputDecorationTheme
+                      .focusedBorder
+                      ?.copyWith(),
+                  label: const Text('Description'),
+                ),
+                enableInteractiveSelection: true,
+                focusNode: focusNode,
+                maxLines: null,
+                onChanged: (value) {
+                  updatedDescription = value;
+                },
+              ),
             ),
             const SizedBox(height: 5),
             if (showControls)
@@ -196,19 +214,14 @@ class _DescriptionWidgetState extends State<_DescriptionWidget> {
                     TextButton(
                       onPressed: () {
                         setState(() => showControls = false);
-                        controller.text = task.description ?? '';
-                        updatedDescription = task.description ?? '';
+                        controller.text = task?.description ?? '';
+                        updatedDescription = task?.description ?? '';
                       },
                       child: const Text('Cancel'),
                     ),
                     const SizedBox(width: 10),
                     ElevatedButton(
-                      onPressed: () {
-                        tasksCubit.updateTask(
-                          task.copyWith(description: updatedDescription),
-                        );
-                        setState(() => showControls = false);
-                      },
+                      onPressed: () => _submitUpdatedDescription(),
                       child: const Text('Save'),
                     ),
                   ],
