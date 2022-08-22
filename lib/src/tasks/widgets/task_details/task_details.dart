@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
+import '../../../core/core.dart';
 import '../../tasks.dart';
 import 'task_details_header.dart';
 
@@ -75,6 +76,7 @@ class TaskDetailsView extends StatelessWidget {
                                             e.copyWith(completed: value),
                                           );
                                         },
+                                        shape: roundedSquareBorder,
                                         value: e.completed,
                                       ),
                                       title: Text(

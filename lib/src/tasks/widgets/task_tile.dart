@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
+import '../../core/core.dart';
 import '../tasks.dart';
 
 class TaskTileCubit extends Cubit<TaskTileState> {
@@ -175,6 +176,7 @@ class _TitleRow extends StatelessWidget {
               onChanged: (bool? value) => tasksCubit.updateTask(
                 state.task.copyWith(completed: value),
               ),
+              shape: roundedSquareBorder,
             ),
             Flexible(
               child: Text(
