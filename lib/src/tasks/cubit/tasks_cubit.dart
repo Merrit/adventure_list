@@ -248,7 +248,17 @@ class TasksCubit extends Cubit<TasksState> {
     // property to true - which doesn't *actually* delete it, but hides it. This
     // gives us the option of retrieving "deleted" items.
 
-    List<Task> tasks = state.activeList!.items.map((Task task) {
+    List<Task> updatedTasks = state.activeList!.items.map((Task task) {
+      final Task? parent = state //
+          .activeList
+          ?.items
+          .singleWhereOrNull((element) => element.id == task.parent);
+
+      // If a parent task is being completed, sub-tasks should be as well.
+      if (parent != null && parent.completed) {
+        return task.copyWith(completed: true, deleted: true);
+      }
+
       // Not completed.
       if (!task.completed) return task;
 
@@ -266,7 +276,9 @@ class TasksCubit extends Cubit<TasksState> {
       return task;
     }).toList();
 
-    final TaskList updatedList = state.activeList!.copyWith(items: tasks);
+    final TaskList updatedList = state //
+        .activeList!
+        .copyWith(items: updatedTasks);
     final int index = state.taskLists.indexWhere((e) => e.id == updatedList.id);
 
     final taskLists = List<TaskList>.from(state.taskLists)

@@ -43,7 +43,31 @@ final AuthenticationState defaultAuthState = AuthenticationState(
 );
 
 void main() {
-  setUpAll(() {
+  setUpAll(() async {
+    /* ----------------------------- StorageService ----------------------------- */
+    _storageService = MockStorageService();
+
+    when(() => _storageService.getStorageAreaValues(any())).thenAnswer(
+      (_) async => [],
+    );
+
+    when(() => _storageService.getValue(
+          any(),
+          storageArea: any(named: 'storageArea'),
+        )).thenAnswer((_) async => null);
+
+    when(() => _storageService.saveStorageAreaValues(
+          storageArea: any(named: 'storageArea'),
+          entries: any(named: 'entries'),
+        )).thenAnswer((_) async {});
+
+    when(() => _storageService.saveValue(
+          key: any(named: 'key'),
+          value: any(named: 'value'),
+        )).thenAnswer((_) async {});
+
+    await initializeLogger(_storageService);
+
     registerFallbackValue(FakeTaskList());
     registerFallbackValue(FakeTask());
   });
@@ -54,28 +78,6 @@ void main() {
       _authCubit = MockAuthenticationCubit();
 
       when(() => _authCubit.state).thenReturn(defaultAuthState);
-
-      /* ----------------------------- StorageService ----------------------------- */
-      _storageService = MockStorageService();
-
-      when(() => _storageService.getStorageAreaValues(any())).thenAnswer(
-        (_) async => [],
-      );
-
-      when(() => _storageService.getValue(
-            any(),
-            storageArea: any(named: 'storageArea'),
-          )).thenAnswer((_) async => null);
-
-      when(() => _storageService.saveStorageAreaValues(
-            storageArea: any(named: 'storageArea'),
-            entries: any(named: 'entries'),
-          )).thenAnswer((_) async {});
-
-      when(() => _storageService.saveValue(
-            key: any(named: 'key'),
-            value: any(named: 'value'),
-          )).thenAnswer((_) async {});
 
       /* ----------------------------- TasksRepository ---------------------------- */
       _tasksRepository = MockTasksRepository();
@@ -118,7 +120,6 @@ void main() {
       });
 
       /* ------------------------------- TasksCubit ------------------------------- */
-      await initializeLogger(_storageService);
 
       _tasksCubit = TasksCubit(
         _authCubit,
@@ -234,6 +235,34 @@ void main() {
         subTask1.copyWith(completed: true, deleted: true),
         subTask2.copyWith(completed: true, deleted: true),
         subTask3.copyWith(completed: true, deleted: true),
+      ]);
+    });
+
+    test('clearing task also clears its sub-tasks', () async {
+      // Prepare state with tasks.
+      await _tasksCubit.createList('Test List');
+      _tasksCubit.setActiveList(state.taskLists.first.id);
+      final task = await _tasksCubit.createTask(
+        Task(title: 'Test Task 1'),
+      );
+      final subTask1 = await _tasksCubit.createTask(
+        Task(title: 'Sub-task 1', parent: task.id),
+      );
+      final subTask2 = await _tasksCubit.createTask(
+        Task(title: 'Sub-task 2', parent: task.id),
+      );
+      expect(state.activeList?.items, [
+        task,
+        subTask1,
+        subTask2,
+      ]);
+
+      await _tasksCubit.updateTask(task.copyWith(completed: true));
+      await _tasksCubit.clearCompletedTasks();
+      expect(state.activeList?.items, [
+        task.copyWith(completed: true, deleted: true),
+        subTask1.copyWith(completed: true, deleted: true),
+        subTask2.copyWith(completed: true, deleted: true),
       ]);
     });
   });
