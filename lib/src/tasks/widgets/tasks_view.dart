@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide PopupMenuButton, PopupMenuItem;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
@@ -15,11 +16,7 @@ class TasksView extends StatelessWidget {
         final TaskList? activeList = state.activeList;
         if (activeList == null) return const SizedBox();
 
-        final tasks = activeList.items
-            .where(
-              (task) => task.parent == null && task.deleted == false,
-            )
-            .toList();
+        final tasks = activeList.items;
 
         return SizedBox(
           width: platformIsMobile() ? null : 600,
@@ -29,40 +26,30 @@ class TasksView extends StatelessWidget {
               const _TasksHeader(),
               const _NewTaskButton(),
               Expanded(
-                child: CustomReorderableListView.separated(
-                  buildDefaultDragHandles: false,
+                child: ReorderableListView.builder(
+                  scrollController: ScrollController(),
+                  buildDefaultDragHandles:
+                      (defaultTargetPlatform == TargetPlatform.android ||
+                              defaultTargetPlatform == TargetPlatform.android)
+                          ? true
+                          : false,
                   padding: const EdgeInsets.only(bottom: 100),
-                  itemCount: tasks.length,
-                  separatorBuilder: (_, __) => const Divider(height: 16),
                   itemBuilder: (_, int index) {
                     final task = tasks[index];
 
-                    return TaskTile(key: ValueKey(task), task: task);
+                    return Column(
+                      key: ValueKey(task),
+                      children: [
+                        TaskTile(key: ValueKey(task), index: index, task: task),
+                        if (index != tasks.length - 1)
+                          const Divider(height: 16),
+                      ],
+                    );
                   },
-                  shrinkWrap: true,
-                  onReorder: (oldIndex, newIndex) {},
-                  scrollController: ScrollController(),
-                  // proxyDecorator: (Widget child, _, animation) {
-                  //   return AnimatedBuilder(
-                  //     child: child,
-                  //     animation: animation,
-                  //     builder: (BuildContext context, Widget? child) {
-                  //       final animValue =
-                  //           Curves.easeInOut.transform(animation.value);
-                  //       final scale = lerpDouble(1, 1.05, animValue)!;
-                  //       final elevation = lerpDouble(0, 6, animValue)!;
-                  //       return Transform.scale(
-                  //         scale: scale,
-                  //         child: Material(
-                  //           elevation: elevation,
-                  //           // borderRadius: allSmallBorderRadius,
-                  //           color: Colors.transparent,
-                  //           child: child,
-                  //         ),
-                  //       );
-                  //     },
-                  //   );
-                  // },
+                  itemCount: tasks.length,
+                  onReorder: (oldIndex, newIndex) {
+                    tasksCubit.reorderTasks(oldIndex, newIndex);
+                  },
                 ),
               ),
               // if (state.activeList!.items.any((element) => element.completed))

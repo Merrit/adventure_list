@@ -67,8 +67,7 @@ class TaskDetailsView extends StatelessWidget {
                             const _DescriptionWidget(),
                             const SizedBox(height: 20),
                             const Text('Sub-tasks'),
-                            ...state.activeList!.items
-                                .where((e) => e.parent == task.id && !e.deleted)
+                            ...task.subTasks
                                 .map((Task e) => ListTile(
                                       leading: Checkbox(
                                         onChanged: (value) {

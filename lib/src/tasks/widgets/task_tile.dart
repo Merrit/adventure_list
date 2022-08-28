@@ -9,12 +9,14 @@ import '../tasks.dart';
 
 class TaskTileCubit extends Cubit<TaskTileState> {
   TaskTileCubit(
+    int index,
     Task task, {
     required List<Task> childTasks,
   }) : super(
           TaskTileState(
             childTasks: childTasks,
             hasChildTasks: childTasks.isNotEmpty,
+            index: index,
             isHovered: false,
             task: task,
           ),
@@ -28,28 +30,40 @@ class TaskTileCubit extends Cubit<TaskTileState> {
 class TaskTileState extends Equatable {
   final List<Task> childTasks;
   final bool hasChildTasks;
+  final int index;
   final bool isHovered;
   final Task task;
 
   const TaskTileState({
     required this.childTasks,
     required this.hasChildTasks,
+    required this.index,
     required this.isHovered,
     required this.task,
   });
 
   @override
-  List<Object> get props => [childTasks, hasChildTasks, isHovered, task];
+  List<Object> get props {
+    return [
+      childTasks,
+      hasChildTasks,
+      index,
+      isHovered,
+      task,
+    ];
+  }
 
   TaskTileState copyWith({
     List<Task>? childTasks,
     bool? hasChildTasks,
+    int? index,
     bool? isHovered,
     Task? task,
   }) {
     return TaskTileState(
       childTasks: childTasks ?? this.childTasks,
       hasChildTasks: hasChildTasks ?? this.hasChildTasks,
+      index: index ?? this.index,
       isHovered: isHovered ?? this.isHovered,
       task: task ?? this.task,
     );
@@ -57,10 +71,12 @@ class TaskTileState extends Equatable {
 }
 
 class TaskTile extends StatelessWidget {
+  final int index;
   final Task task;
 
   const TaskTile({
     Key? key,
+    required this.index,
     required this.task,
   }) : super(key: key);
 
@@ -72,11 +88,8 @@ class TaskTile extends StatelessWidget {
 
         if (activeList == null) return const SizedBox();
 
-        final childTasks = state.activeList!.items
-            .where((element) => element.parent == task.id && !element.deleted)
-            .toList();
-
-        final completedTasks = childTasks //
+        final int numCompletedTasks = task //
+            .subTasks
             .where((element) => element.completed)
             .length;
 
@@ -99,8 +112,9 @@ class TaskTile extends StatelessWidget {
 
         return BlocProvider(
           create: (context) => TaskTileCubit(
+            index,
             task,
-            childTasks: childTasks,
+            childTasks: task.subTasks,
           ),
           child: Builder(
             builder: (context) {
@@ -124,9 +138,12 @@ class TaskTile extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (childTasks.isNotEmpty)
-                                Text('($completedTasks/${childTasks.length})'),
-                              if (task.description != null)
+                              if (task.subTasks.isNotEmpty)
+                                Text(
+                                  '($numCompletedTasks/${task.subTasks.length})',
+                                ),
+                              if (task.description != null &&
+                                  task.description != '')
                                 Text(task.description!),
                             ],
                           ),
@@ -164,7 +181,10 @@ class _TitleRow extends StatelessWidget {
         } else {
           dragHandle = Opacity(
             opacity: state.isHovered ? 0.5 : 0.0,
-            child: const Icon(Icons.drag_indicator),
+            child: ReorderableDragStartListener(
+              index: state.task.index,
+              child: const Icon(Icons.drag_indicator),
+            ),
           );
         }
 

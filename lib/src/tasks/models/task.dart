@@ -18,6 +18,8 @@ class Task extends Equatable {
   /// The ID of the task considered the parent, only if this task is nested.
   final String? parent;
 
+  final List<Task> subTasks;
+
   /// Title of the task.
   final String title;
 
@@ -31,6 +33,7 @@ class Task extends Equatable {
     this.id = '',
     this.index = -1,
     this.parent,
+    this.subTasks = const [],
     required this.title,
     DateTime? updated,
   }) : updated = updated ?? DateTime.now();
@@ -45,6 +48,7 @@ class Task extends Equatable {
       id,
       index,
       parent,
+      subTasks,
       title,
       updated,
     ];
@@ -58,6 +62,7 @@ class Task extends Equatable {
     String? id,
     int? index,
     String? parent,
+    List<Task>? subTasks,
     String? title,
     DateTime? updated,
   }) {
@@ -69,9 +74,53 @@ class Task extends Equatable {
       id: id ?? this.id,
       index: index ?? this.index,
       parent: parent ?? this.parent,
+      subTasks: subTasks ?? this.subTasks,
       title: title ?? this.title,
       updated: updated ?? this.updated,
     );
+  }
+
+  Task addSubTask(Task newSubTask) {
+    return copyWith(
+      subTasks: [...subTasks, newSubTask],
+    );
+  }
+
+  Task clearAllSubTasks() {
+    final subTasks = List<Task>.from(this.subTasks);
+    for (var i = 0; i < subTasks.length; i++) {
+      final updatedSubTask = subTasks[i].copyWith(
+        completed: true,
+        deleted: true,
+      );
+      subTasks.removeAt(i);
+      subTasks.insert(i, updatedSubTask);
+    }
+    return copyWith(subTasks: subTasks);
+  }
+
+  Task clearCompletedSubTasks() {
+    final subTasks = List<Task>.from(this.subTasks);
+    for (var i = 0; i < subTasks.length; i++) {
+      if (subTasks[i].completed) {
+        final updatedSubTask = subTasks[i].copyWith(deleted: true);
+        subTasks.removeAt(i);
+        subTasks.insert(i, updatedSubTask);
+      }
+    }
+    return copyWith(subTasks: subTasks);
+  }
+
+  /// Updates the sub-task that matches the id of the provided task.
+  ///
+  /// Returns the updated parent task with updated sub-task.
+  Task updateSubTask(Task updatedSubTask) {
+    final subTasks = List<Task>.from(this.subTasks)
+      ..removeWhere((element) => element.id == updatedSubTask.id)
+      ..add(updatedSubTask)
+      ..sort((a, b) => a.index.compareTo(b.index));
+
+    return copyWith(subTasks: subTasks);
   }
 
   Map<String, dynamic> toMap() {
@@ -97,7 +146,7 @@ class Task extends Equatable {
           ? DateTime.fromMillisecondsSinceEpoch(map['dueDate'])
           : null,
       id: map['id'] ?? '',
-      index: map['index']?.toInt() ?? -1,
+      index: map['index'] ?? -1,
       parent: map['parent'],
       title: map['title'] ?? '',
       updated: DateTime.fromMillisecondsSinceEpoch(map['updated']),

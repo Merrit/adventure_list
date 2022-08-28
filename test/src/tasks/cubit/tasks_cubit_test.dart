@@ -73,7 +73,7 @@ void main() {
   });
 
   group('TasksCubit:', () {
-    setUp(() async {
+    setUpAll(() async {
       /* -------------------------------- AuthCubit ------------------------------- */
       _authCubit = MockAuthenticationCubit();
 
@@ -118,9 +118,9 @@ void main() {
             invokation.namedArguments[const Symbol('updatedTask')] as Task;
         return providedTask;
       });
+    });
 
-      /* ------------------------------- TasksCubit ------------------------------- */
-
+    setUp(() {
       _tasksCubit = TasksCubit(
         _authCubit,
         _storageService,
@@ -128,141 +128,237 @@ void main() {
       );
     });
 
-    test('clearing completed tasks works', () async {
+    group('clearing completed tasks works:', () {
+      late Task task1;
+      late Task taskWithSubTasks;
+
+      setUp(() async {
+        // Prepare state with tasks.
+        _tasksCubit = TasksCubit(
+          _authCubit,
+          _storageService,
+          tasksRepository: _tasksRepository,
+        );
+        await _tasksCubit.createList('Test List');
+        _tasksCubit.setActiveList(state.taskLists.first.id);
+        task1 = await _tasksCubit.createTask(
+          Task(title: 'Test Task 1'),
+        );
+        taskWithSubTasks = await _tasksCubit.createTask(
+          Task(title: 'Test Task with sub-tasks'),
+        );
+        for (var i = 1; i < 3; i++) {
+          taskWithSubTasks = taskWithSubTasks.addSubTask(
+            await _tasksCubit.createTask(
+              Task(title: 'Sub-task $i', parent: taskWithSubTasks.id),
+            ),
+          );
+        }
+      });
+
+      test('none are completed initially', () {
+        expect(state.activeList?.items, [
+          Task(
+            title: 'Test Task 1',
+            id: task1.id,
+            index: 0,
+            updated: task1.updated,
+          ),
+          Task(
+            title: 'Test Task with sub-tasks',
+            id: taskWithSubTasks.id,
+            index: 1,
+            updated: taskWithSubTasks.updated,
+            subTasks: [
+              Task(
+                title: 'Sub-task 1',
+                id: taskWithSubTasks.subTasks[0].id,
+                parent: taskWithSubTasks.id,
+                index: 0,
+                updated: taskWithSubTasks.subTasks[0].updated,
+              ),
+              Task(
+                title: 'Sub-task 2',
+                id: taskWithSubTasks.subTasks[1].id,
+                parent: taskWithSubTasks.id,
+                index: 1,
+                updated: taskWithSubTasks.subTasks[1].updated,
+              ),
+            ],
+          ),
+        ]);
+      });
+
+      test('clearing completed sub-tasks works', () async {
+        task1 = await _tasksCubit.updateTask(task1.copyWith(completed: true));
+        taskWithSubTasks = await _tasksCubit.updateTask(
+          taskWithSubTasks.updateSubTask(
+            taskWithSubTasks.subTasks[0].copyWith(completed: true),
+          ),
+        );
+        await _tasksCubit.clearCompletedTasks(taskWithSubTasks.id);
+        expect(state.activeList?.items, [
+          Task(
+            title: 'Test Task 1',
+            id: task1.id,
+            index: 0,
+            updated: task1.updated,
+            completed: true,
+          ),
+          Task(
+            title: 'Test Task with sub-tasks',
+            id: taskWithSubTasks.id,
+            index: 1,
+            updated: taskWithSubTasks.updated,
+            subTasks: [
+              Task(
+                title: 'Sub-task 1',
+                id: taskWithSubTasks.subTasks[0].id,
+                parent: taskWithSubTasks.id,
+                index: 0,
+                updated: taskWithSubTasks.subTasks[0].updated,
+                completed: true,
+                deleted: true,
+              ),
+              Task(
+                title: 'Sub-task 2',
+                id: taskWithSubTasks.subTasks[1].id,
+                parent: taskWithSubTasks.id,
+                index: 1,
+                updated: taskWithSubTasks.subTasks[1].updated,
+              ),
+            ],
+          ),
+        ]);
+      });
+
+      test('clearing completed top-level tasks works', () async {
+        // Set a top-level task and a sub-task as completed.
+        task1 = await _tasksCubit.updateTask(task1.copyWith(completed: true));
+        taskWithSubTasks = await _tasksCubit.updateTask(
+          taskWithSubTasks.updateSubTask(
+            taskWithSubTasks.subTasks[0].copyWith(completed: true),
+          ),
+        );
+        // Clear completed top-level tasks.
+        await _tasksCubit.clearCompletedTasks();
+        expect(state.activeList?.items, [
+          Task(
+            title: 'Test Task 1',
+            id: task1.id,
+            index: 0,
+            updated: task1.updated,
+            completed: true,
+            deleted: true,
+          ),
+          Task(
+            title: 'Test Task with sub-tasks',
+            id: taskWithSubTasks.id,
+            index: 1,
+            updated: taskWithSubTasks.updated,
+            subTasks: [
+              Task(
+                title: 'Sub-task 1',
+                id: taskWithSubTasks.subTasks[0].id,
+                parent: taskWithSubTasks.id,
+                index: 0,
+                updated: taskWithSubTasks.subTasks[0].updated,
+                completed: true,
+                deleted: false,
+              ),
+              Task(
+                title: 'Sub-task 2',
+                id: taskWithSubTasks.subTasks[1].id,
+                parent: taskWithSubTasks.id,
+                index: 1,
+                updated: taskWithSubTasks.subTasks[1].updated,
+              ),
+            ],
+          ),
+        ]);
+      });
+
+      test('clearing completed top-level task also clears sub-tasks', () async {
+        // Set a top-level task with sub-tasks as completed.
+        taskWithSubTasks = await _tasksCubit.updateTask(
+          taskWithSubTasks.copyWith(completed: true),
+        );
+        // Clear completed top-level tasks.
+        await _tasksCubit.clearCompletedTasks();
+        expect(state.activeList?.items, [
+          Task(
+            title: 'Test Task 1',
+            id: task1.id,
+            index: 0,
+            updated: task1.updated,
+          ),
+          Task(
+            title: 'Test Task with sub-tasks',
+            id: taskWithSubTasks.id,
+            index: 1,
+            updated: taskWithSubTasks.updated,
+            completed: true,
+            deleted: true,
+            subTasks: [
+              Task(
+                title: 'Sub-task 1',
+                id: taskWithSubTasks.subTasks[0].id,
+                parent: taskWithSubTasks.id,
+                index: 0,
+                updated: taskWithSubTasks.subTasks[0].updated,
+                completed: true,
+                deleted: true,
+              ),
+              Task(
+                title: 'Sub-task 2',
+                id: taskWithSubTasks.subTasks[1].id,
+                parent: taskWithSubTasks.id,
+                index: 1,
+                updated: taskWithSubTasks.subTasks[1].updated,
+                completed: true,
+                deleted: true,
+              ),
+            ],
+          ),
+        ]);
+      });
+    });
+
+    test('reordering tasks works', () async {
       // Prepare state with tasks.
       await _tasksCubit.createList('Test List');
       _tasksCubit.setActiveList(state.taskLists.first.id);
       final task1 = await _tasksCubit.createTask(
-        Task(title: 'Test Task 1'),
+        Task(
+          title: 'Test Task 1',
+          index: 0,
+        ),
       );
       final task2 = await _tasksCubit.createTask(
-        Task(title: 'Test Task 2'),
+        Task(
+          title: 'Test Task 2',
+          index: 1,
+        ),
       );
       final task3 = await _tasksCubit.createTask(
-        Task(title: 'Test Task 3'),
+        Task(
+          title: 'Test Task 3',
+          index: 2,
+        ),
       );
-      final taskWithSubTasks = await _tasksCubit.createTask(
-        Task(title: 'Test Task with sub-tasks'),
-      );
-      final subTask1 = await _tasksCubit.createTask(
-        Task(title: 'Sub-task 1', parent: taskWithSubTasks.id),
-      );
-      final subTask2 = await _tasksCubit.createTask(
-        Task(title: 'Sub-task 2', parent: taskWithSubTasks.id),
-      );
-      final subTask3 = await _tasksCubit.createTask(
-        Task(title: 'Sub-task 3', parent: taskWithSubTasks.id),
-      );
+
       expect(state.activeList?.items, [
         task1,
         task2,
         task3,
-        taskWithSubTasks,
-        subTask1,
-        subTask2,
-        subTask3,
       ]);
 
-      // Set a top-level task and a sub-task as completed.
-      await _tasksCubit.updateTask(task1.copyWith(completed: true));
-      await _tasksCubit.updateTask(subTask1.copyWith(completed: true));
+      // Reorder tasks.
+      await _tasksCubit.reorderTasks(2, 0);
       expect(state.activeList?.items, [
-        task1.copyWith(completed: true),
-        task2,
-        task3,
-        taskWithSubTasks,
-        subTask1.copyWith(completed: true),
-        subTask2,
-        subTask3,
-      ]);
-
-      // Clear completed sub-tasks.
-      await _tasksCubit.clearCompletedTasks(taskWithSubTasks.id);
-      expect(state.activeList?.items, [
-        task1.copyWith(completed: true),
-        task2,
-        task3,
-        taskWithSubTasks,
-        subTask1.copyWith(completed: true, deleted: true),
-        subTask2,
-        subTask3,
-      ]);
-
-      // Set a top-level task and a sub-task as completed.
-      await _tasksCubit.updateTask(task2.copyWith(completed: true));
-      await _tasksCubit.updateTask(subTask2.copyWith(completed: true));
-      expect(state.activeList?.items, [
-        task1.copyWith(completed: true),
-        task2.copyWith(completed: true),
-        task3,
-        taskWithSubTasks,
-        subTask1.copyWith(completed: true, deleted: true),
-        subTask2.copyWith(completed: true),
-        subTask3,
-      ]);
-
-      // Clear completed top-level tasks.
-      await _tasksCubit.clearCompletedTasks();
-      expect(state.activeList?.items, [
-        task1.copyWith(completed: true, deleted: true),
-        task2.copyWith(completed: true, deleted: true),
-        task3,
-        taskWithSubTasks,
-        subTask1.copyWith(completed: true, deleted: true),
-        subTask2.copyWith(completed: true),
-        subTask3,
-      ]);
-
-      // Clear all sub-tasks.
-      await _tasksCubit.updateTask(subTask3.copyWith(completed: true));
-      expect(state.activeList?.items, [
-        task1.copyWith(completed: true, deleted: true),
-        task2.copyWith(completed: true, deleted: true),
-        task3,
-        taskWithSubTasks,
-        subTask1.copyWith(completed: true, deleted: true),
-        subTask2.copyWith(completed: true),
-        subTask3.copyWith(completed: true),
-      ]);
-
-      // Clear completed sub-tasks.
-      await _tasksCubit.clearCompletedTasks(taskWithSubTasks.id);
-      expect(state.activeList?.items, [
-        task1.copyWith(completed: true, deleted: true),
-        task2.copyWith(completed: true, deleted: true),
-        task3,
-        taskWithSubTasks,
-        subTask1.copyWith(completed: true, deleted: true),
-        subTask2.copyWith(completed: true, deleted: true),
-        subTask3.copyWith(completed: true, deleted: true),
-      ]);
-    });
-
-    test('clearing task also clears its sub-tasks', () async {
-      // Prepare state with tasks.
-      await _tasksCubit.createList('Test List');
-      _tasksCubit.setActiveList(state.taskLists.first.id);
-      final task = await _tasksCubit.createTask(
-        Task(title: 'Test Task 1'),
-      );
-      final subTask1 = await _tasksCubit.createTask(
-        Task(title: 'Sub-task 1', parent: task.id),
-      );
-      final subTask2 = await _tasksCubit.createTask(
-        Task(title: 'Sub-task 2', parent: task.id),
-      );
-      expect(state.activeList?.items, [
-        task,
-        subTask1,
-        subTask2,
-      ]);
-
-      await _tasksCubit.updateTask(task.copyWith(completed: true));
-      await _tasksCubit.clearCompletedTasks();
-      expect(state.activeList?.items, [
-        task.copyWith(completed: true, deleted: true),
-        subTask1.copyWith(completed: true, deleted: true),
-        subTask2.copyWith(completed: true, deleted: true),
+        task3.copyWith(index: 0),
+        task1.copyWith(index: 1),
+        task2.copyWith(index: 2),
       ]);
     });
   });
