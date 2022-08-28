@@ -14,17 +14,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  call-tests:
+    uses: ./.github/workflows/tests.yml
+
   call-build-linux:
+    needs: call-tests
     uses: ./.github/workflows/build-linux.yml
     with:
       pre-release: true
     secrets: inherit
   call-build-windows:
+    needs: call-tests
     uses: ./.github/workflows/build-windows.yml
     with:
       pre-release: true
     secrets: inherit
   call-build-android:
+    needs: call-tests
     uses: ./.github/workflows/build-android.yml
     secrets: inherit
 
