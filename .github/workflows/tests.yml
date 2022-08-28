@@ -3,10 +3,6 @@ name: Run tests
 on:
   # Run on pull requests
   pull_request:
-  # Run on pushes to main
-  push:
-    branches:
-      - main
   # Allow being called by other workflows
   workflow_call:
   # Allow being called manually
