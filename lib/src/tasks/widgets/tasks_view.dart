@@ -16,7 +16,10 @@ class TasksView extends StatelessWidget {
         final TaskList? activeList = state.activeList;
         if (activeList == null) return const SizedBox();
 
-        final tasks = activeList.items;
+        final tasks = activeList //
+            .items
+            .where((element) => !element.deleted)
+            .toList();
 
         return SizedBox(
           width: platformIsMobile() ? null : 600,
