@@ -48,59 +48,48 @@ class TaskDetailsView extends StatelessWidget {
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
         final Task? task = state.activeTask;
+        if (task == null) return const SizedBox();
 
         final widgetContents = Card(
           margin: const EdgeInsets.all(6),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: task == null
-                  ? []
-                  : [
-                      if (!platformIsMobile())
-                        const Flexible(
-                          flex: 0,
-                          child: TaskDetailsHeader(),
-                        ),
-                      Flexible(
-                        child: ListView(
-                          padding: const EdgeInsets.all(12.0),
-                          controller: ScrollController(),
-                          children: [
-                            const _DescriptionWidget(),
-                            const SizedBox(height: 20),
-                            const Text('Sub-tasks'),
-                            ...task.subTasks
-                                .map((Task e) => ListTile(
-                                      leading: Checkbox(
-                                        onChanged: (value) {
-                                          tasksCubit.updateTask(
-                                            e.copyWith(completed: value),
-                                          );
-                                        },
-                                        shape: roundedSquareBorder,
-                                        value: e.completed,
-                                      ),
-                                      title: Text(
-                                        e.title,
-                                        style: TextStyle(
-                                          decoration: e.completed
-                                              ? TextDecoration.lineThrough
-                                              : null,
-                                        ),
-                                      ),
-                                      onTap: () {
-                                        tasksCubit.updateTask(
-                                          e.copyWith(completed: !e.completed),
-                                        );
-                                      },
-                                    ))
-                                .toList(),
-                            _AddSubTaskWidget(parentTask: task),
-                          ],
-                        ),
-                      ),
-                    ],
+            child: ListView(
+              padding: const EdgeInsets.all(12.0),
+              controller: ScrollController(),
+              children: [
+                if (!platformIsMobile()) const TaskDetailsHeader(),
+                const _DescriptionWidget(),
+                const SizedBox(height: 20),
+                const Text('Sub-tasks'),
+                ...task.subTasks
+                    .map((Task e) => ListTile(
+                          leading: Checkbox(
+                            onChanged: (value) {
+                              tasksCubit.updateTask(
+                                e.copyWith(completed: value),
+                              );
+                            },
+                            shape: roundedSquareBorder,
+                            value: e.completed,
+                          ),
+                          title: Text(
+                            e.title,
+                            style: TextStyle(
+                              decoration: e.completed
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                            ),
+                          ),
+                          onTap: () {
+                            tasksCubit.updateTask(
+                              e.copyWith(completed: !e.completed),
+                            );
+                          },
+                        ))
+                    .toList(),
+                _AddSubTaskWidget(parentTask: task),
+              ],
             ),
           ),
         );
@@ -115,7 +104,7 @@ class TaskDetailsView extends StatelessWidget {
             scale: animation,
             child: child,
           ),
-          child: (task == null) ? const SizedBox() : widgetContents,
+          child: widgetContents,
         );
       },
     );
