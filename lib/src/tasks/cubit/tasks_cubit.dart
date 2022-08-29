@@ -396,8 +396,15 @@ class TasksCubit extends Cubit<TasksState> {
         .singleWhereOrNull(
       (taskList) => taskList.id == selectedListId,
     );
-    if (selectedList != null) {
-      updateHomeWidget('selectedList', selectedList.toJson());
-    }
+    if (selectedList == null) return;
+
+    // Make a copy so we don't affect the actual list while preparing for
+    // widget.
+    final TaskList listCopy = selectedList.copyWith(
+      items: List<Task>.from(selectedList.items),
+    );
+    // Don't show completed/deleted items in widget.
+    listCopy.items.removeWhere((e) => e.completed || e.deleted);
+    updateHomeWidget('selectedList', listCopy.toJson());
   }
 }
