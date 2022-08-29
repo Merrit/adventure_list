@@ -22,12 +22,14 @@ class TaskDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Task? task = context.watch<TasksCubit>().state.activeTask;
+
     final mobileView = Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(task?.title ?? ''),
+      ),
       body: const TaskDetailsView(),
     );
-
-    final Task? task = context.watch<TasksCubit>().state.activeTask;
 
     final largeScreenView = Expanded(
       flex: (task == null) ? 0 : 1,
@@ -55,10 +57,11 @@ class TaskDetailsView extends StatelessWidget {
               children: task == null
                   ? []
                   : [
-                      const Flexible(
-                        flex: 0,
-                        child: TaskDetailsHeader(),
-                      ),
+                      if (!platformIsMobile())
+                        const Flexible(
+                          flex: 0,
+                          child: TaskDetailsHeader(),
+                        ),
                       Flexible(
                         child: ListView(
                           padding: const EdgeInsets.all(12.0),
