@@ -131,6 +131,8 @@ void main() {
     group('clearing completed tasks works:', () {
       late Task task1;
       late Task taskWithSubTasks;
+      late Task subTask1;
+      late Task subTask2;
 
       setUp(() async {
         // Prepare state with tasks.
@@ -147,13 +149,12 @@ void main() {
         taskWithSubTasks = await _tasksCubit.createTask(
           Task(title: 'Test Task with sub-tasks'),
         );
-        for (var i = 1; i < 3; i++) {
-          taskWithSubTasks = taskWithSubTasks.addSubTask(
-            await _tasksCubit.createTask(
-              Task(title: 'Sub-task $i', parent: taskWithSubTasks.id),
-            ),
-          );
-        }
+        subTask1 = await _tasksCubit.createTask(
+          Task(title: 'Sub-task 1', parent: taskWithSubTasks.id),
+        );
+        subTask2 = await _tasksCubit.createTask(
+          Task(title: 'Sub-task 2', parent: taskWithSubTasks.id),
+        );
       });
 
       test('none are completed initially', () {
@@ -169,32 +170,28 @@ void main() {
             id: taskWithSubTasks.id,
             index: 1,
             updated: taskWithSubTasks.updated,
-            subTasks: [
-              Task(
-                title: 'Sub-task 1',
-                id: taskWithSubTasks.subTasks[0].id,
-                parent: taskWithSubTasks.id,
-                index: 0,
-                updated: taskWithSubTasks.subTasks[0].updated,
-              ),
-              Task(
-                title: 'Sub-task 2',
-                id: taskWithSubTasks.subTasks[1].id,
-                parent: taskWithSubTasks.id,
-                index: 1,
-                updated: taskWithSubTasks.subTasks[1].updated,
-              ),
-            ],
+          ),
+          Task(
+            title: 'Sub-task 1',
+            id: subTask1.id,
+            parent: taskWithSubTasks.id,
+            index: 0,
+            updated: subTask1.updated,
+          ),
+          Task(
+            title: 'Sub-task 2',
+            id: subTask2.id,
+            parent: taskWithSubTasks.id,
+            index: 1,
+            updated: subTask2.updated,
           ),
         ]);
       });
 
       test('clearing completed sub-tasks works', () async {
         task1 = await _tasksCubit.updateTask(task1.copyWith(completed: true));
-        taskWithSubTasks = await _tasksCubit.updateTask(
-          taskWithSubTasks.updateSubTask(
-            taskWithSubTasks.subTasks[0].copyWith(completed: true),
-          ),
+        subTask1 = await _tasksCubit.updateTask(
+          subTask1.copyWith(completed: true),
         );
         await _tasksCubit.clearCompletedTasks(taskWithSubTasks.id);
         expect(state.activeList?.items, [
@@ -210,24 +207,22 @@ void main() {
             id: taskWithSubTasks.id,
             index: 1,
             updated: taskWithSubTasks.updated,
-            subTasks: [
-              Task(
-                title: 'Sub-task 1',
-                id: taskWithSubTasks.subTasks[0].id,
-                parent: taskWithSubTasks.id,
-                index: 0,
-                updated: taskWithSubTasks.subTasks[0].updated,
-                completed: true,
-                deleted: true,
-              ),
-              Task(
-                title: 'Sub-task 2',
-                id: taskWithSubTasks.subTasks[1].id,
-                parent: taskWithSubTasks.id,
-                index: 1,
-                updated: taskWithSubTasks.subTasks[1].updated,
-              ),
-            ],
+          ),
+          Task(
+            title: 'Sub-task 1',
+            id: subTask1.id,
+            parent: taskWithSubTasks.id,
+            index: 0,
+            updated: subTask1.updated,
+            completed: true,
+            deleted: true,
+          ),
+          Task(
+            title: 'Sub-task 2',
+            id: subTask2.id,
+            parent: taskWithSubTasks.id,
+            index: 1,
+            updated: subTask2.updated,
           ),
         ]);
       });
@@ -235,10 +230,8 @@ void main() {
       test('clearing completed top-level tasks works', () async {
         // Set a top-level task and a sub-task as completed.
         task1 = await _tasksCubit.updateTask(task1.copyWith(completed: true));
-        taskWithSubTasks = await _tasksCubit.updateTask(
-          taskWithSubTasks.updateSubTask(
-            taskWithSubTasks.subTasks[0].copyWith(completed: true),
-          ),
+        subTask1 = await _tasksCubit.updateTask(
+          subTask1.copyWith(completed: true),
         );
         // Clear completed top-level tasks.
         await _tasksCubit.clearCompletedTasks();
@@ -256,24 +249,22 @@ void main() {
             id: taskWithSubTasks.id,
             index: 1,
             updated: taskWithSubTasks.updated,
-            subTasks: [
-              Task(
-                title: 'Sub-task 1',
-                id: taskWithSubTasks.subTasks[0].id,
-                parent: taskWithSubTasks.id,
-                index: 0,
-                updated: taskWithSubTasks.subTasks[0].updated,
-                completed: true,
-                deleted: false,
-              ),
-              Task(
-                title: 'Sub-task 2',
-                id: taskWithSubTasks.subTasks[1].id,
-                parent: taskWithSubTasks.id,
-                index: 1,
-                updated: taskWithSubTasks.subTasks[1].updated,
-              ),
-            ],
+          ),
+          Task(
+            title: 'Sub-task 1',
+            id: subTask1.id,
+            parent: taskWithSubTasks.id,
+            index: 0,
+            updated: subTask1.updated,
+            completed: true,
+            deleted: false,
+          ),
+          Task(
+            title: 'Sub-task 2',
+            id: subTask2.id,
+            parent: taskWithSubTasks.id,
+            index: 1,
+            updated: subTask2.updated,
           ),
         ]);
       });
@@ -299,26 +290,24 @@ void main() {
             updated: taskWithSubTasks.updated,
             completed: true,
             deleted: true,
-            subTasks: [
-              Task(
-                title: 'Sub-task 1',
-                id: taskWithSubTasks.subTasks[0].id,
-                parent: taskWithSubTasks.id,
-                index: 0,
-                updated: taskWithSubTasks.subTasks[0].updated,
-                completed: true,
-                deleted: true,
-              ),
-              Task(
-                title: 'Sub-task 2',
-                id: taskWithSubTasks.subTasks[1].id,
-                parent: taskWithSubTasks.id,
-                index: 1,
-                updated: taskWithSubTasks.subTasks[1].updated,
-                completed: true,
-                deleted: true,
-              ),
-            ],
+          ),
+          Task(
+            title: 'Sub-task 1',
+            id: subTask1.id,
+            parent: taskWithSubTasks.id,
+            index: 0,
+            updated: subTask1.updated,
+            completed: true,
+            deleted: true,
+          ),
+          Task(
+            title: 'Sub-task 2',
+            id: subTask2.id,
+            parent: taskWithSubTasks.id,
+            index: 1,
+            updated: subTask2.updated,
+            completed: true,
+            deleted: true,
           ),
         ]);
       });

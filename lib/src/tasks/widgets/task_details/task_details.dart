@@ -1,10 +1,10 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
-import '../../../core/core.dart';
 import '../../tasks.dart';
 import 'task_details_header.dart';
 
@@ -60,33 +60,12 @@ class TaskDetailsView extends StatelessWidget {
               children: [
                 if (!platformIsMobile()) const TaskDetailsHeader(),
                 const _DescriptionWidget(),
+                const _ParentSelectionWidget(),
                 const SizedBox(height: 20),
                 const Text('Sub-tasks'),
-                ...task.subTasks
-                    .map((Task e) => ListTile(
-                          leading: Checkbox(
-                            onChanged: (value) {
-                              tasksCubit.updateTask(
-                                e.copyWith(completed: value),
-                              );
-                            },
-                            shape: roundedSquareBorder,
-                            value: e.completed,
-                          ),
-                          title: Text(
-                            e.title,
-                            style: TextStyle(
-                              decoration: e.completed
-                                  ? TextDecoration.lineThrough
-                                  : null,
-                            ),
-                          ),
-                          onTap: () {
-                            tasksCubit.updateTask(
-                              e.copyWith(completed: !e.completed),
-                            );
-                          },
-                        ))
+                ...state.activeList!.items
+                    .where((e) => e.parent == task.id && !e.deleted)
+                    .map((e) => TaskTile(index: 0, task: e))
                     .toList(),
                 _AddSubTaskWidget(parentTask: task),
               ],
@@ -221,6 +200,57 @@ class _DescriptionWidgetState extends State<_DescriptionWidget> {
                 ),
               ),
           ],
+        );
+      },
+    );
+  }
+}
+
+class _ParentSelectionWidget extends StatelessWidget {
+  const _ParentSelectionWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        final task = state.activeTask;
+        if (task == null) return const SizedBox();
+
+        final tasks = state.activeList?.items //
+            .where((e) =>
+                !e.deleted &&
+                e.id != task.id &&
+                (e.parent == null || e.parent == ''))
+            .toList();
+        if (tasks == null) return const SizedBox();
+
+        tasks.insert(0, Task(title: 'None'));
+
+        return ListTile(
+          title: const Text('Parent task'),
+          trailing: SizedBox(
+            width: 200,
+            child: DropdownButton<Task>(
+              isExpanded: true,
+              hint: const Text('None'),
+              items: tasks
+                  .map((e) => DropdownMenuItem<Task>(
+                        value: e,
+                        child: Text(e.title),
+                      ))
+                  .toList(),
+              value: tasks
+                  .firstWhereOrNull((element) => element.id == task.parent),
+              onChanged: (Task? value) {
+                if (value == null) return;
+                if (value.title == 'None') {
+                  tasksCubit.updateTask(task.copyWith(parent: ''));
+                } else {
+                  tasksCubit.updateTask(task.copyWith(parent: value.id));
+                }
+              },
+            ),
+          ),
         );
       },
     );

@@ -18,7 +18,7 @@ class TasksView extends StatelessWidget {
 
         final tasks = activeList //
             .items
-            .where((element) => !element.deleted)
+            .where((e) => !e.deleted && (e.parent == null || e.parent == ''))
             .toList();
 
         return SizedBox(

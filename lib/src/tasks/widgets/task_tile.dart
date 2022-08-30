@@ -88,8 +88,11 @@ class TaskTile extends StatelessWidget {
 
         if (activeList == null) return const SizedBox();
 
-        final int numCompletedTasks = task //
-            .subTasks
+        final childTasks = state.activeList!.items
+            .where((element) => element.parent == task.id && !element.deleted)
+            .toList();
+
+        final completedTasks = childTasks //
             .where((element) => element.completed)
             .length;
 
@@ -114,7 +117,7 @@ class TaskTile extends StatelessWidget {
           create: (context) => TaskTileCubit(
             index,
             task,
-            childTasks: task.subTasks,
+            childTasks: childTasks,
           ),
           child: Builder(
             builder: (context) {
@@ -138,12 +141,9 @@ class TaskTile extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (task.subTasks.isNotEmpty)
-                                Text(
-                                  '($numCompletedTasks/${task.subTasks.length})',
-                                ),
-                              if (task.description != null &&
-                                  task.description != '')
+                              if (childTasks.isNotEmpty)
+                                Text('($completedTasks/${childTasks.length})'),
+                              if (task.description != null)
                                 Text(task.description!),
                             ],
                           ),
@@ -183,6 +183,7 @@ class _TitleRow extends StatelessWidget {
             opacity: state.isHovered ? 0.5 : 0.0,
             child: ReorderableDragStartListener(
               index: state.task.index,
+              enabled: state.task.parent == null,
               child: const Icon(Icons.drag_indicator),
             ),
           );

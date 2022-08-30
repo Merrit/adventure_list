@@ -114,6 +114,18 @@ class TasksCubit extends Cubit<TasksState> {
     return lists;
   }
 
+  /// Sort tasks as top-level before sub-tasks, both in order by index.
+  List<Task> _tasksInOrder(List<Task> tasks) {
+    tasks.sort((a, b) {
+      if (a.parent == null && b.parent != null) {
+        return -1;
+      }
+
+      return a.index.compareTo(b.index);
+    });
+    return tasks;
+  }
+
   Future<void> createList(String title) async {
     final newList = await _tasksRepository.createList(title: title);
     emit(state.copyWith(
@@ -189,16 +201,18 @@ class TasksCubit extends Cubit<TasksState> {
     assert(state.activeList != null);
 
     final bool isSubTask = newTask.parent != null;
-    final int parentTaskIndex = state.activeList!.items
-        .indexWhere((element) => element.id == newTask.parent);
     final Task? parentTask = state.activeList!.items
-        .singleWhereIndexedOrNull((index, element) => index == parentTaskIndex);
+        .singleWhereOrNull((element) => element.id == newTask.parent);
 
     int index;
     if (isSubTask) {
-      index = parentTask!.subTasks.length;
+      index = state.activeList!.items
+          .where((element) => element.parent == parentTask!.id)
+          .length;
     } else {
-      index = state.activeList!.items.length;
+      index = state.activeList!.items
+          .where((element) => element.parent == null)
+          .length;
     }
 
     newTask = await _tasksRepository.createTask(
@@ -206,14 +220,8 @@ class TasksCubit extends Cubit<TasksState> {
       newTask: newTask.copyWith(index: index),
     );
 
-    final updatedItems = List<Task>.from(state.activeList!.items);
-    if (isSubTask) {
-      updatedItems[parentTaskIndex] = parentTask!.copyWith(
-        subTasks: [...parentTask.subTasks, newTask],
-      );
-    } else {
-      updatedItems.add(newTask);
-    }
+    final updatedItems = List<Task>.from(state.activeList!.items) //
+      ..add(newTask);
 
     final updatedList = state.activeList!.copyWith(items: updatedItems);
     final updatedTaskLists = List<TaskList>.from(state.taskLists)
@@ -226,22 +234,6 @@ class TasksCubit extends Cubit<TasksState> {
     ));
 
     return newTask;
-  }
-
-  List<Task> _tasksInOrder(List<Task> tasks) {
-    // Verify each task has a unique index.
-    if (tasks.map((e) => e.index).toSet().length != tasks.length) {
-      tasks = _assignTaskIndexes(tasks);
-    }
-    tasks.sort((a, b) => a.index.compareTo(b.index));
-    return tasks;
-  }
-
-  List<Task> _assignTaskIndexes(List<Task> tasks) {
-    for (var i = 0; i < tasks.length; i++) {
-      tasks[i] = tasks[i].copyWith(index: i);
-    }
-    return tasks;
   }
 
   /// Called when the user is reordering the list of TaskLists.
@@ -326,29 +318,38 @@ class TasksCubit extends Cubit<TasksState> {
     // gives us the option of retrieving "deleted" items.
 
     List<Task> updatedTasks = state.activeList!.items.map((Task task) {
-      // Clear sub-tasks for a given parent task.
-      if (task.id == parentId) {
-        return task.clearCompletedSubTasks();
+      final Task? parent = state //
+          .activeList
+          ?.items
+          .singleWhereOrNull((element) => element.id == task.parent);
+
+      // If a parent task is being completed, sub-tasks should be as well.
+      if (parent != null && parent.completed) {
+        return task.copyWith(completed: true, deleted: true);
       }
 
-      /// If we were provided a parentId, we are only affecting tasks associated
-      /// with *that* task and its sub-tasks.
-      if (parentId != null) {
-        return task;
+      // Not completed.
+      if (!task.completed) return task;
+
+      // Completed top-level tasks.
+      if (parentId == null && task.parent == null) {
+        return task.copyWith(deleted: true);
       }
 
-      if (task.completed) {
-        // If a parent task is being completed, sub-tasks should be as well.
-        final withSubTasksCompleted = task.clearAllSubTasks();
-        return withSubTasksCompleted.copyWith(deleted: true);
-      } else {
-        return task;
+      // Completed sub-tasks.
+      if (parentId != null && task.parent == parentId) {
+        return task.copyWith(deleted: true);
       }
+
+      // Default.
+      return task;
     }).toList();
+
+    updatedTasks = _tasksInOrder(updatedTasks);
 
     final TaskList updatedList = state //
         .activeList!
-        .copyWith(items: _tasksInOrder(updatedTasks));
+        .copyWith(items: updatedTasks);
     final int index = state.taskLists.indexWhere((e) => e.id == updatedList.id);
 
     final taskLists = List<TaskList>.from(state.taskLists)

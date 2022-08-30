@@ -5,7 +5,6 @@ import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
 
 import '../authentication/authentication.dart';
-import '../logs/logs.dart';
 import 'tasks.dart';
 
 /// Notes on interfacing with the Google Calendar API.
@@ -169,27 +168,6 @@ extension CalendarHelper on Calendar {
 
     // Convert events to Tasks.
     final List<Task> tasks = apiTasks.items!.map((e) => e.toModel()).toList();
-    // Extract Tasks that are sub-tasks.
-    final subTasks = tasks
-        .where((element) => element.parent != null && element.parent != '')
-        .toList();
-    tasks.removeWhere((element) => element.parent != null);
-    for (var subTask in subTasks) {
-      // Verify the parent task exists.
-      final int parentTaskIndex = tasks //
-          .indexWhere((element) => element.id == subTask.parent);
-      // If parent task does not exist, sub-task becomes top-level.
-      if (parentTaskIndex == -1) {
-        logger.w('Found no parent task for subTask: ${subTask.toString()}');
-        tasks.add(subTask.copyWith(parent: ''));
-      } else {
-        // If parent task exists, sub-task gets added to sub-tasks list.
-        final parentTask = tasks[parentTaskIndex];
-        tasks[parentTaskIndex] = parentTask.copyWith(
-          subTasks: [...parentTask.subTasks, subTask],
-        );
-      }
-    }
 
     int index = -1;
 
