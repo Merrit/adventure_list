@@ -236,7 +236,10 @@ class _ParentSelectionWidget extends StatelessWidget {
               items: tasks
                   .map((e) => DropdownMenuItem<Task>(
                         value: e,
-                        child: Text(e.title),
+                        child: Text(
+                          e.title,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ))
                   .toList(),
               value: tasks
