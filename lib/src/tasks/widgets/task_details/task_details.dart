@@ -206,8 +206,31 @@ class _DescriptionWidgetState extends State<_DescriptionWidget> {
   }
 }
 
-class _ParentSelectionWidget extends StatelessWidget {
+class _ParentSelectionWidget extends StatefulWidget {
   const _ParentSelectionWidget({Key? key}) : super(key: key);
+
+  @override
+  State<_ParentSelectionWidget> createState() => _ParentSelectionWidgetState();
+}
+
+class _ParentSelectionWidgetState extends State<_ParentSelectionWidget> {
+  @override
+  void initState() {
+    super.initState();
+    focusNode = FocusNode(debugLabel: 'parentSelectorFocusNode')
+      ..addListener(() {
+        // If the DropdownButton is deselected it should not be highlighted.
+        if (focusNode.hasPrimaryFocus) focusNode.unfocus();
+      });
+  }
+
+  @override
+  void dispose() {
+    focusNode.dispose();
+    super.dispose();
+  }
+
+  late final FocusNode focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -231,6 +254,7 @@ class _ParentSelectionWidget extends StatelessWidget {
           trailing: SizedBox(
             width: 200,
             child: DropdownButton<Task>(
+              focusNode: focusNode,
               isExpanded: true,
               hint: const Text('None'),
               items: tasks
