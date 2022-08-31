@@ -163,14 +163,6 @@ class _TaskListTile extends StatefulWidget {
 }
 
 class __TaskListTileState extends State<_TaskListTile> {
-  late TaskList taskList;
-
-  @override
-  void initState() {
-    super.initState();
-    taskList = widget.taskList;
-  }
-
   bool isHovered = false;
 
   @override
@@ -180,6 +172,10 @@ class __TaskListTileState extends State<_TaskListTile> {
       onExit: (_) => setState(() => isHovered = false),
       child: BlocBuilder<TasksCubit, TasksState>(
         builder: (context, state) {
+          final taskList = state.taskLists.singleWhere(
+            (element) => element.id == widget.taskList.id,
+          );
+
           return ListTile(
             key: ValueKey(taskList.id),
             title: Text(taskList.title),
