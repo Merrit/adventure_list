@@ -30,10 +30,11 @@ class Task extends Equatable {
     this.dueDate,
     this.id = '',
     this.index = -1,
-    this.parent,
+    String? parent,
     required this.title,
     DateTime? updated,
-  }) : updated = updated ?? DateTime.now();
+  })  : parent = (parent == '') ? null : parent,
+        updated = updated ?? DateTime.now();
 
   @override
   List<Object?> get props {

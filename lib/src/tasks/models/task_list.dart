@@ -17,12 +17,12 @@ class TaskList extends Equatable {
 
   final String title;
 
-  const TaskList({
+  TaskList({
     required this.id,
     required this.index,
-    required this.items,
+    required List<Task> items,
     required this.title,
-  });
+  }) : items = TaskListValidator.tasksInOrder(items);
 
   @override
   List<Object> get props => [id, index, items, title];
@@ -63,4 +63,29 @@ class TaskList extends Equatable {
 
   factory TaskList.fromJson(String source) =>
       TaskList.fromMap(json.decode(source));
+
+  /// Task from [oldIndex] is moved to [newIndex].
+  ///
+  /// Task indexes are recalculated and the updated [TaskList] is returned.
+  TaskList reorderTasks(int oldIndex, int newIndex) {
+    final updatedTasks = List<Task>.from(items);
+    final topLevelTasks = updatedTasks
+        .where((element) => element.parent == null && !element.deleted)
+        .toList();
+
+    for (var task in topLevelTasks) {
+      updatedTasks.remove(task);
+    }
+
+    final task = topLevelTasks.removeAt(oldIndex);
+    topLevelTasks.insert(newIndex, task);
+
+    for (var i = 0; i < topLevelTasks.length; i++) {
+      topLevelTasks[i] = topLevelTasks[i].copyWith(index: i);
+    }
+
+    updatedTasks.addAll(topLevelTasks);
+
+    return copyWith(items: updatedTasks);
+  }
 }

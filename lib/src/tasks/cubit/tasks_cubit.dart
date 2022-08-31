@@ -95,12 +95,6 @@ class TasksCubit extends Cubit<TasksState> {
       return;
     }
 
-    // Make sure tasks are in order by index.
-    for (var i = 0; i < taskLists.length; i++) {
-      final taskList = taskLists[i];
-      taskLists[i] = taskList.copyWith(items: _tasksInOrder(taskList.items));
-    }
-
     final String? activeListId = await _storageService.getValue('activeList');
     emit(state.copyWith(
       activeList: taskLists.singleWhereOrNull((e) => e.id == activeListId),
@@ -112,18 +106,6 @@ class TasksCubit extends Cubit<TasksState> {
   List<TaskList> _listsInOrder(List<TaskList> lists) {
     lists.sort((a, b) => a.index.compareTo(b.index));
     return lists;
-  }
-
-  /// Sort tasks as top-level before sub-tasks, both in order by index.
-  List<Task> _tasksInOrder(List<Task> tasks) {
-    tasks.sort((a, b) {
-      if (a.parent == null && b.parent != null) {
-        return -1;
-      }
-
-      return a.index.compareTo(b.index);
-    });
-    return tasks;
   }
 
   Future<void> createList(String title) async {
@@ -238,32 +220,32 @@ class TasksCubit extends Cubit<TasksState> {
 
   /// Called when the user is reordering the list of TaskLists.
   Future<void> reorderTasks(int oldIndex, int newIndex) async {
-    if (oldIndex < newIndex) newIndex -= 1;
-    List<Task> tasks = List<Task>.from(state.activeList!.items)
-      ..removeAt(oldIndex)
-      ..insert(newIndex, state.activeList!.items[oldIndex]);
-    for (var i = 0; i < tasks.length; i++) {
-      tasks[i] = tasks[i].copyWith(index: i);
-    }
-    final updatedActiveList = state.activeList?.copyWith(items: tasks);
+    final previousActiveList = state.activeList!;
+    final updatedList = state.activeList!.reorderTasks(oldIndex, newIndex);
+
     final activeListIndex = state //
         .taskLists
-        .indexWhere((element) => element.id == updatedActiveList?.id);
+        .indexWhere((element) => element.id == state.activeList!.id);
     final updatedTaskLists = List<TaskList>.from(state.taskLists)
       ..removeAt(activeListIndex)
-      ..insert(activeListIndex, updatedActiveList!);
+      ..insert(activeListIndex, updatedList);
+
     emit(state.copyWith(
-      activeList: updatedActiveList,
+      activeList: updatedList,
       taskLists: updatedTaskLists,
     ));
-    await _tasksRepository.updateTask(
-      taskListId: state.activeList!.id,
-      updatedTask: tasks[oldIndex],
-    );
-    await _tasksRepository.updateTask(
-      taskListId: state.activeList!.id,
-      updatedTask: tasks[newIndex],
-    );
+
+    // Find every task that has changed, and update repository.
+    final updatedTasks = updatedList.items
+        .toSet()
+        .difference(previousActiveList.items.toSet())
+        .toList();
+    for (var task in updatedTasks) {
+      await _tasksRepository.updateTask(
+        taskListId: state.activeList!.id,
+        updatedTask: task,
+      );
+    }
   }
 
   Future<Task> updateTask(Task task) async {
@@ -344,8 +326,6 @@ class TasksCubit extends Cubit<TasksState> {
       // Default.
       return task;
     }).toList();
-
-    updatedTasks = _tasksInOrder(updatedTasks);
 
     final TaskList updatedList = state //
         .activeList!

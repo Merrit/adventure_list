@@ -18,7 +18,7 @@ class TasksView extends StatelessWidget {
 
         final tasks = activeList //
             .items
-            .where((e) => !e.deleted && (e.parent == null || e.parent == ''))
+            .where((e) => !e.deleted && e.parent == null)
             .toList();
 
         return SizedBox(
@@ -51,6 +51,7 @@ class TasksView extends StatelessWidget {
                   },
                   itemCount: tasks.length,
                   onReorder: (oldIndex, newIndex) {
+                    if (oldIndex < newIndex) newIndex -= 1;
                     tasksCubit.reorderTasks(oldIndex, newIndex);
                   },
                 ),

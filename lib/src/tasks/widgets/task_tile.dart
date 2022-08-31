@@ -96,7 +96,7 @@ class TaskTile extends StatelessWidget {
             .where((element) => element.completed)
             .length;
 
-        Future<void> _setActiveTaskCallback() async {
+        Future<void> setActiveTaskCallback() async {
           String? taskId = (tasksCubit.state.activeTask == task) //
               ? null
               : task.id;
@@ -125,7 +125,7 @@ class TaskTile extends StatelessWidget {
 
               return InkWell(
                 hoverColor: Colors.transparent,
-                onTap: () => _setActiveTaskCallback(),
+                onTap: () => setActiveTaskCallback(),
                 child: MouseRegion(
                   onEnter: (_) => stateCubit.updateIsHovered(true),
                   onExit: (_) => stateCubit.updateIsHovered(false),
@@ -181,11 +181,16 @@ class _TitleRow extends StatelessWidget {
         } else {
           dragHandle = Opacity(
             opacity: state.isHovered ? 0.5 : 0.0,
-            child: ReorderableDragStartListener(
-              index: state.task.index,
-              enabled: state.task.parent == null,
-              child: const Icon(Icons.drag_indicator),
-            ),
+            child: state.task.parent == null
+                // Disable for sub-tasks until reordering them is implemented.
+                ? ReorderableDragStartListener(
+                    index: state.index,
+                    child: const Icon(Icons.drag_indicator),
+                  )
+                : const Icon(
+                    Icons.hot_tub,
+                    color: Colors.transparent,
+                  ),
           );
         }
 
