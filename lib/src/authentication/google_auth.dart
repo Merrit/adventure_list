@@ -61,7 +61,7 @@ abstract class GoogleAuthIds {
 class GoogleAuth {
   static final scopes = [CalendarApi.calendarScope];
 
-  Future<AccessCredentials?> login() async {
+  Future<AccessCredentials?> signin() async {
     if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
       return await _googleSignInAuth();
     } else {
@@ -79,7 +79,7 @@ class GoogleAuth {
         launchAuthUrl,
       );
     } catch (e) {
-      logger.w('Unable to login: $e');
+      logger.w('Unable to sign in: $e');
     }
 
     return client?.credentials;
@@ -110,7 +110,7 @@ class GoogleAuth {
     final GoogleSignInAccount? googleSignInAccount =
         await googleSignIn.signInSilently();
 
-    if (googleSignInAccount == null) await GoogleAuth().login();
+    if (googleSignInAccount == null) await GoogleAuth().signin();
 
     final AuthClient? client = await googleSignIn.authenticatedClient();
 

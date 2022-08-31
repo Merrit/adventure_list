@@ -49,7 +49,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   Future<void> signIn() async {
     assert(!state.signedIn);
 
-    final accessCredentials = await _googleAuth.login();
+    final accessCredentials = await _googleAuth.signin();
     if (accessCredentials == null) return;
 
     emit(state.copyWith(

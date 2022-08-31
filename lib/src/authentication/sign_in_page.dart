@@ -11,7 +11,7 @@ import '../tasks/tasks.dart';
 import 'cubit/authentication_cubit.dart';
 
 class SignInPage extends StatelessWidget {
-  static const routeName = '/login_page';
+  static const routeName = '/signin_page';
 
   const SignInPage({Key? key}) : super(key: key);
 
