@@ -109,7 +109,7 @@ class TaskTile extends StatelessWidget {
             );
 
             // User has returned from details page, unset active task.
-            tasksCubit.setActiveTask('');
+            tasksCubit.setActiveTask(null);
           }
         }
 
