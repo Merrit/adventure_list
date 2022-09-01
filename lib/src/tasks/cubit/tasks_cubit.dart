@@ -276,7 +276,7 @@ class TasksCubit extends Cubit<TasksState> {
     // If the task is unchanged, don't do anything.
     if (state.activeList!.items.contains(task)) return task;
 
-    final activeTask = (state.activeTask?.id == task.id) ? task : null;
+    final bool isActiveTask = (state.activeTask?.id == task.id);
     final int index = state.activeList!.items.indexWhere(
       (element) => element.id == task.id,
     );
@@ -287,7 +287,7 @@ class TasksCubit extends Cubit<TasksState> {
       ..insert(index, task);
     emit(state.copyWith(
       activeList: state.activeList!.copyWith(items: items),
-      activeTask: activeTask,
+      activeTask: isActiveTask ? task : null,
     ));
 
     final updatedTaskFromRepo = await _tasksRepository.updateTask(
@@ -300,7 +300,7 @@ class TasksCubit extends Cubit<TasksState> {
     items.insert(index, updatedTaskFromRepo);
     emit(state.copyWith(
       activeList: state.activeList!.copyWith(items: items),
-      activeTask: activeTask,
+      activeTask: isActiveTask ? updatedTaskFromRepo : null,
     ));
 
     return updatedTaskFromRepo;
