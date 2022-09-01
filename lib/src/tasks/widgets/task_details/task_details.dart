@@ -22,21 +22,35 @@ class TaskDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Task? task = context.watch<TasksCubit>().state.activeTask;
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        final Task? task = state.activeTask;
 
-    final mobileView = Scaffold(
-      appBar: AppBar(
-        title: Text(task?.title ?? ''),
-      ),
-      body: const TaskDetailsView(),
+        final mobileView = Scaffold(
+          appBar: AppBar(
+            key: ValueKey(task),
+            title: (task == null)
+                ? null
+                : TextInputListTile(
+                    editingPlaceholderText: true,
+                    placeholderText: task.title,
+                    unfocusedOpacity: 1.0,
+                    callback: (String value) => tasksCubit.updateTask(
+                      task.copyWith(title: value),
+                    ),
+                  ),
+          ),
+          body: const TaskDetailsView(),
+        );
+
+        final largeScreenView = Expanded(
+          flex: (task == null) ? 0 : 1,
+          child: const TaskDetailsView(),
+        );
+
+        return (platformIsMobile()) ? mobileView : largeScreenView;
+      },
     );
-
-    final largeScreenView = Expanded(
-      flex: (task == null) ? 0 : 1,
-      child: const TaskDetailsView(),
-    );
-
-    return (platformIsMobile()) ? mobileView : largeScreenView;
   }
 }
 
