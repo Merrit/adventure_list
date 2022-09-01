@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 
@@ -19,10 +21,19 @@ class HomeScreenWidget extends StatefulWidget {
 }
 
 class _HomeScreenWidgetState extends State<HomeScreenWidget> {
+  StreamSubscription? homeWidgetListener;
   @override
   void initState() {
     super.initState();
-    HomeWidget.widgetClicked.listen(_handleAppLaunchedFromHomeWidget);
+    homeWidgetListener = HomeWidget.widgetClicked.listen(
+      _handleAppLaunchedFromHomeWidget,
+    );
+  }
+
+  @override
+  void dispose() {
+    homeWidgetListener?.cancel();
+    super.dispose();
   }
 
   void _handleAppLaunchedFromHomeWidget(Uri? uri) {
