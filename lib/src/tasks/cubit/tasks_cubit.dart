@@ -285,9 +285,20 @@ class TasksCubit extends Cubit<TasksState> {
     var items = List<Task>.from(state.activeList!.items)
       ..removeAt(index)
       ..insert(index, task);
+    final int taskListIndex = state.taskLists.indexWhere(
+      (element) => element.id == state.activeList!.id,
+    );
+    TaskList updatedTaskList = state //
+        .taskLists[taskListIndex]
+        .copyWith(items: items);
+    List<TaskList> updatedAllTaskLists = List<TaskList>.from(state.taskLists)
+      ..[taskListIndex] = updatedTaskList;
+
     emit(state.copyWith(
-      activeList: state.activeList!.copyWith(items: items),
+      activeList: updatedTaskList,
       activeTask: isActiveTask ? task : null,
+      taskLists: updatedAllTaskLists,
+      // taskLists: update the regular list of tasklists!
     ));
 
     final updatedTaskFromRepo = await _tasksRepository.updateTask(
@@ -298,9 +309,12 @@ class TasksCubit extends Cubit<TasksState> {
     // Update local state with final remote changes.
     items.removeAt(index);
     items.insert(index, updatedTaskFromRepo);
+    updatedTaskList = updatedTaskList.copyWith(items: items);
+    updatedAllTaskLists[taskListIndex] = updatedTaskList;
     emit(state.copyWith(
       activeList: state.activeList!.copyWith(items: items),
       activeTask: isActiveTask ? updatedTaskFromRepo : null,
+      taskLists: updatedAllTaskLists,
     ));
 
     return updatedTaskFromRepo;
