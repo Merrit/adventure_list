@@ -399,10 +399,14 @@ class TasksCubit extends Cubit<TasksState> {
   }
 
   /// Timer ensures we aren't caching constantly.
-  // ignore: unused_field
   Timer? _cacheTimer;
 
   Future<void> _cacheData(TasksState state) async {
+    if (_cacheTimer?.isActive == true) {
+      _cacheTimer?.cancel();
+      _cacheTimer = null;
+    }
+
     _cacheTimer = Timer(const Duration(seconds: 10), () async {
       final taskListsJson = <String>[];
       for (var taskList in state.taskLists) {
