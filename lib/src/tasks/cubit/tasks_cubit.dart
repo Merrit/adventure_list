@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
 
@@ -48,11 +50,14 @@ class TasksCubit extends Cubit<TasksState> {
   }
 
   Future<void> _getCachedData() async {
-    final List<String> cache = List<String>.from(
-      await _storageService.getStorageAreaValues('cache'),
+    final List<String>? taskListsJson = await _storageService.getValue(
+      'taskListsJson',
+      storageArea: 'cache',
     );
 
-    final List<TaskList> taskLists = cache //
+    if (taskListsJson == null) return;
+
+    final List<TaskList> taskLists = taskListsJson //
         .map((e) => TaskList.fromJson(e))
         .toList();
 
@@ -367,23 +372,32 @@ class TasksCubit extends Cubit<TasksState> {
 
   @override
   void onChange(Change<TasksState> change) {
-    _cacheData(change.nextState);
+    if (change.currentState != change.nextState) {
+      _cacheData(change.nextState);
+    }
 
     if (Platform.isAndroid) _updateAndroidWidget(change.nextState);
 
     super.onChange(change);
   }
 
-  Future<void> _cacheData(TasksState state) async {
-    final entries = {};
-    for (var taskList in state.taskLists) {
-      entries[taskList.id] = taskList.toJson();
-    }
+  /// Timer ensures we aren't caching constantly.
+  // ignore: unused_field
+  Timer? _cacheTimer;
 
-    await _storageService.saveStorageAreaValues(
-      storageArea: 'cache',
-      entries: entries,
-    );
+  Future<void> _cacheData(TasksState state) async {
+    _cacheTimer = Timer(const Duration(seconds: 10), () async {
+      final taskListsJson = <String>[];
+      for (var taskList in state.taskLists) {
+        taskListsJson.add(taskList.toJson());
+      }
+
+      await _storageService.saveValue(
+        key: 'taskListsJson',
+        value: taskListsJson,
+        storageArea: 'cache',
+      );
+    });
   }
 
   void _updateAndroidWidget(TasksState data) {
