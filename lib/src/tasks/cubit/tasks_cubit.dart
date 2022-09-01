@@ -436,7 +436,9 @@ class TasksCubit extends Cubit<TasksState> {
       items: List<Task>.from(selectedList.items),
     );
     // Don't show completed/deleted items in widget.
-    listCopy.items.removeWhere((e) => e.completed || e.deleted);
+    listCopy //
+        .items
+        .removeWhere((e) => e.completed || e.deleted || e.parent != null);
     updateHomeWidget('selectedList', listCopy.toJson());
   }
 }
