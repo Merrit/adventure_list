@@ -6,7 +6,7 @@ abstract class TasksRepository {
   Future<List<TaskList>> getAll();
 
   /// Create a new [TaskList].
-  Future<TaskList> createList({required String title});
+  Future<TaskList> createList(TaskList taskList);
 
   /// Delete the [TaskList] with [id].
   Future<void> deleteList({required String id});

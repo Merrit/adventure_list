@@ -127,13 +127,16 @@ class TasksCubit extends Cubit<TasksState> {
     ));
 
     // Create list properly through repository to get id & etc.
-    final newListFromRepo = await _tasksRepository.createList(title: title);
+    final newListFromRepo = await _tasksRepository.createList(newList);
     newList = newList.copyWith(id: newListFromRepo.id);
+
+    final taskLists = List<TaskList>.from(state.taskLists);
+    if (taskLists.isNotEmpty) taskLists.removeLast();
+    taskLists.add(newList);
+
     emit(state.copyWith(
       activeList: newList,
-      taskLists: List<TaskList>.from(state.taskLists)
-        ..removeLast()
-        ..add(newList),
+      taskLists: taskLists,
     ));
   }
 

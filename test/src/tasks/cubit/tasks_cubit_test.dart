@@ -84,13 +84,13 @@ void main() {
 
       when(() => _tasksRepository.getAll()).thenAnswer((_) async => []);
 
-      when(() => _tasksRepository.createList(title: any(named: 'title')))
+      when(() => _tasksRepository.createList(any()))
           .thenAnswer((invokation) async => TaskList(
                 id: UniqueKey().toString(),
                 index: 0,
                 items: const [],
-                title:
-                    invokation.namedArguments[const Symbol('title')] as String,
+                title: (invokation.positionalArguments.first as TaskList).title,
+                // invokation.namedArguments[const Symbol('title')] as String,
               ));
 
       when(() => _tasksRepository.deleteList(id: any(named: 'id')))

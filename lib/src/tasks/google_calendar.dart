@@ -97,11 +97,11 @@ class GoogleCalendar implements TasksRepository {
   }
 
   @override
-  Future<TaskList> createList({required String title}) async {
+  Future<TaskList> createList(TaskList taskList) async {
     final newCalendar = await _api.calendars.insert(Calendar(
-      description: '{}',
+      description: json.encode({'index': taskList.index}),
       location: 'adventure_list',
-      summary: title,
+      summary: taskList.title,
     ));
 
     await _setListHidden(newCalendar.id!);
