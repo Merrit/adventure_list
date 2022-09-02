@@ -47,23 +47,25 @@ class _NavContents extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsButton = ListTile(
+      title: const Text('Settings'),
+      onTap: () {
+        if (platformIsMobile()) {
+          Navigator.pushNamed(context, SettingsPage.routeName);
+        } else {
+          showDialog(
+            context: context,
+            builder: (context) => const SettingsDialog(),
+          );
+        }
+      },
+    );
+
     return Column(
       children: [
         const _CreateListButton(),
         const _ScrollingListTiles(),
-        ListTile(
-          title: const Text('Settings'),
-          onTap: () {
-            if (platformIsMobile()) {
-              Navigator.pushNamed(context, SettingsPage.routeName);
-            } else {
-              showDialog(
-                context: context,
-                builder: (context) => const SettingsDialog(),
-              );
-            }
-          },
-        ),
+        settingsButton,
         const _UpdateButton(),
       ],
     );
