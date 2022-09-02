@@ -166,51 +166,57 @@ class _TitleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final stateCubit = context.read<TaskTileCubit>();
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, tasksState) {
+        return BlocBuilder<TaskTileCubit, TaskTileState>(
+          builder: (context, tileState) {
+            final bool selected =
+                tasksState.activeTask?.id == tileState.task.id;
+            TextStyle titleTextStyle = TextStyle(
+              decoration:
+                  tileState.task.completed ? TextDecoration.lineThrough : null,
+              color: selected ? Theme.of(context).colorScheme.primary : null,
+            );
 
-    return BlocBuilder<TaskTileCubit, TaskTileState>(
-      builder: (context, state) {
-        TextStyle titleTextStyle = TextStyle(
-          decoration: state.task.completed ? TextDecoration.lineThrough : null,
-        );
+            Widget dragHandle;
+            if (defaultTargetPlatform == TargetPlatform.android ||
+                defaultTargetPlatform == TargetPlatform.iOS) {
+              dragHandle = const SizedBox();
+            } else {
+              dragHandle = Opacity(
+                opacity: tileState.isHovered ? 0.5 : 0.0,
+                child: tileState.task.parent == null
+                    // Disable for sub-tasks until reordering them is implemented.
+                    ? ReorderableDragStartListener(
+                        index: tileState.index,
+                        child: const Icon(Icons.drag_indicator),
+                      )
+                    : const Icon(
+                        Icons.hot_tub,
+                        color: Colors.transparent,
+                      ),
+              );
+            }
 
-        Widget dragHandle;
-        if (defaultTargetPlatform == TargetPlatform.android ||
-            defaultTargetPlatform == TargetPlatform.iOS) {
-          dragHandle = const SizedBox();
-        } else {
-          dragHandle = Opacity(
-            opacity: state.isHovered ? 0.5 : 0.0,
-            child: state.task.parent == null
-                // Disable for sub-tasks until reordering them is implemented.
-                ? ReorderableDragStartListener(
-                    index: state.index,
-                    child: const Icon(Icons.drag_indicator),
-                  )
-                : const Icon(
-                    Icons.hot_tub,
-                    color: Colors.transparent,
+            return Row(
+              children: [
+                dragHandle,
+                Checkbox(
+                  value: tileState.task.completed,
+                  onChanged: (bool? value) => tasksCubit.updateTask(
+                    tileState.task.copyWith(completed: value),
                   ),
-          );
-        }
-
-        return Row(
-          children: [
-            dragHandle,
-            Checkbox(
-              value: state.task.completed,
-              onChanged: (bool? value) => tasksCubit.updateTask(
-                state.task.copyWith(completed: value),
-              ),
-              shape: roundedSquareBorder,
-            ),
-            Flexible(
-              child: Text(
-                state.task.title,
-                style: titleTextStyle,
-              ),
-            ),
-          ],
+                  shape: roundedSquareBorder,
+                ),
+                Flexible(
+                  child: Text(
+                    tileState.task.title,
+                    style: titleTextStyle,
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
