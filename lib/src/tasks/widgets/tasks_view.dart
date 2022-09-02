@@ -179,6 +179,7 @@ class _NewTaskButton extends StatelessWidget {
       debugLabel: 'NewTaskButton FocusNode',
       leading: const Icon(Icons.add),
       placeholderText: 'New Task',
+      retainFocus: true,
       callback: (value) => tasksCubit.createTask(Task(title: value)),
     );
   }
