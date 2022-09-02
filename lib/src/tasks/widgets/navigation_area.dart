@@ -64,14 +64,14 @@ class _NavContents extends StatelessWidget {
             }
           },
         ),
-        const UpdateButton(),
+        const _UpdateButton(),
       ],
     );
   }
 }
 
-class UpdateButton extends StatelessWidget {
-  const UpdateButton({Key? key}) : super(key: key);
+class _UpdateButton extends StatelessWidget {
+  const _UpdateButton({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
