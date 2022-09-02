@@ -14,7 +14,7 @@ class TasksView extends StatelessWidget {
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
         final TaskList? activeList = state.activeList;
-        if (activeList == null) return const SizedBox();
+        if (activeList == null) return const _CreateSelectListPrompt();
 
         final tasks = activeList //
             .items
@@ -68,6 +68,32 @@ class TasksView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _CreateSelectListPrompt extends StatelessWidget {
+  const _CreateSelectListPrompt({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(50.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          SizedBox(height: double.infinity),
+          Icon(Icons.arrow_back),
+          SizedBox(width: 10),
+          Text(
+            'Select or create a list to get started',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
