@@ -36,7 +36,7 @@ class TasksView extends StatelessWidget {
                               defaultTargetPlatform == TargetPlatform.android)
                           ? true
                           : false,
-                  padding: const EdgeInsets.only(bottom: 100),
+                  padding: const EdgeInsets.only(bottom: 20),
                   itemBuilder: (_, int index) {
                     final task = tasks[index];
 
