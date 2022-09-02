@@ -73,7 +73,7 @@ class TasksView extends StatelessWidget {
 }
 
 class _CreateSelectListPrompt extends StatelessWidget {
-  const _CreateSelectListPrompt({super.key});
+  const _CreateSelectListPrompt();
 
   @override
   Widget build(BuildContext context) {
