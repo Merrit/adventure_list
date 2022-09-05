@@ -4,8 +4,8 @@ import 'package:googleapis/calendar/v3.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
 
-import '../authentication/authentication.dart';
-import 'tasks.dart';
+import '../../../authentication/authentication.dart';
+import '../../tasks.dart';
 
 /// Notes on interfacing with the Google Calendar API.
 
