@@ -106,6 +106,11 @@ class TasksCubit extends Cubit<TasksState> {
       loading: false,
       taskLists: _listsInOrder(taskLists),
     ));
+
+    Timer.periodic(
+      const Duration(minutes: 1),
+      (timer) => _syncUpdatedTasks(),
+    );
   }
 
   List<TaskList> _listsInOrder(List<TaskList> lists) {
@@ -298,26 +303,43 @@ class TasksCubit extends Cubit<TasksState> {
       activeList: updatedTaskList,
       activeTask: isActiveTask ? task : null,
       taskLists: updatedAllTaskLists,
-      // taskLists: update the regular list of tasklists!
     ));
 
-    final updatedTaskFromRepo = await _tasksRepository.updateTask(
-      taskListId: state.activeList!.id,
-      updatedTask: task,
+    // Save task to be batch synced periodically.
+    await _storageService.saveValue(
+      key: task.id,
+      value: {
+        'taskListId': updatedTaskList.id,
+        'task': task.toJson(),
+      },
+      storageArea: 'tasksToBeSynced',
     );
 
-    // Update local state with final remote changes.
-    items.removeAt(index);
-    items.insert(index, updatedTaskFromRepo);
-    updatedTaskList = updatedTaskList.copyWith(items: items);
-    updatedAllTaskLists[taskListIndex] = updatedTaskList;
-    emit(state.copyWith(
-      activeList: state.activeList!.copyWith(items: items),
-      activeTask: isActiveTask ? updatedTaskFromRepo : null,
-      taskLists: updatedAllTaskLists,
-    ));
+    return task;
+  }
 
-    return updatedTaskFromRepo;
+  /// Called to periodically sync updated tasks to remote repository.
+  Future<void> _syncUpdatedTasks() async {
+    final tasksToBeSynced = await _storageService.getStorageAreaValues(
+      'tasksToBeSynced',
+    );
+
+    for (var taskEntry in tasksToBeSynced) {
+      final taskListId = taskEntry['taskListId'] as String;
+      final taskJson = taskEntry['task'] as String;
+
+      final task = Task.fromJson(taskJson);
+
+      await _tasksRepository.updateTask(
+        taskListId: taskListId,
+        updatedTask: task,
+      );
+
+      await _storageService.deleteValue(
+        task.id,
+        storageArea: 'tasksToBeSynced',
+      );
+    }
   }
 
   void setActiveTask(String? id) {
