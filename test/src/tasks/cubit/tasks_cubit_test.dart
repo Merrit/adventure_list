@@ -64,6 +64,7 @@ void main() {
     when(() => _storageService.saveValue(
           key: any(named: 'key'),
           value: any(named: 'value'),
+          storageArea: any(named: 'storageArea'),
         )).thenAnswer((_) async {});
 
     await initializeLogger(_storageService);
