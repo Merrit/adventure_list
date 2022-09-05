@@ -242,33 +242,18 @@ class TasksCubit extends Cubit<TasksState> {
     return newTask;
   }
 
-  /// Called when the user is reordering the list of TaskLists.
+  /// Called when the user is reordering Tasks.
   Future<void> reorderTasks(int oldIndex, int newIndex) async {
-    final previousActiveList = state.activeList!;
     final updatedList = state.activeList!.reorderTasks(oldIndex, newIndex);
 
-    final activeListIndex = state //
-        .taskLists
-        .indexWhere((element) => element.id == state.activeList!.id);
-    final updatedTaskLists = List<TaskList>.from(state.taskLists)
-      ..removeAt(activeListIndex)
-      ..insert(activeListIndex, updatedList);
-
-    emit(state.copyWith(
-      activeList: updatedList,
-      taskLists: updatedTaskLists,
-    ));
-
-    // Find every task that has changed, and update repository.
+    // Find every task that has changed and update them.
     final updatedTasks = updatedList.items
         .toSet()
-        .difference(previousActiveList.items.toSet())
+        .difference(state.activeList!.items.toSet())
         .toList();
+
     for (var task in updatedTasks) {
-      await _tasksRepository.updateTask(
-        taskListId: state.activeList!.id,
-        updatedTask: task,
-      );
+      await updateTask(task);
     }
   }
 
