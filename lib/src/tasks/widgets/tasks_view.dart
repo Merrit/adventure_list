@@ -11,7 +11,23 @@ class TasksView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TasksCubit, TasksState>(
+    return BlocConsumer<TasksCubit, TasksState>(
+      listener: (context, state) {
+        if (state.awaitingClearTasksUndo) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Cleared completed tasks'),
+              action: SnackBarAction(
+                label: 'Undo',
+                onPressed: () {
+                  tasksCubit.undoClearTasks();
+                  ScaffoldMessenger.of(context).clearSnackBars();
+                },
+              ),
+            ),
+          );
+        }
+      },
       builder: (context, state) {
         final TaskList? activeList = state.activeList;
         if (activeList == null) return const _CreateSelectListPrompt();

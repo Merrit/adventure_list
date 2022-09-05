@@ -353,11 +353,20 @@ class TasksCubit extends Cubit<TasksState> {
     ));
   }
 
+  bool _clearTasksWasCancelled = false;
+  TaskList? _activeTaskListBeforeClear;
+  List<TaskList>? _taskListCollectionBeforeClear;
+
   Future<void> clearCompletedTasks([String? parentId]) async {
+    _clearTasksWasCancelled = false;
+
     // A task is marked "completed" when it is checked, but this does not remove
     // it from the list. By "clearing" we are also setting the "deleted"
     // property to true - which doesn't *actually* delete it, but hides it. This
     // gives us the option of retrieving "deleted" items.
+
+    _activeTaskListBeforeClear = state.activeList!.copyWith();
+    _taskListCollectionBeforeClear = List<TaskList>.from(state.taskLists);
 
     List<Task> updatedTasks = state.activeList!.items.map((Task task) {
       final Task? parent = state //
@@ -398,15 +407,32 @@ class TasksCubit extends Cubit<TasksState> {
 
     emit(state.copyWith(
       activeList: updatedList,
+      awaitingClearTasksUndo: true,
       taskLists: _listsInOrder(taskLists),
     ));
 
-    for (var task in updatedList.items) {
-      await _tasksRepository.updateTask(
-        taskListId: updatedList.id,
-        updatedTask: task,
-      );
+    // Give the user a chance to undo.
+    await Future.delayed(const Duration(seconds: 5));
+    emit(state.copyWith(awaitingClearTasksUndo: false));
+
+    if (!_clearTasksWasCancelled) {
+      // Commit to clearing changes.
+      for (var task in updatedList.items) {
+        await _tasksRepository.updateTask(
+          taskListId: updatedList.id,
+          updatedTask: task,
+        );
+      }
     }
+  }
+
+  void undoClearTasks() {
+    _clearTasksWasCancelled = true;
+    emit(state.copyWith(
+      activeList: _activeTaskListBeforeClear,
+      awaitingClearTasksUndo: false,
+      taskLists: _taskListCollectionBeforeClear,
+    ));
   }
 
   @override
