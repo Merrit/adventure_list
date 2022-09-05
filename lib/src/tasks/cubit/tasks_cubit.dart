@@ -221,16 +221,31 @@ class TasksCubit extends Cubit<TasksState> {
           .length;
     }
 
+    // Emit local cached task immediately.
+    newTask = newTask.copyWith(index: index);
+    List<Task> updatedItems = List<Task>.from(state.activeList!.items) //
+      ..add(newTask);
+    TaskList updatedList = state.activeList!.copyWith(items: updatedItems);
+    List<TaskList> updatedTaskLists = List<TaskList>.from(state.taskLists)
+      ..remove(state.activeList)
+      ..add(updatedList);
+
+    emit(state.copyWith(
+      activeList: updatedList,
+      taskLists: _listsInOrder(updatedTaskLists),
+    ));
+
+    // Create task with repository to get id.
     newTask = await _tasksRepository.createTask(
       taskListId: state.activeList!.id,
-      newTask: newTask.copyWith(index: index),
+      newTask: newTask,
     );
 
-    final updatedItems = List<Task>.from(state.activeList!.items) //
+    updatedItems = List<Task>.from(state.activeList!.items) //
+      ..removeLast()
       ..add(newTask);
-
-    final updatedList = state.activeList!.copyWith(items: updatedItems);
-    final updatedTaskLists = List<TaskList>.from(state.taskLists)
+    updatedList = state.activeList!.copyWith(items: updatedItems);
+    updatedTaskLists = List<TaskList>.from(state.taskLists)
       ..remove(state.activeList)
       ..add(updatedList);
 
