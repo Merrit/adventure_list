@@ -32,11 +32,7 @@ class SettingsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       return AlertDialog(
-        contentPadding: const EdgeInsets.only(
-          top: 20,
-          left: 10,
-          right: 10,
-        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 20),
         insetPadding: EdgeInsets.symmetric(
           horizontal: constraints.maxWidth / 8,
           vertical: 24,
@@ -113,21 +109,19 @@ class _SectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        children: [
-          ListTile(
-            title: Text(
-              title,
-              style: TextStyle(
-                color: Theme.of(context).primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
+    return Column(
+      children: [
+        ListTile(
+          title: Text(
+            title,
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          ...children,
-        ],
-      ),
+        ),
+        ...children,
+      ],
     );
   }
 }
