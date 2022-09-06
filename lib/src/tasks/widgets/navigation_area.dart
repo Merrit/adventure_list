@@ -47,8 +47,43 @@ class _NavContents extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final settingsButton = ListTile(
-      title: const Text('Settings'),
+    return Column(
+      children: const [
+        _CreateListButton(),
+        _ScrollingListTiles(),
+        _SettingsButton(),
+        _UpdateButton(),
+      ],
+    );
+  }
+}
+
+class _SettingsButton extends StatelessWidget {
+  const _SettingsButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Stack(
+        children: [
+          const Text('Settings'),
+          Positioned(
+            left: 64,
+            top: 4,
+            child: BlocBuilder<AppCubit, AppState>(
+              builder: (context, state) {
+                return Icon(
+                  Icons.circle,
+                  color: state.updateAvailable //
+                      ? Theme.of(context).colorScheme.secondary
+                      : Colors.transparent,
+                  size: 8,
+                );
+              },
+            ),
+          )
+        ],
+      ),
       onTap: () {
         if (platformIsMobile()) {
           Navigator.pushNamed(context, SettingsPage.routeName);
@@ -59,15 +94,6 @@ class _NavContents extends StatelessWidget {
           );
         }
       },
-    );
-
-    return Column(
-      children: [
-        const _CreateListButton(),
-        const _ScrollingListTiles(),
-        settingsButton,
-        const _UpdateButton(),
-      ],
     );
   }
 }

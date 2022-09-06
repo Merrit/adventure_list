@@ -4,9 +4,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
-
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:self_updater/self_updater.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../constants.dart';
 import '../../logs/logs.dart';
@@ -89,6 +89,10 @@ current version: $currentVersion''');
     }
 
     emit(state.copyWith(updateDownloaded: true, updateInProgress: false));
+  }
+
+  Future<bool> launchAUrl(Uri url) async {
+    return await launchUrl(url);
   }
 
   Future<void> startUpdate() async {

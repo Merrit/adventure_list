@@ -138,11 +138,37 @@ class _VersionTile extends StatelessWidget {
     return BlocBuilder<AppCubit, AppState>(
       builder: (context, state) {
         return Opacity(
-          opacity: 0.6,
+          opacity: 0.8,
           child: ListTile(
-            title: Text('Version ${state.appVersion}'),
+            title: Row(
+              children: [
+                Text('Version ${state.appVersion}'),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.circle,
+                  color: Theme.of(context).colorScheme.secondary,
+                  size: 10,
+                ),
+              ],
+            ),
             subtitle: (state.updateAvailable)
-                ? Text('Update available: ${state.updateVersion}')
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Update available: ${state.updateVersion}'),
+                      Row(
+                        children: const [
+                          Text('Open download page'),
+                          Icon(Icons.launch, size: 16),
+                        ],
+                      ),
+                    ],
+                  )
+                : null,
+            onTap: (state.updateAvailable)
+                ? () => appCubit.launchAUrl(Uri.parse(
+                      'https://github.com/Merrit/adventure_list/releases',
+                    ))
                 : null,
           ),
         );
