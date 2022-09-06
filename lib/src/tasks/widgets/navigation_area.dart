@@ -117,7 +117,9 @@ class _UpdateButton extends StatelessWidget {
           child = Center(
             child: Transform.scale(
               scale: 0.8,
-              child: CircularProgressIndicator(color: Colors.pink.shade400),
+              child: CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
             ),
           );
         } else {
