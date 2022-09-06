@@ -144,10 +144,16 @@ class _VersionTile extends StatelessWidget {
               children: [
                 Text('Version ${state.appVersion}'),
                 const SizedBox(width: 4),
-                Icon(
-                  Icons.circle,
-                  color: Theme.of(context).colorScheme.secondary,
-                  size: 10,
+                BlocBuilder<AppCubit, AppState>(
+                  builder: (context, state) {
+                    return Icon(
+                      Icons.circle,
+                      color: (state.updateAvailable)
+                          ? Theme.of(context).colorScheme.secondary
+                          : Colors.transparent,
+                      size: 10,
+                    );
+                  },
                 ),
               ],
             ),
