@@ -40,7 +40,8 @@ void main(List<String> args) async {
     return false;
   };
 
-  await AppWindow.initialize();
+  final appWindow = AppWindow();
+  appWindow.initialize();
 
   // Firebase not available on Linux & Windows.
   if (!Platform.isLinux && !Platform.isWindows) {
