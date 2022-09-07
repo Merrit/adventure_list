@@ -6,6 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../authentication/authentication.dart';
 import '../../home_widget/home_widget_manager.dart';
@@ -211,6 +212,9 @@ class TasksCubit extends Cubit<TasksState> {
   Future<Task> createTask(Task newTask) async {
     assert(state.activeList != null);
 
+    final tempId = const Uuid().v4();
+    newTask = newTask.copyWith(id: tempId);
+
     final bool isSubTask = newTask.parent != null;
     final Task? parentTask = state.activeList!.items
         .singleWhereOrNull((element) => element.id == newTask.parent);
@@ -240,14 +244,14 @@ class TasksCubit extends Cubit<TasksState> {
       taskLists: _listsInOrder(updatedTaskLists),
     ));
 
-    // Create task with repository to get id.
+    // Create task with repository to get final id.
     newTask = await _tasksRepository.createTask(
       taskListId: state.activeList!.id,
       newTask: newTask,
     );
 
     updatedItems = List<Task>.from(state.activeList!.items) //
-      ..removeLast()
+      ..removeWhere((e) => e.id == tempId)
       ..add(newTask);
     updatedList = state.activeList!.copyWith(items: updatedItems);
     updatedTaskLists = List<TaskList>.from(state.taskLists)
