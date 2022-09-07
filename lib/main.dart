@@ -13,10 +13,11 @@ import 'firebase_options.dart';
 import 'src/app.dart';
 import 'src/app/cubit/app_cubit.dart';
 import 'src/authentication/authentication.dart';
-import 'src/constants.dart';
+import 'src/core/constants.dart';
 import 'src/logs/logs.dart';
 import 'src/settings/cubit/settings_cubit.dart';
 import 'src/storage/storage_service.dart';
+import 'src/system_tray/system_tray_manager.dart';
 import 'src/tasks/tasks.dart';
 import 'src/window/app_window.dart';
 
@@ -40,8 +41,10 @@ void main(List<String> args) async {
     return false;
   };
 
-  final appWindow = AppWindow();
-  appWindow.initialize();
+  final appWindow = AppWindow() //
+    ..initialize();
+  final systemTray = SystemTrayManager(appWindow);
+  await systemTray.initialize();
 
   // Firebase not available on Linux & Windows.
   if (!Platform.isLinux && !Platform.isWindows) {
@@ -109,7 +112,7 @@ Future<void> integrateWithDesktop() async {
   final desktopIntegration = DesktopIntegration(
     desktopFilePath: desktopFile?.path ?? '',
     iconPath: iconFile.path,
-    packageName: kpackageId,
+    packageName: kPackageId,
     linkFileName: 'Adventure List',
   );
 

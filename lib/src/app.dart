@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'authentication/authentication.dart';
@@ -26,15 +27,17 @@ class App extends StatefulWidget {
   State<App> createState() => _AppState();
 }
 
-class _AppState extends State<App> with WindowListener {
+class _AppState extends State<App> with TrayListener, WindowListener {
   @override
   void initState() {
+    trayManager.addListener(this);
     windowManager.addListener(this);
     super.initState();
   }
 
   @override
   void dispose() {
+    trayManager.removeListener(this);
     windowManager.removeListener(this);
     super.dispose();
   }

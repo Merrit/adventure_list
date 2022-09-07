@@ -41,6 +41,8 @@ class AppWindow {
   }
 
   void close() => exit(0);
+  Future<void> hide() async => await windowManager.hide();
+  Future<void> show() async => await windowManager.show();
 
   Future<void> saveWindowSizeAndPosition() async {
     print('Saving window size and position');

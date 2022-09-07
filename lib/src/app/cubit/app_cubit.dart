@@ -8,7 +8,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:self_updater/self_updater.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../constants.dart';
+import '../../core/constants.dart';
 import '../../logs/logs.dart';
 import '../../settings/settings.dart';
 

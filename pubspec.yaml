@@ -47,11 +47,12 @@ dependencies:
   self_updater:
     git:
       url: https://github.com/Merrit/self_updater.git
+  tray_manager: ^0.2.0
   url_launcher: ^6.1.4
-  window_manager: ^0.2.7
-  workmanager: ^0.5.0
-  window_to_front: ^0.0.3
   uuid: ^3.0.6
+  window_manager: ^0.2.7
+  window_to_front: ^0.0.3
+  workmanager: ^0.5.0
 
 dev_dependencies:
   change_app_package_name: ^1.1.0
@@ -74,8 +75,7 @@ flutter:
   generate: true
 
   assets:
-    - assets/icons/codes.merritt.adventurelist.svg
-    - assets/icons/codes.merritt.adventurelist.ico
+    - assets/icons/
     - packaging/linux/codes.merritt.adventurelist.desktop
 
 flutter_icons:
