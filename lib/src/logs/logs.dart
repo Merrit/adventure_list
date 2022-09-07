@@ -24,6 +24,9 @@ Future<void> initializeLogger(
   }
 
   logToFile ??= await storageService.getValue('logToFile');
+  // Default to logging to file on Windows.
+  // Helpful for troubleshooting since you can't run from terminal on Windows.
+  if (Platform.isWindows) logToFile ??= true;
 
   final dataDir = await getApplicationSupportDirectory();
   final logFile = File('${dataDir.path}${Platform.pathSeparator}log.txt');
