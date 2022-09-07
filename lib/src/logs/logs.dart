@@ -14,13 +14,16 @@ import '../storage/storage_service.dart';
 
 late final Logger logger;
 
-Future<void> initializeLogger(StorageService storageService) async {
+Future<void> initializeLogger(
+  StorageService storageService, {
+  bool? logToFile,
+}) async {
   if (testing) {
     logger = Logger();
     return;
   }
 
-  final bool? logToFile = await storageService.getValue('logToFile');
+  logToFile ??= await storageService.getValue('logToFile');
 
   final dataDir = await getApplicationSupportDirectory();
   final logFile = File('${dataDir.path}${Platform.pathSeparator}log.txt');

@@ -20,11 +20,11 @@ import 'src/storage/storage_service.dart';
 import 'src/tasks/tasks.dart';
 import 'src/window/app_window.dart';
 
-void main() async {
+void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final storageService = await StorageService.initialize();
-  await initializeLogger(storageService);
+  await initializeLogger(storageService, logToFile: args.contains('--log'));
 
   // Handle errors caught by Flutter.
   FlutterError.onError = (details) {
