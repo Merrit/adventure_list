@@ -22,6 +22,24 @@ import 'src/window/app_window.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final storageService = await StorageService.initialize();
+  await initializeLogger(storageService);
+
+  // Handle errors caught by Flutter.
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    if (kReleaseMode && Platform.isWindows) {
+      logger.e('Flutter caught an error:', details.exception, details.stack);
+    }
+  };
+
+  // Handle platform errors not caught by Flutter.
+  PlatformDispatcher.instance.onError = (exception, stackTrace) {
+    logger.e('Platform caught an error:', exception, stackTrace);
+    return false;
+  };
+
   await AppWindow.initialize();
 
   // Firebase not available on Linux & Windows.
@@ -35,10 +53,6 @@ void main() async {
     Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
     HomeWidget.registerBackgroundCallback(backgroundCallback);
   }
-
-  final storageService = await StorageService.initialize();
-
-  await initializeLogger(storageService);
 
   final googleAuth = GoogleAuth();
   final authenticationCubit = await AuthenticationCubit.initialize(
