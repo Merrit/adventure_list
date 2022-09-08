@@ -420,6 +420,14 @@ class TasksCubit extends Cubit<TasksState> {
     emit(state.copyWith(awaitingClearTasksUndo: false));
 
     if (!_clearTasksWasCancelled) {
+      // Ensure pending task updates don't overwrite the cleared state.
+      for (var task in updatedList.items) {
+        await _storageService.deleteValue(
+          task.id,
+          storageArea: 'tasksToBeSynced',
+        );
+      }
+
       // Commit to clearing changes.
       for (var task in updatedList.items) {
         await _tasksRepository.updateTask(
