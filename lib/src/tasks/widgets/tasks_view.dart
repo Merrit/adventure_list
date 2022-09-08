@@ -187,13 +187,8 @@ class _TasksHeader extends StatelessWidget {
                           itemBuilder: (context) {
                             return [
                               PopupMenuItem(
-                                child: TextButton(
-                                  onPressed: () {
-                                    tasksCubit.clearCompletedTasks();
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('Clear completed'),
-                                ),
+                                onTap: () => tasksCubit.clearCompletedTasks(),
+                                child: const Text('Clear completed'),
                               ),
                             ];
                           },
