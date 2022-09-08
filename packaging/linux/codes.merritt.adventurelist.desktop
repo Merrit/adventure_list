@@ -9,4 +9,4 @@ Categories=Utility;
 Icon=codes.merritt.adventurelist
 Exec=adventure_list
 Terminal=false
-StartupWMClass=adventure_list
+StartupWMClass=Adventure_list
