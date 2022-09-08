@@ -67,6 +67,10 @@ class SettingsView extends StatelessWidget {
       _UpdateChannelTile(),
     ];
 
+    const integrationSection = [
+      _CloseToTrayTile(),
+    ];
+
     const troubleshootingSection = [
       _LogToFileWidget(),
     ];
@@ -82,6 +86,10 @@ class SettingsView extends StatelessWidget {
                 _SectionWidget(
                   title: 'Version and updates',
                   children: updatesSection,
+                ),
+                _SectionWidget(
+                  title: 'Integration',
+                  children: integrationSection,
                 ),
                 _SectionWidget(
                   title: 'Troubleshooting',
@@ -262,6 +270,27 @@ Please do not choose Dev unless you can accept these risks.'''),
           ),
         ],
       ),
+    );
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                 Integration                                */
+/* -------------------------------------------------------------------------- */
+
+class _CloseToTrayTile extends StatelessWidget {
+  const _CloseToTrayTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, state) {
+        return SwitchListTile(
+          title: const Text('Close to tray'),
+          value: state.closeToTray,
+          onChanged: (value) => settingsCubit.updateCloseToTray(value),
+        );
+      },
     );
   }
 }

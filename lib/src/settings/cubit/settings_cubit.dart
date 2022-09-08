@@ -35,6 +35,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     return SettingsCubit(
       storageService,
       initialState: SettingsState(
+        closeToTray: await storageService.getValue('closeToTray') ?? true,
         homeWidgetSelectedListId: homeWidgetSelectedListId ?? '',
         logToFile: await storageService.getValue('logToFile') ?? false,
         updateAutomatically:
@@ -47,6 +48,11 @@ class SettingsCubit extends Cubit<SettingsState> {
   Future<void> updateAutomaticUpdatesSetting(bool value) async {
     emit(state.copyWith(updateAutomatically: value));
     await _storageService.saveValue(key: 'updateAutomatically', value: value);
+  }
+
+  Future<void> updateCloseToTray(bool value) async {
+    emit(state.copyWith(closeToTray: value));
+    await _storageService.saveValue(key: 'closeToTray', value: value);
   }
 
   Future<void> updateHomeWidgetSelectedListId(String id) async {

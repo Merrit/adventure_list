@@ -12,7 +12,7 @@ import 'authentication/authentication.dart';
 import 'authentication/sign_in_page.dart';
 import 'home_widget/widgets/home_screen_widget.dart';
 import 'home_widget/widgets/home_widget_config_page.dart';
-import 'settings/widgets/settings_page.dart';
+import 'settings/settings.dart';
 import 'shortcuts/app_shortcuts.dart';
 import 'tasks/tasks.dart';
 import 'theme/theme.dart';
@@ -40,6 +40,18 @@ class _AppState extends State<App> with TrayListener, WindowListener {
     trayManager.removeListener(this);
     windowManager.removeListener(this);
     super.dispose();
+  }
+
+  @override
+  void onWindowClose() {
+    /// Only working on Windows for some reason.
+    /// Linux will use `flutter_window_close` instead.
+    if (settingsCubit.state.closeToTray) {
+      appWindow.hide();
+      return;
+    } else {
+      super.onWindowClose();
+    }
   }
 
   Timer? timer;
