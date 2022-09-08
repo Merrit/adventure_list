@@ -1,5 +1,8 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
     "git.detectSubmodules": false,
-    "git.pullTags": false
+    "git.pullTags": false,
+    "dart.flutterTestAdditionalArgs": [
+        "--coverage"
+    ]
 }
