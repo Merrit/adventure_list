@@ -47,6 +47,9 @@ void main() {
     /* ----------------------------- StorageService ----------------------------- */
     _storageService = MockStorageService();
 
+    when(() => _storageService.deleteValue(any(),
+        storageArea: any(named: 'storageArea'))).thenAnswer((_) async {});
+
     when(() => _storageService.getStorageAreaValues(any())).thenAnswer(
       (_) async => [],
     );
