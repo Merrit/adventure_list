@@ -1,3 +1,18 @@
+# ---------------------------------------------------------------------------- #
+#                                    Custom                                    #
+# ---------------------------------------------------------------------------- #
+
+# Some generated Flutter engine files keep getting added to git.
+generated*
+
+# Test coverage report.
+coverage/
+
+
+# ---------------------------------------------------------------------------- #
+#                                    Default                                   #
+# ---------------------------------------------------------------------------- #
+
 # Miscellaneous
 *.class
 *.log
@@ -31,7 +46,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
-generated*
+
 
 # Web related
 lib/generated_plugin_registrant.dart
