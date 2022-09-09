@@ -132,6 +132,10 @@ void main() {
       );
     });
 
+    test('instance variable is available', () {
+      expect(tasksCubit, isA<TasksCubit>());
+    });
+
     group('clearing completed tasks works:', () {
       late Task task1;
       late Task taskWithSubTasks;
