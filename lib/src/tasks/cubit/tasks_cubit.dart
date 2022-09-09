@@ -17,6 +17,9 @@ import '../tasks.dart';
 
 part 'tasks_state.dart';
 
+/// Global instance of the [TasksCubit].
+///
+/// Allows access without a [BuildContext].
 late TasksCubit tasksCubit;
 
 class TasksCubit extends Cubit<TasksState> {
