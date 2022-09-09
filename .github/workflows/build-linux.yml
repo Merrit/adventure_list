@@ -26,6 +26,12 @@ jobs:
     # ----------------------------------- Setup ------------------------------ #
 
     steps:
+      - name: Setup Linux build requirements
+        # libappindicator required for tray_manager
+        run: |
+          sudo apt-get update
+          sudo apt-get install appindicator3-0.1 libappindicator3-dev
+
       - name: Set pre-release environment variable
         if: inputs.pre-release == true
         run: echo "prerelease=true" >> $GITHUB_ENV
