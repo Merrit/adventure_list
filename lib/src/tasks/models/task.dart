@@ -23,18 +23,56 @@ class Task extends Equatable {
 
   final DateTime updated;
 
-  Task({
-    this.completed = false,
-    this.deleted = false,
-    this.description,
-    this.dueDate,
-    this.id = '',
-    this.index = -1,
-    String? parent,
+  const Task._({
+    required this.completed,
+    required this.deleted,
+    required this.description,
+    required this.dueDate,
+    required this.id,
+    required this.index,
+    required this.parent,
     required this.title,
+    required this.updated,
+  });
+
+  factory Task({
+    bool completed = false,
+    bool deleted = false,
+    String? description,
+    DateTime? dueDate,
+    String id = '',
+    int index = -1,
+    String? parent,
+    required String title,
     DateTime? updated,
-  })  : parent = (parent == '') ? null : parent,
-        updated = updated ?? DateTime.now();
+  }) {
+    if (dueDate != null) {
+      // Remove microseconds so serialization will work reliably.
+      dueDate = DateTime.fromMillisecondsSinceEpoch(
+        dueDate.millisecondsSinceEpoch,
+      );
+    }
+
+    if (parent == '') parent = null;
+
+    updated ??= DateTime.now();
+    // Remove microseconds so serialization will work reliably.
+    updated = DateTime.fromMillisecondsSinceEpoch(
+      updated.millisecondsSinceEpoch,
+    );
+
+    return Task._(
+      completed: completed,
+      deleted: deleted,
+      description: description,
+      dueDate: dueDate,
+      id: id,
+      index: index,
+      parent: parent,
+      title: title,
+      updated: updated,
+    );
+  }
 
   @override
   List<Object?> get props {
