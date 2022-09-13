@@ -101,11 +101,13 @@ class _CreateSelectListPrompt extends StatelessWidget {
           SizedBox(height: double.infinity),
           Icon(Icons.arrow_back),
           SizedBox(width: 10),
-          Text(
-            'Select or create a list to get started',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
+          Flexible(
+            child: Text(
+              'Select or create a list to get started',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],
