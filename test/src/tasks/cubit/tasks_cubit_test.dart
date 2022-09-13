@@ -333,6 +333,28 @@ void main() {
       expect(state.activeList, null);
     });
 
+    test('reordering lists works', () async {
+      await _tasksCubit.createList('Tasks');
+      await _tasksCubit.createList('Chores');
+      await _tasksCubit.createList('Work');
+      expect(state.taskLists.length, 3);
+      expect(state.taskLists[0].title, 'Tasks');
+      expect(state.taskLists[1].title, 'Chores');
+      expect(state.taskLists[2].title, 'Work');
+      expect(state.taskLists[0].index, 0);
+      expect(state.taskLists[1].index, 1);
+      expect(state.taskLists[2].index, 2);
+
+      await _tasksCubit.reorderLists(2, 0);
+      expect(state.taskLists.length, 3);
+      expect(state.taskLists[0].title, 'Work');
+      expect(state.taskLists[1].title, 'Tasks');
+      expect(state.taskLists[2].title, 'Chores');
+      expect(state.taskLists[0].index, 0);
+      expect(state.taskLists[1].index, 1);
+      expect(state.taskLists[2].index, 2);
+    });
+
     test('reordering tasks works', () async {
       // Prepare state with tasks.
       await _tasksCubit.createList('Test List');
