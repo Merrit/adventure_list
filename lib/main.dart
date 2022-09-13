@@ -41,10 +41,12 @@ void main(List<String> args) async {
     return false;
   };
 
-  final appWindow = AppWindow() //
-    ..initialize();
-  final systemTray = SystemTrayManager(appWindow);
-  await systemTray.initialize();
+  if (Platform.isLinux || Platform.isWindows) {
+    final appWindow = AppWindow() //
+      ..initialize();
+    final systemTray = SystemTrayManager(appWindow);
+    await systemTray.initialize();
+  }
 
   // Firebase not available on Linux & Windows.
   if (!Platform.isLinux && !Platform.isWindows) {
