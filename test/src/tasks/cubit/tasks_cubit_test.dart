@@ -392,5 +392,15 @@ void main() {
         task2.copyWith(index: 2),
       ]);
     });
+
+    test('setting active task works', () async {
+      await _tasksCubit.createList('Tasks');
+      final task = await _tasksCubit.createTask(Task(title: 'Do a thing'));
+      expect(state.activeTask, null);
+      _tasksCubit.setActiveTask(task.id);
+      expect(state.activeTask, task);
+      _tasksCubit.setActiveTask(null);
+      expect(state.activeTask, null);
+    });
   });
 }
