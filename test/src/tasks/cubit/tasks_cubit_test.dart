@@ -402,5 +402,15 @@ void main() {
       _tasksCubit.setActiveTask(null);
       expect(state.activeTask, null);
     });
+
+    test('undoClearTasks works', () async {
+      await _tasksCubit.createList('Tasks');
+      Task task = await _tasksCubit.createTask(Task(title: 'Do a thing'));
+      await _tasksCubit.updateTask(task.copyWith(completed: true));
+      _tasksCubit.clearCompletedTasks();
+      await Future.delayed(const Duration(seconds: 3));
+      _tasksCubit.undoClearTasks();
+      expect(state.activeList!.items.first, task.copyWith(completed: true));
+    });
   });
 }
