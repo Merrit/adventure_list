@@ -321,6 +321,18 @@ void main() {
       });
     });
 
+    test('deleting list works', () async {
+      await _tasksCubit.createList('Chores');
+      await _tasksCubit.createList('Tasks');
+      expect(state.taskLists.length, 2);
+      expect(state.activeList!.title, 'Tasks');
+
+      await _tasksCubit.deleteList();
+      expect(state.taskLists.length, 1);
+      expect(state.taskLists.first.title, 'Chores');
+      expect(state.activeList, null);
+    });
+
     test('reordering tasks works', () async {
       // Prepare state with tasks.
       await _tasksCubit.createList('Test List');
