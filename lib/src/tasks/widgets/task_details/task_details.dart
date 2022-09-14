@@ -79,7 +79,7 @@ class TaskDetailsView extends StatelessWidget {
                 const Text('Sub-tasks'),
                 ...state.activeList!.items
                     .where((e) => e.parent == task.id && !e.deleted)
-                    .map((e) => TaskTile(index: 0, task: e))
+                    .map((e) => TaskTile(key: ValueKey(e), index: 0, task: e))
                     .toList(),
                 _AddSubTaskWidget(parentTask: task),
               ],
