@@ -75,7 +75,7 @@ class TaskTile extends StatelessWidget {
   final Task task;
 
   const TaskTile({
-    Key? key,
+    required Key? key,
     required this.index,
     required this.task,
   }) : super(key: key);
