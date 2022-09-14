@@ -84,11 +84,12 @@ class HomeWidgetExampleProvider : HomeWidgetProvider() {
 
 
                 // Tapping configure button launches widget config in main app.
-                val configureWidgetIntent = HomeWidgetLaunchIntent.getActivity(
-                    context,
-                    MainActivity::class.java,
-                    Uri.parse("configureWidget"))
-                setOnClickPendingIntent(R.id.configure_button, configureWidgetIntent)
+// Disabled for now because it stops working after the first use, issue in home widget repo.
+//                val configureWidgetIntent = HomeWidgetLaunchIntent.getActivity(
+//                    context,
+//                    MainActivity::class.java,
+//                    Uri.parse("configureWidget"))
+//                setOnClickPendingIntent(R.id.configure_button, configureWidgetIntent)
 
 
                 // Set the tasks list text.

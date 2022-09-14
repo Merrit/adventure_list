@@ -8,6 +8,7 @@ import 'package:self_updater/self_updater.dart';
 import '../../app/cubit/app_cubit.dart';
 import '../../authentication/cubit/authentication_cubit.dart';
 import '../../authentication/sign_in_page.dart';
+import '../../home_widget/home_widget.dart';
 import '../settings.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -69,6 +70,7 @@ class SettingsView extends StatelessWidget {
 
     const integrationSection = [
       _CloseToTrayTile(),
+      _CustomizeAndroidWidgetTile(),
     ];
 
     const troubleshootingSection = [
@@ -291,6 +293,21 @@ class _CloseToTrayTile extends StatelessWidget {
           onChanged: (value) => settingsCubit.updateCloseToTray(value),
         );
       },
+    );
+  }
+}
+
+class _CustomizeAndroidWidgetTile extends StatelessWidget {
+  const _CustomizeAndroidWidgetTile();
+
+  @override
+  Widget build(BuildContext context) {
+    if (!Platform.isAndroid) return const SizedBox();
+
+    return ListTile(
+      title: const Text('Android widget'),
+      trailing: const Icon(Icons.keyboard_arrow_right),
+      onTap: () => Navigator.pushNamed(context, HomeWidgetConfigPage.routeName),
     );
   }
 }
