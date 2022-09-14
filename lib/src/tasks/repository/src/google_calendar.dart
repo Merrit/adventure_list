@@ -192,7 +192,7 @@ extension EventHelper on Event {
   }
 }
 
-extension TaskListHelper on TaskList {
+extension GoogleTaskListHelper on TaskList {
   Calendar toGoogleCalendar() {
     final map = toMap()..remove('items');
 

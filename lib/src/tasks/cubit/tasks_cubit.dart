@@ -70,7 +70,7 @@ class TasksCubit extends Cubit<TasksState> {
     emit(state.copyWith(
       activeList: taskLists.singleWhereOrNull((e) => e.id == activeListId),
       loading: false,
-      taskLists: _listsInOrder(taskLists),
+      taskLists: taskLists.sorted(),
     ));
   }
 
@@ -108,18 +108,13 @@ class TasksCubit extends Cubit<TasksState> {
     emit(state.copyWith(
       activeList: taskLists.singleWhereOrNull((e) => e.id == activeListId),
       loading: false,
-      taskLists: _listsInOrder(taskLists),
+      taskLists: taskLists.sorted(),
     ));
 
     Timer.periodic(
       const Duration(minutes: 1),
       (timer) => _syncUpdatedTasks(),
     );
-  }
-
-  List<TaskList> _listsInOrder(List<TaskList> lists) {
-    lists.sort((a, b) => a.index.compareTo(b.index));
-    return lists;
   }
 
   Future<void> createList(String title) async {
@@ -132,14 +127,14 @@ class TasksCubit extends Cubit<TasksState> {
     );
     emit(state.copyWith(
       activeList: newList,
-      taskLists: List<TaskList>.from(state.taskLists)..add(newList),
+      taskLists: state.taskLists.copy()..add(newList),
     ));
 
     // Create list properly through repository to get id & etc.
     final newListFromRepo = await _tasksRepository.createList(newList);
     newList = newList.copyWith(id: newListFromRepo.id);
 
-    final taskLists = List<TaskList>.from(state.taskLists);
+    final taskLists = state.taskLists.copy();
     if (taskLists.isNotEmpty) taskLists.removeLast();
     taskLists.add(newList);
 
@@ -154,13 +149,13 @@ class TasksCubit extends Cubit<TasksState> {
     if (activeList == null) return;
 
     final String deletionListId = activeList.id;
-    final updatedLists = List<TaskList>.from(state.taskLists)
+    final updatedLists = state.taskLists.copy() //
       ..remove(activeList);
     emit(TasksState(
       activeList: null,
       activeTask: null,
       loading: false,
-      taskLists: _listsInOrder(updatedLists),
+      taskLists: updatedLists.sorted(),
     ));
     await _tasksRepository.deleteList(id: deletionListId);
   }
@@ -168,7 +163,7 @@ class TasksCubit extends Cubit<TasksState> {
   /// Called when the user is reordering the list of TaskLists.
   Future<void> reorderLists(int oldIndex, int newIndex) async {
     if (oldIndex < newIndex) newIndex -= 1;
-    List<TaskList> lists = List<TaskList>.from(state.taskLists)
+    List<TaskList> lists = state.taskLists.copy()
       ..removeAt(oldIndex)
       ..insert(newIndex, state.taskLists[oldIndex]);
     for (var i = 0; i < lists.length; i++) {
@@ -198,7 +193,7 @@ class TasksCubit extends Cubit<TasksState> {
   }
 
   Future<void> updateList(TaskList list) async {
-    final updatedLists = List<TaskList>.from(state.taskLists)
+    final updatedLists = state.taskLists.copy()
       ..removeWhere((element) => element.id == list.id)
       ..add(list);
 
@@ -206,7 +201,7 @@ class TasksCubit extends Cubit<TasksState> {
 
     emit(state.copyWith(
       activeList: activeList,
-      taskLists: _listsInOrder(updatedLists),
+      taskLists: updatedLists.sorted(),
     ));
 
     await _tasksRepository.updateList(list: list);
@@ -238,13 +233,13 @@ class TasksCubit extends Cubit<TasksState> {
     List<Task> updatedItems = List<Task>.from(state.activeList!.items) //
       ..add(newTask);
     TaskList updatedList = state.activeList!.copyWith(items: updatedItems);
-    List<TaskList> updatedTaskLists = List<TaskList>.from(state.taskLists)
+    List<TaskList> updatedTaskLists = state.taskLists.copy()
       ..remove(state.activeList)
       ..add(updatedList);
 
     emit(state.copyWith(
       activeList: updatedList,
-      taskLists: _listsInOrder(updatedTaskLists),
+      taskLists: updatedTaskLists.sorted(),
     ));
 
     // Create task with repository to get final id.
@@ -257,13 +252,13 @@ class TasksCubit extends Cubit<TasksState> {
       ..removeWhere((e) => e.id == tempId)
       ..add(newTask);
     updatedList = state.activeList!.copyWith(items: updatedItems);
-    updatedTaskLists = List<TaskList>.from(state.taskLists)
+    updatedTaskLists = state.taskLists.copy()
       ..remove(state.activeList)
       ..add(updatedList);
 
     emit(state.copyWith(
       activeList: updatedList,
-      taskLists: _listsInOrder(updatedTaskLists),
+      taskLists: updatedTaskLists.sorted(),
     ));
 
     return newTask;
@@ -303,7 +298,7 @@ class TasksCubit extends Cubit<TasksState> {
     TaskList updatedTaskList = state //
         .taskLists[taskListIndex]
         .copyWith(items: items);
-    List<TaskList> updatedAllTaskLists = List<TaskList>.from(state.taskLists)
+    List<TaskList> updatedAllTaskLists = state.taskLists.copy()
       ..[taskListIndex] = updatedTaskList;
 
     emit(state.copyWith(
@@ -373,7 +368,7 @@ class TasksCubit extends Cubit<TasksState> {
     // gives us the option of retrieving "deleted" items.
 
     _activeTaskListBeforeClear = state.activeList!.copyWith();
-    _taskListCollectionBeforeClear = List<TaskList>.from(state.taskLists);
+    _taskListCollectionBeforeClear = state.taskLists.copy();
 
     List<Task> updatedTasks = state.activeList!.items.map((Task task) {
       final Task? parent = state //
@@ -408,14 +403,14 @@ class TasksCubit extends Cubit<TasksState> {
         .copyWith(items: updatedTasks);
     final int index = state.taskLists.indexWhere((e) => e.id == updatedList.id);
 
-    final taskLists = List<TaskList>.from(state.taskLists)
+    final taskLists = state.taskLists.copy()
       ..removeAt(index)
       ..insert(index, updatedList);
 
     emit(state.copyWith(
       activeList: updatedList,
       awaitingClearTasksUndo: true,
-      taskLists: _listsInOrder(taskLists),
+      taskLists: taskLists.sorted(),
     ));
 
     // Give the user a chance to undo.

@@ -89,3 +89,12 @@ class TaskList extends Equatable {
     return copyWith(items: updatedTasks);
   }
 }
+
+extension TaskListHelper on List<TaskList> {
+  List<TaskList> copy() => List<TaskList>.from(this);
+
+  List<TaskList> sorted() {
+    sort((a, b) => a.index.compareTo(b.index));
+    return this;
+  }
+}
