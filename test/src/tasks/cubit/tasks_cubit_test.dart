@@ -412,5 +412,27 @@ void main() {
       _tasksCubit.undoClearTasks();
       expect(state.activeList!.items.first, task.copyWith(completed: true));
     });
+
+    test('updating sub-task works', () async {
+      await _tasksCubit.createList('Tasks');
+      Task task = await _tasksCubit.createTask(Task(title: 'Parent task'));
+      final subTask = await _tasksCubit.createTask(
+        Task(
+          title: 'sub-task',
+          parent: task.id,
+        ),
+      );
+
+      Task getSubTask() {
+        return state //
+            .activeList!
+            .items
+            .singleWhere((element) => element.id == subTask.id);
+      }
+
+      expect(getSubTask().completed, false);
+      await _tasksCubit.updateTask(subTask.copyWith(completed: true));
+      expect(getSubTask().completed, true);
+    });
   });
 }
