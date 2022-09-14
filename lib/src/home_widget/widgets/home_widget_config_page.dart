@@ -45,6 +45,11 @@ class HomeWidgetConfigPage extends StatelessWidget {
                                   (taskList) => taskList.id == value,
                                 );
 
+                                selectedList.items.removeWhere((e) =>
+                                    e.completed ||
+                                    e.deleted ||
+                                    e.parent != null);
+
                                 await updateHomeWidget(
                                   'selectedList',
                                   selectedList.toJson(),
