@@ -6,6 +6,10 @@ Seamlessly synchronizes between devices using the user's Google Calendar.
 
 Available for Linux, Windows and Android.
 
+[Releases](https://github.com/Merrit/adventure_list/releases)
+
+[Google Play](https://play.google.com/store/apps/details?id=codes.merritt.adventurelist)
+
 
 <br>
 
