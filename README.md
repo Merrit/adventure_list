@@ -1,30 +1,36 @@
-# adventure_list
+# Adventure List
 
-A new Flutter project.
+A beautiful app to manage all your tasks and todos.
 
-## Getting Started
+Seamlessly synchronizes between devices using the user's Google Calendar.
 
-This project is a starting point for a Flutter application that follows the
-[simple app state management
-tutorial](https://flutter.dev/docs/development/data-and-backend/state-mgmt/simple).
+Available for Linux, Windows and Android.
 
-For help getting started with Flutter development, view the
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
 
-## Assets
+<br>
 
-The `assets` directory houses images, fonts, and any other files you want to
-include with your application.
+<img src="https://i.imgur.com/wdqxDFP.png" style="width:90%">
+<img src="https://i.imgur.com/oDECfhj.png" style="width:90%">
+<img src="https://i.imgur.com/KNREbG8.png" style="width:40%">
+<img src="https://i.imgur.com/KpvZLLt.png" style="width:40%">
 
-The `assets/images` directory contains [resolution-aware
-images](https://flutter.dev/docs/development/ui/assets-and-images#resolution-aware).
+<br>
 
-## Localization
 
-This project generates localized messages based on arb files found in
-the `lib/src/localization` directory.
+## Roadmap
 
-To support additional languages, please visit the tutorial on
-[Internationalizing Flutter
-apps](https://flutter.dev/docs/development/accessibility-and-localization/internationalization)
+### Planned
+
+- Due dates / reminders
+  - Recurring tasks
+- Offline mode
+  - Improve offline capabilities so the app can reliably be used offline
+- Collaboration on lists with other users
+- Desktop widget
+- Desktop notifications
+  - Notification center / popup / tray icon badge / etc
+
+### Considering
+
+- Improve Android widget (could use assistance)
+- Web version
