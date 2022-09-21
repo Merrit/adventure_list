@@ -42,7 +42,7 @@ import '../../tasks.dart';
 
 class GoogleCalendar implements TasksRepository {
   /// The Google Calendar API.
-  final CalendarApi _api;
+  final CalendarApi? _api;
 
   GoogleCalendar._(this._api) {
     getAll();
@@ -52,7 +52,7 @@ class GoogleCalendar implements TasksRepository {
     required ClientId clientId,
     required AccessCredentials credentials,
   }) async {
-    AuthClient client;
+    AuthClient? client;
     // `google_sign_in` can't get us a refresh token, so.
     if (credentials.refreshToken != null) {
       client = autoRefreshingClient(
@@ -64,12 +64,17 @@ class GoogleCalendar implements TasksRepository {
       client = await GoogleAuth.refreshAuthClient();
     }
 
-    return GoogleCalendar._(CalendarApi(client));
+    CalendarApi? calendarApi;
+    if (client != null) calendarApi = CalendarApi(client);
+
+    return GoogleCalendar._(calendarApi);
   }
 
   @override
-  Future<List<TaskList>> getAll() async {
-    final calendarListRepository = _api.calendarList;
+  Future<List<TaskList>?> getAll() async {
+    if (_api == null) return null;
+
+    final calendarListRepository = _api!.calendarList;
 
     final apiCalendarsList = await calendarListRepository.list(
       showHidden: true,
@@ -89,16 +94,18 @@ class GoogleCalendar implements TasksRepository {
 
     final taskLists = <TaskList>[];
     for (var calendarListEntry in apiCalendarsList.items!) {
-      final calendar = await _api.calendars.get(calendarListEntry.id!);
-      taskLists.add(await calendar.toModel(_api));
+      final calendar = await _api!.calendars.get(calendarListEntry.id!);
+      taskLists.add(await calendar.toModel(_api!));
     }
 
     return taskLists;
   }
 
   @override
-  Future<TaskList> createList(TaskList taskList) async {
-    final newCalendar = await _api.calendars.insert(Calendar(
+  Future<TaskList?> createList(TaskList taskList) async {
+    if (_api == null) return null;
+
+    final newCalendar = await _api!.calendars.insert(Calendar(
       description: json.encode({'index': taskList.index}),
       location: 'adventure_list',
       summary: taskList.title,
@@ -106,28 +113,38 @@ class GoogleCalendar implements TasksRepository {
 
     await _setListHidden(newCalendar.id!);
 
-    return await newCalendar.toModel(_api);
+    return await newCalendar.toModel(_api!);
   }
 
   @override
-  Future<void> deleteList({required String id}) async {
-    await _api.calendars.delete(id);
+  Future<bool> deleteList({required String id}) async {
+    if (_api == null) return false;
+
+    await _api!.calendars.delete(id);
+
+    return true;
   }
 
   @override
-  Future<void> updateList({required TaskList list}) async {
-    await _api.calendars.update(
+  Future<TaskList?> updateList({required TaskList list}) async {
+    if (_api == null) return null;
+
+    final Calendar calendar = await _api!.calendars.update(
       list.toGoogleCalendar(),
       list.id,
     );
+
+    return await calendar.toModel(_api!);
   }
 
   @override
-  Future<Task> createTask({
+  Future<Task?> createTask({
     required String taskListId,
     required Task newTask,
   }) async {
-    final createdEvent = await _api.events.insert(
+    if (_api == null) return null;
+
+    final createdEvent = await _api!.events.insert(
       newTask.toGoogleEvent(),
       taskListId,
     );
@@ -136,11 +153,13 @@ class GoogleCalendar implements TasksRepository {
   }
 
   @override
-  Future<Task> updateTask({
+  Future<Task?> updateTask({
     required String taskListId,
     required Task updatedTask,
   }) async {
-    final updatedEvent = await _api.events.update(
+    if (_api == null) return null;
+
+    final updatedEvent = await _api!.events.update(
       updatedTask.toGoogleEvent(),
       taskListId,
       updatedTask.id,
@@ -149,13 +168,17 @@ class GoogleCalendar implements TasksRepository {
     return updatedEvent.toModel();
   }
 
-  _setListHidden(String calendarId) async {
-    await _api.calendarList.update(
+  Future<bool> _setListHidden(String calendarId) async {
+    if (_api == null) return false;
+
+    await _api!.calendarList.update(
       // Set the calendar to hidden, so it doesn't appear when the user
       // accesses their calendars normally.
       CalendarListEntry(hidden: true),
       calendarId,
     );
+
+    return true;
   }
 }
 

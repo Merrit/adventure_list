@@ -98,10 +98,11 @@ void main() {
               ));
 
       when(() => _tasksRepository.deleteList(id: any(named: 'id')))
-          .thenAnswer((_) async {});
+          .thenAnswer((_) async => true);
 
       when(() => _tasksRepository.updateList(list: any(named: 'list')))
-          .thenAnswer((_) async {});
+          .thenAnswer((_) async =>
+              TaskList(id: 'id', index: 0, items: const [], title: ''));
 
       when(() => _tasksRepository.createTask(
             newTask: any(named: 'newTask'),

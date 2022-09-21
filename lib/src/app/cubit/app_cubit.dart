@@ -54,19 +54,21 @@ BUILD file path would be: ${buildFile.path}
 build file exists: $buildFileExists
 current version: $currentVersion''');
 
-    final updater = await Updater.initialize(
-      currentVersion: currentVersion,
-      updateChannel: settingsCubit.state.updateChannel,
-      repoUrl: kRepoUrl,
-    );
-
-    _updater = updater;
+    try {
+      _updater = await Updater.initialize(
+        currentVersion: currentVersion,
+        updateChannel: settingsCubit.state.updateChannel,
+        repoUrl: kRepoUrl,
+      );
+    } on Exception catch (e) {
+      logger.w('Unable to initialize updater: $e');
+    }
 
     emit(state.copyWith(
       appVersion: currentVersion,
       updateAutomatically: settingsCubit.state.updateAutomatically,
-      updateAvailable: updater.updateAvailable,
-      updateVersion: updater.updateVersion,
+      updateAvailable: _updater?.updateAvailable,
+      updateVersion: _updater?.updateVersion,
     ));
 
     if (settingsCubit.state.updateAutomatically) downloadUpdate();

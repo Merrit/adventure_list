@@ -98,9 +98,17 @@ class GoogleAuth {
       await googleSignIn.signIn();
     } on PlatformException catch (e) {
       logger.w('Failed to sign in with google_sign_in: $e');
+      return null;
     }
 
-    final client = await googleSignIn.authenticatedClient();
+    final AuthClient? client;
+    try {
+      client = await googleSignIn.authenticatedClient();
+    } catch (e) {
+      logger.w('Unable to get AuthClient: $e');
+      return null;
+    }
+
     final googleAuth = await googleSignIn.currentUser?.authentication;
     if (googleAuth == null) return null;
     if (googleAuth.accessToken == null) return null;
@@ -110,7 +118,7 @@ class GoogleAuth {
 
   /// google_sign_in doesn't provide us with a refresh token, so this is a
   /// workaround to refresh authentication for platforms that use google_sign_in
-  static Future<AuthClient> refreshAuthClient() async {
+  static Future<AuthClient?> refreshAuthClient() async {
     final GoogleSignIn googleSignIn = GoogleSignIn(scopes: scopes);
     final GoogleSignInAccount? googleSignInAccount =
         await googleSignIn.signInSilently();
@@ -119,7 +127,7 @@ class GoogleAuth {
 
     final AuthClient? client = await googleSignIn.authenticatedClient();
 
-    return client!;
+    return client;
   }
 
   // Commented code left until we are sure current implementation works.

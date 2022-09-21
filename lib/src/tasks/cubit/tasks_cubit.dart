@@ -92,9 +92,10 @@ class TasksCubit extends Cubit<TasksState> {
   Future<void> initialize(TasksRepository tasksRepository) async {
     _tasksRepository = tasksRepository;
 
-    emit(state.copyWith(loading: true));
+    // If we have cached data we don't show a loading indicator.
+    emit(state.copyWith(loading: state.taskLists.isEmpty));
 
-    List<TaskList> taskLists;
+    List<TaskList>? taskLists;
     try {
       taskLists = await _tasksRepository.getAll();
     } catch (e) {
@@ -106,14 +107,14 @@ class TasksCubit extends Cubit<TasksState> {
 
     final String? activeListId = await _storageService.getValue('activeList');
     emit(state.copyWith(
-      activeList: taskLists.singleWhereOrNull((e) => e.id == activeListId),
+      activeList: taskLists?.singleWhereOrNull((e) => e.id == activeListId),
       loading: false,
-      taskLists: taskLists.sorted(),
+      taskLists: taskLists?.sorted(),
     ));
 
     Timer.periodic(
       const Duration(minutes: 1),
-      (timer) => _syncUpdatedTasks(),
+      (timer) => syncUpdatedTasks(),
     );
   }
 
@@ -132,6 +133,9 @@ class TasksCubit extends Cubit<TasksState> {
 
     // Create list properly through repository to get id & etc.
     final newListFromRepo = await _tasksRepository.createList(newList);
+    // TODO: Move list sync operations to a method on a timer.
+    if (newListFromRepo == null) return;
+
     newList = newList.copyWith(id: newListFromRepo.id);
 
     final taskLists = state.taskLists.copy();
@@ -243,14 +247,15 @@ class TasksCubit extends Cubit<TasksState> {
     ));
 
     // Create task with repository to get final id.
-    newTask = await _tasksRepository.createTask(
+    // TODO: Move to a batching / cache method on a timer.
+    final newTaskFromRepo = await _tasksRepository.createTask(
       taskListId: state.activeList!.id,
       newTask: newTask,
     );
 
     updatedItems = List<Task>.from(state.activeList!.items) //
       ..removeWhere((e) => e.id == tempId)
-      ..add(newTask);
+      ..add(newTaskFromRepo!);
     updatedList = state.activeList!.copyWith(items: updatedItems);
     updatedTaskLists = state.taskLists.copy()
       ..remove(state.activeList)
@@ -261,7 +266,7 @@ class TasksCubit extends Cubit<TasksState> {
       taskLists: updatedTaskLists.sorted(),
     ));
 
-    return newTask;
+    return newTaskFromRepo;
   }
 
   /// Called when the user is reordering Tasks.
