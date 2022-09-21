@@ -69,7 +69,10 @@ class GoogleAuth {
     }
   }
 
+  /// Authenticates via the `googleapis_auth` package.
   ///
+  /// Supports all platforms, but is not as stable or nice to use as the
+  /// `google_sign_in` package.
   Future<AccessCredentials?> _googleApisAuth() async {
     AutoRefreshingAuthClient? client;
     try {
@@ -85,7 +88,9 @@ class GoogleAuth {
     return client?.credentials;
   }
 
+  /// Authenticates via the `google_sign_in` package.
   ///
+  /// Supports Android, iOS & Web.
   Future<AccessCredentials?> _googleSignInAuth() async {
     final GoogleSignIn googleSignIn = GoogleSignIn(scopes: scopes);
 
