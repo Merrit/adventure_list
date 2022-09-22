@@ -31,7 +31,7 @@ class AppShortcuts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shortcuts.manager(
-      manager: LoggingShortcutManager(_shortcuts),
+      manager: LoggingShortcutManager(shortcuts: _shortcuts),
       child: Actions(
         dispatcher: LoggingActionDispatcher(),
         actions: _actions,

@@ -4,9 +4,7 @@ import '../logs/logs.dart';
 
 /// A ShortcutManager that logs all keys that it handles.
 class LoggingShortcutManager extends ShortcutManager {
-  LoggingShortcutManager(
-    Map<ShortcutActivator, Intent> shortcuts,
-  ) : super(shortcuts: shortcuts);
+  LoggingShortcutManager({required super.shortcuts});
 
   @override
   KeyEventResult handleKeypress(BuildContext context, RawKeyEvent event) {
