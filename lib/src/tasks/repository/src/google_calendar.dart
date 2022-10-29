@@ -5,6 +5,7 @@ import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart';
 
 import '../../../authentication/authentication.dart';
+import '../../../logs/logs.dart';
 import '../../tasks.dart';
 
 /// Notes on interfacing with the Google Calendar API.
@@ -159,11 +160,17 @@ class GoogleCalendar implements TasksRepository {
   }) async {
     if (_api == null) return null;
 
-    final updatedEvent = await _api!.events.update(
-      updatedTask.toGoogleEvent(),
-      taskListId,
-      updatedTask.id,
-    );
+    final Event updatedEvent;
+    try {
+      updatedEvent = await _api!.events.update(
+        updatedTask.toGoogleEvent(),
+        taskListId,
+        updatedTask.id,
+      );
+    } on DetailedApiRequestError catch (e) {
+      logger.e(e);
+      return null;
+    }
 
     return updatedEvent.toModel();
   }
