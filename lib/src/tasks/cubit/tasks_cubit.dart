@@ -114,7 +114,7 @@ class TasksCubit extends Cubit<TasksState> {
 
     Timer.periodic(
       const Duration(minutes: 1),
-      (timer) => syncUpdatedTasks(),
+      (timer) => syncWithRepo(),
     );
   }
 
@@ -133,10 +133,9 @@ class TasksCubit extends Cubit<TasksState> {
 
     // Create list properly through repository to get id & etc.
     final newListFromRepo = await _tasksRepository.createList(newList);
-    // TODO: Move list sync operations to a method on a timer.
     if (newListFromRepo == null) return;
 
-    newList = newList.copyWith(id: newListFromRepo.id);
+    newList = newList.copyWith(id: newListFromRepo.id, synced: true);
 
     final taskLists = state.taskLists.copy();
     if (taskLists.isNotEmpty) taskLists.removeLast();
@@ -171,14 +170,13 @@ class TasksCubit extends Cubit<TasksState> {
       ..removeAt(oldIndex)
       ..insert(newIndex, state.taskLists[oldIndex]);
     for (var i = 0; i < lists.length; i++) {
-      lists[i] = lists[i].copyWith(index: i);
+      lists[i] = lists[i].copyWith(index: i, synced: false);
     }
     final String? activeListId = state.activeList?.id;
     emit(state.copyWith(
       taskLists: lists,
       activeList: lists.singleWhereOrNull((e) => e.id == activeListId),
     ));
-    await _updateAllLists();
   }
 
   void setActiveList(String id) {
@@ -190,13 +188,8 @@ class TasksCubit extends Cubit<TasksState> {
     _storageService.saveValue(key: 'activeList', value: id);
   }
 
-  Future<void> _updateAllLists() async {
-    for (var list in state.taskLists) {
-      await updateList(list);
-    }
-  }
-
   Future<void> updateList(TaskList list) async {
+    list = list.copyWith(synced: false);
     final updatedLists = state.taskLists.copy()
       ..removeWhere((element) => element.id == list.id)
       ..add(list);
@@ -207,8 +200,6 @@ class TasksCubit extends Cubit<TasksState> {
       activeList: activeList,
       taskLists: updatedLists.sorted(),
     ));
-
-    await _tasksRepository.updateList(list: list);
   }
 
   Future<Task> createTask(Task newTask) async {
@@ -325,7 +316,20 @@ class TasksCubit extends Cubit<TasksState> {
     return task;
   }
 
-  /// Called to periodically sync updated tasks to remote repository.
+  /// Sync all lists with changes to the remote repository.
+  Future<void> _syncUpdatedLists() async {
+    final Iterable<TaskList> listsToBeSynced = state.taskLists //
+        .where((element) => !element.synced);
+    for (var list in listsToBeSynced) {
+      await _tasksRepository.updateList(list: list);
+      final int index = state.taskLists.indexWhere((e) => e.id == list.id);
+      state.taskLists
+        ..removeAt(index)
+        ..insert(index, list.copyWith(synced: true));
+    }
+  }
+
+  /// Sync all tasks with changes to the remote repository.
   Future<void> _syncUpdatedTasks() async {
     final tasksToBeSynced = await _storageService.getStorageAreaValues(
       'tasksToBeSynced',
@@ -347,6 +351,12 @@ class TasksCubit extends Cubit<TasksState> {
         storageArea: 'tasksToBeSynced',
       );
     }
+  }
+
+  /// Sync all changes to the remote repository.
+  Future<void> syncWithRepo() async {
+    await _syncUpdatedLists();
+    await _syncUpdatedTasks();
   }
 
   void setActiveTask(String? id) {

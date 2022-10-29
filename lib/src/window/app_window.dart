@@ -8,8 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../logs/logs.dart';
 import '../settings/settings.dart';
 import '../storage/storage_service.dart';
+import '../tasks/tasks.dart';
 
 final appWindow = AppWindow();
 
@@ -52,19 +54,23 @@ class AppWindow {
     /// some reason. Probably best to switch to only using `window_manager` if
     /// it starts also working on Linux in the future.
     FlutterWindowClose.setWindowShouldCloseHandler(() async {
-      if (settingsCubit.state.closeToTray) {
-        hide();
-        return false;
-      } else {
-        return true;
-      }
+      return await handleWindowCloseEvent();
     });
   }
 
-  Future<void> catchClose() async {
-    print('catching close');
-    await windowManager.setClosable(false);
-    // hide();
+  Future<bool> handleWindowCloseEvent() async {
+    if (settingsCubit.state.closeToTray) {
+      logger.i('Hiding app window.');
+      hide();
+      return false;
+    } else {
+      // Hide window while performing sync, then exit.
+      hide();
+      logger.i('Syncing before exit.');
+      await tasksCubit.syncWithRepo();
+      logger.i('Sync finished, exiting.');
+      return true;
+    }
   }
 
   void close() => exit(0);

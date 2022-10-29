@@ -43,15 +43,12 @@ class _AppState extends State<App> with TrayListener, WindowListener {
   }
 
   @override
-  void onWindowClose() {
-    /// Only working on Windows for some reason.
-    /// Linux will use `flutter_window_close` instead.
-    if (settingsCubit.state.closeToTray) {
-      appWindow.hide();
-      return;
-    } else {
-      super.onWindowClose();
-    }
+  Future<void> onWindowClose() async {
+    /// This method from the `window_manager` package is only working on Windows
+    /// for some reason. Linux will use `flutter_window_close` instead until it
+    /// has been resolved.
+    final bool allowClose = await appWindow.handleWindowCloseEvent();
+    if (allowClose) super.onWindowClose();
   }
 
   Timer? timer;

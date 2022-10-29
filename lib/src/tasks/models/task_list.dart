@@ -15,28 +15,42 @@ class TaskList extends Equatable {
 
   final List<Task> items;
 
+  /// True if local changes have been synced to remote server.
+  final bool synced;
+
   final String title;
 
   TaskList({
+    required List<Task> items,
     required this.id,
     required this.index,
-    required List<Task> items,
+    this.synced = false,
     required this.title,
   }) : items = TaskListValidator.tasksInOrder(items);
 
   @override
-  List<Object> get props => [id, index, items, title];
+  List<Object> get props {
+    return [
+      id,
+      index,
+      items,
+      synced,
+      title,
+    ];
+  }
 
   TaskList copyWith({
     String? id,
     int? index,
     List<Task>? items,
+    bool? synced,
     String? title,
   }) {
     return TaskList(
       id: id ?? this.id,
       index: index ?? this.index,
       items: items ?? this.items,
+      synced: synced ?? this.synced,
       title: title ?? this.title,
     );
   }
@@ -46,6 +60,7 @@ class TaskList extends Equatable {
       'id': id,
       'index': index,
       'items': items.map((x) => x.toMap()).toList(),
+      'synced': synced,
       'title': title,
     };
   }
@@ -55,6 +70,7 @@ class TaskList extends Equatable {
       id: map['id'] ?? '',
       index: map['index']?.toInt() ?? -1,
       items: List<Task>.from(map['items']?.map((x) => Task.fromMap(x))),
+      synced: map['synced'] ?? false,
       title: map['title'] ?? '',
     );
   }
@@ -87,6 +103,11 @@ class TaskList extends Equatable {
     updatedTasks.addAll(topLevelTasks);
 
     return copyWith(items: updatedTasks);
+  }
+
+  @override
+  String toString() {
+    return 'TaskList(id: $id, index: $index, items: $items, synced: $synced, title: $title)';
   }
 }
 
