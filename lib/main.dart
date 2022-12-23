@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:window_manager/window_manager.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'firebase_options.dart';
@@ -21,9 +22,9 @@ import 'src/system_tray/system_tray_manager.dart';
 import 'src/tasks/tasks.dart';
 import 'src/window/app_window.dart';
 
-void main(List<String> args) async {
+Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await windowManager.ensureInitialized();
   final storageService = await StorageService.initialize();
   await initializeLogger(storageService, logToFile: args.contains('--log'));
 
