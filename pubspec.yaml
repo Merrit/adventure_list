@@ -19,7 +19,9 @@ dependencies:
   extension_google_sign_in_as_googleapis_auth: ^2.0.5
   firebase_auth: ^3.3.20
   firebase_core: ^1.20.0
-  flex_color_scheme: ^5.1.0
+  # Temporary lock of firebase_core_platform_interface.
+  # To be removed when upgrading the firebase packages.
+  firebase_core_platform_interface: 4.5.1
   flutter:
     sdk: flutter
   flutter_bloc: ^8.0.1
