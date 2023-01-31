@@ -47,7 +47,7 @@ class TaskListSettingsView extends StatelessWidget {
                       context: context,
                     );
 
-                    if (newName == null) return;
+                    if (newName == null || newName == '') return;
 
                     tasksCubit.updateList(
                       taskList.copyWith(title: newName),
