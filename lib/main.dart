@@ -28,18 +28,10 @@ Future<void> main(List<String> args) async {
   final storageService = await StorageService.initialize();
   await initializeLogger(storageService, logToFile: args.contains('--log'));
 
-  // Handle errors caught by Flutter.
-  FlutterError.onError = (details) {
-    FlutterError.presentError(details);
-    if (kReleaseMode && Platform.isWindows) {
-      logger.e('Flutter caught an error:', details.exception, details.stack);
-    }
-  };
-
   // Handle platform errors not caught by Flutter.
-  PlatformDispatcher.instance.onError = (exception, stackTrace) {
-    logger.e('Platform caught an error:', exception, stackTrace);
-    return false;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    logger.e('Uncaught platform error:', error, stack);
+    return true;
   };
 
   if (Platform.isLinux || Platform.isWindows) {
