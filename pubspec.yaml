@@ -56,7 +56,6 @@ dependencies:
   workmanager: ^0.5.0
 
 dev_dependencies:
-  change_app_package_name: ^1.1.0
   flutter_app_builder:
     git:
       url: https://github.com/Merrit/flutter_app_builder.git
