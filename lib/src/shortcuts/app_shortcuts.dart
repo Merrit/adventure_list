@@ -50,7 +50,7 @@ class QuitIntent extends Intent {
 class QuitAction extends Action<QuitIntent> {
   @override
   Object? invoke(QuitIntent intent) {
-    logger.i('Quit requested, exiting.');
+    log.i('Quit requested, exiting.');
     exit(0);
   }
 }

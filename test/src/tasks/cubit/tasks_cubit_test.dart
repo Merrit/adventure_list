@@ -70,7 +70,7 @@ void main() {
           storageArea: any(named: 'storageArea'),
         )).thenAnswer((_) async {});
 
-    await initializeLogger(_storageService);
+    await LoggingManager.initialize(verbose: false);
 
     registerFallbackValue(FakeTaskList());
     registerFallbackValue(FakeTask());

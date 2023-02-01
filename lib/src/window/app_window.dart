@@ -60,15 +60,15 @@ class AppWindow {
 
   Future<bool> handleWindowCloseEvent() async {
     if (settingsCubit.state.closeToTray) {
-      logger.i('Hiding app window.');
+      log.i('Hiding app window.');
       hide();
       return false;
     } else {
       // Hide window while performing sync, then exit.
       hide();
-      logger.i('Syncing before exit.');
+      log.i('Syncing before exit.');
       await tasksCubit.syncWithRepo();
-      logger.i('Sync finished, exiting.');
+      log.i('Sync finished, exiting.');
       return true;
     }
   }

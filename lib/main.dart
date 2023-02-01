@@ -26,11 +26,11 @@ Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
   final storageService = await StorageService.initialize();
-  await initializeLogger(storageService, logToFile: args.contains('--log'));
+  await LoggingManager.initialize(verbose: args.contains('--log'));
 
   // Handle platform errors not caught by Flutter.
   PlatformDispatcher.instance.onError = (error, stack) {
-    logger.e('Uncaught platform error:', error, stack);
+    log.e('Uncaught platform error:', error, stack);
     return true;
   };
 
