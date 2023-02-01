@@ -77,9 +77,15 @@ class GoogleCalendar implements TasksRepository {
 
     final calendarListRepository = _api!.calendarList;
 
-    final apiCalendarsList = await calendarListRepository.list(
-      showHidden: true,
-    );
+    final CalendarList apiCalendarsList;
+    try {
+      apiCalendarsList = await calendarListRepository.list(
+        showHidden: true,
+      );
+    } on Exception catch (e) {
+      log.e('Failed to get all lists', e);
+      return null;
+    }
 
     apiCalendarsList.items?.removeWhere(
       (CalendarListEntry element) => element.location != 'adventure_list',
@@ -95,8 +101,17 @@ class GoogleCalendar implements TasksRepository {
 
     final taskLists = <TaskList>[];
     for (var calendarListEntry in apiCalendarsList.items!) {
-      final calendar = await _api!.calendars.get(calendarListEntry.id!);
-      taskLists.add(await calendar.toModel(_api!));
+      final Calendar calendar;
+      try {
+        calendar = await _api!.calendars.get(calendarListEntry.id!);
+      } on Exception catch (e) {
+        log.e('Failed to get list', e);
+        return null;
+      }
+
+      final model = await calendar.toModel(_api!);
+      if (model == null) return null;
+      taskLists.add(model);
     }
 
     return taskLists;
@@ -106,11 +121,17 @@ class GoogleCalendar implements TasksRepository {
   Future<TaskList?> createList(TaskList taskList) async {
     if (_api == null) return null;
 
-    final newCalendar = await _api!.calendars.insert(Calendar(
-      description: json.encode({'index': taskList.index}),
-      location: 'adventure_list',
-      summary: taskList.title,
-    ));
+    final Calendar newCalendar;
+    try {
+      newCalendar = await _api!.calendars.insert(Calendar(
+        description: json.encode({'index': taskList.index}),
+        location: 'adventure_list',
+        summary: taskList.title,
+      ));
+    } on Exception catch (e) {
+      log.e('Failed to create list', e);
+      return null;
+    }
 
     await _setListHidden(newCalendar.id!);
 
@@ -121,7 +142,12 @@ class GoogleCalendar implements TasksRepository {
   Future<bool> deleteList({required String id}) async {
     if (_api == null) return false;
 
-    await _api!.calendars.delete(id);
+    try {
+      await _api!.calendars.delete(id);
+    } on Exception catch (e) {
+      log.e('Failed to delete list', e);
+      return false;
+    }
 
     return true;
   }
@@ -130,10 +156,16 @@ class GoogleCalendar implements TasksRepository {
   Future<TaskList?> updateList({required TaskList list}) async {
     if (_api == null) return null;
 
-    final Calendar calendar = await _api!.calendars.update(
-      list.toGoogleCalendar(),
-      list.id,
-    );
+    final Calendar calendar;
+    try {
+      calendar = await _api!.calendars.update(
+        list.toGoogleCalendar(),
+        list.id,
+      );
+    } on Exception catch (e) {
+      log.e('Failed to update list', e);
+      return null;
+    }
 
     return await calendar.toModel(_api!);
   }
@@ -145,10 +177,16 @@ class GoogleCalendar implements TasksRepository {
   }) async {
     if (_api == null) return null;
 
-    final createdEvent = await _api!.events.insert(
-      newTask.toGoogleEvent(),
-      taskListId,
-    );
+    final Event createdEvent;
+    try {
+      createdEvent = await _api!.events.insert(
+        newTask.toGoogleEvent(),
+        taskListId,
+      );
+    } on Exception catch (e) {
+      log.e('Failed to create task', e);
+      return null;
+    }
 
     return createdEvent.toModel();
   }
@@ -168,7 +206,7 @@ class GoogleCalendar implements TasksRepository {
         updatedTask.id,
       );
     } on DetailedApiRequestError catch (e) {
-      logger.e(e);
+      log.e('Failed to update task', e);
       return null;
     }
 
@@ -178,23 +216,34 @@ class GoogleCalendar implements TasksRepository {
   Future<bool> _setListHidden(String calendarId) async {
     if (_api == null) return false;
 
-    await _api!.calendarList.update(
-      // Set the calendar to hidden, so it doesn't appear when the user
-      // accesses their calendars normally.
-      CalendarListEntry(hidden: true),
-      calendarId,
-    );
+    try {
+      await _api!.calendarList.update(
+        // Set the calendar to hidden, so it doesn't appear when the user
+        // accesses their calendars normally.
+        CalendarListEntry(hidden: true),
+        calendarId,
+      );
+    } on Exception catch (e) {
+      log.e('Failed to set list hidden', e);
+      return false;
+    }
 
     return true;
   }
 }
 
 extension CalendarHelper on Calendar {
-  Future<TaskList> toModel(CalendarApi api) async {
-    final apiTasks = await api.events.list(
-      id!,
-      showDeleted: true,
-    );
+  Future<TaskList?> toModel(CalendarApi api) async {
+    final Events apiTasks;
+    try {
+      apiTasks = await api.events.list(
+        id!,
+        showDeleted: true,
+      );
+    } on Exception catch (e) {
+      log.e('Failed to get tasks for list', e);
+      return null;
+    }
 
     // Convert events to Tasks.
     final List<Task> tasks = apiTasks.items!.map((e) => e.toModel()).toList();
