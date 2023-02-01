@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
@@ -52,7 +51,6 @@ class _NavContents extends StatelessWidget {
         _CreateListButton(),
         _ScrollingListTiles(),
         _SettingsButton(),
-        _UpdateButton(),
       ],
     );
   }
@@ -93,48 +91,6 @@ class _SettingsButton extends StatelessWidget {
             builder: (context) => const SettingsDialog(),
           );
         }
-      },
-    );
-  }
-}
-
-class _UpdateButton extends StatelessWidget {
-  const _UpdateButton({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    if (kDebugMode) return const SizedBox();
-    // Only show on Linux. Mobile / web don't need self_updater and Windows is
-    // being persistently borken.
-    if (!Platform.isLinux) return const SizedBox();
-
-    return BlocBuilder<AppCubit, AppState>(
-      builder: (context, state) {
-        if (!state.updateAvailable) return const SizedBox();
-
-        Widget child;
-        if (state.updateInProgress) {
-          child = Center(
-            child: Transform.scale(
-              scale: 0.8,
-              child: CircularProgressIndicator(
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-            ),
-          );
-        } else {
-          final text = (state.updateDownloaded) ? 'RESTART' : 'DOWNLOAD UPDATE';
-          child = Text(text);
-        }
-
-        return ListTile(
-          title: ElevatedButton(
-            onPressed: () => (state.updateDownloaded)
-                ? appCubit.startUpdate()
-                : appCubit.downloadUpdate(),
-            child: child,
-          ),
-        );
       },
     );
   }

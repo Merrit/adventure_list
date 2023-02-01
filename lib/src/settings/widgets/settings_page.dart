@@ -2,8 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:helpers/helpers.dart';
-import 'package:self_updater/self_updater.dart';
 
 import '../../app/cubit/app_cubit.dart';
 import '../../authentication/cubit/authentication_cubit.dart';
@@ -64,8 +62,6 @@ class SettingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     const updatesSection = [
       _VersionTile(),
-      _AutomaticUpdatesTile(),
-      _UpdateChannelTile(),
     ];
 
     const integrationSection = [
@@ -189,89 +185,6 @@ class _VersionTile extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class _AutomaticUpdatesTile extends StatelessWidget {
-  const _AutomaticUpdatesTile({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // Only show on Linux, Windows is broken.
-    if (!Platform.isLinux) return const SizedBox();
-
-    return BlocBuilder<SettingsCubit, SettingsState>(
-      builder: (context, state) {
-        return SwitchListTile(
-          title: const Text('Update automatically'),
-          value: state.updateAutomatically,
-          onChanged: (value) => settingsCubit.updateAutomaticUpdatesSetting(
-            value,
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _UpdateChannelTile extends StatelessWidget {
-  const _UpdateChannelTile({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    if (!Platform.isLinux && !Platform.isWindows) return const SizedBox();
-
-    return BlocBuilder<SettingsCubit, SettingsState>(
-      builder: (context, state) {
-        return Column(
-          children: [
-            const ListTile(title: Text('Update channel')),
-            ...UpdateChannel.values
-                .map((UpdateChannel channel) => RadioListTile(
-                      title: Text(channel.name.capitalized()),
-                      value: channel,
-                      groupValue: state.updateChannel,
-                      onChanged: (UpdateChannel? value) async {
-                        if (value == UpdateChannel.dev) {
-                          await _showConfirmDevDialog(context);
-                        } else {
-                          settingsCubit.setUpdateChannel(value);
-                        }
-                      },
-                    ))
-                .toList(),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _showConfirmDevDialog(BuildContext context) async {
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: const Text('''
-Development builds are untested and may (probably will) BREAK ALL THE THINGS and/or LOSE ALL YOUR DATA.
-
-Please do not choose Dev unless you can accept these risks.'''),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('CANCEL'),
-          ),
-          TextButton(
-            onPressed: () async {
-              final navigator = Navigator.of(context);
-              await settingsCubit.setUpdateChannel(UpdateChannel.dev);
-              navigator.pop();
-            },
-            child: const Text('My middle name is "risk".'),
-          ),
-        ],
-      ),
     );
   }
 }
