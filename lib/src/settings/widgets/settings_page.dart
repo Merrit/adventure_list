@@ -69,9 +69,7 @@ class SettingsView extends StatelessWidget {
       _CustomizeAndroidWidgetTile(),
     ];
 
-    const troubleshootingSection = [
-      _LogToFileWidget(),
-    ];
+    // const troubleshootingSection = [];
 
     return SizedBox(
       height: double.maxFinite,
@@ -89,10 +87,10 @@ class SettingsView extends StatelessWidget {
                   title: 'Integration',
                   children: integrationSection,
                 ),
-                _SectionWidget(
-                  title: 'Troubleshooting',
-                  children: troubleshootingSection,
-                ),
+                // _SectionWidget(
+                //   title: 'Troubleshooting',
+                //   children: troubleshootingSection,
+                // ),
               ],
             ),
           ),
@@ -230,23 +228,6 @@ class _CustomizeAndroidWidgetTile extends StatelessWidget {
 /* -------------------------------------------------------------------------- */
 /*                               Troubleshooting                              */
 /* -------------------------------------------------------------------------- */
-
-class _LogToFileWidget extends StatelessWidget {
-  const _LogToFileWidget({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<SettingsCubit, SettingsState>(
-      builder: (context, state) {
-        return SwitchListTile(
-          title: const Text('Save logs to disk'),
-          value: state.logToFile,
-          onChanged: (value) => settingsCubit.updateLogToFile(value),
-        );
-      },
-    );
-  }
-}
 
 class _SignOutButton extends StatelessWidget {
   const _SignOutButton({

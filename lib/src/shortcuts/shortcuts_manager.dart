@@ -11,7 +11,7 @@ class LoggingShortcutManager extends ShortcutManager {
     final KeyEventResult result = super.handleKeypress(context, event);
 
     if (result == KeyEventResult.handled) {
-      logger.i('''Handled shortcut
+      log.i('''Handled shortcut
 Shortcut: $event
 Context: $context
       ''');
@@ -29,7 +29,7 @@ class LoggingActionDispatcher extends ActionDispatcher {
     covariant Intent intent, [
     BuildContext? context,
   ]) {
-    logger.i('''
+    log.i('''
 Action invoked:
 Action: $action($intent)
 From: $context

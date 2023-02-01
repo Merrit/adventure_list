@@ -27,7 +27,7 @@ class AppCubit extends Cubit<AppState> {
   Future<void> initialize({required SettingsCubit settingsCubit}) async {
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();
     final currentVersion = packageInfo.version;
-    logger.v('Current version: $currentVersion');
+    log.v('Current version: $currentVersion');
 
     emit(state.copyWith(
       appVersion: currentVersion,

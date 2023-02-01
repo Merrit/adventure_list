@@ -25,7 +25,6 @@ class SettingsCubit extends Cubit<SettingsState> {
       initialState: SettingsState(
         closeToTray: await storageService.getValue('closeToTray') ?? true,
         homeWidgetSelectedListId: homeWidgetSelectedListId ?? '',
-        logToFile: await storageService.getValue('logToFile') ?? false,
       ),
     );
   }
@@ -38,10 +37,5 @@ class SettingsCubit extends Cubit<SettingsState> {
   Future<void> updateHomeWidgetSelectedListId(String id) async {
     emit(state.copyWith(homeWidgetSelectedListId: id));
     await _storageService.saveValue(key: 'homeWidgetSelectedListId', value: id);
-  }
-
-  Future<void> updateLogToFile(bool value) async {
-    emit(state.copyWith(logToFile: value));
-    await _storageService.saveValue(key: 'logToFile', value: value);
   }
 }

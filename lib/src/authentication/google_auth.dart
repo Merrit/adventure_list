@@ -82,7 +82,7 @@ class GoogleAuth {
         launchAuthUrl,
       );
     } catch (e) {
-      logger.w('Unable to sign in: $e');
+      log.w('Unable to sign in: $e');
     }
 
     return client?.credentials;
@@ -97,7 +97,7 @@ class GoogleAuth {
     try {
       await googleSignIn.signIn();
     } on PlatformException catch (e) {
-      logger.w('Failed to sign in with google_sign_in: $e');
+      log.w('Failed to sign in with google_sign_in: $e');
       return null;
     }
 
@@ -105,7 +105,7 @@ class GoogleAuth {
     try {
       client = await googleSignIn.authenticatedClient();
     } catch (e) {
-      logger.w('Unable to get AuthClient: $e');
+      log.w('Unable to get AuthClient: $e');
       return null;
     }
 
