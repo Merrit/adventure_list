@@ -1,8 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:self_updater/self_updater.dart';
 
-import '../../app/cubit/app_cubit.dart';
 import '../../storage/storage_service.dart';
 
 part 'settings_state.dart';
@@ -22,32 +20,14 @@ class SettingsCubit extends Cubit<SettingsState> {
       'homeWidgetSelectedListId',
     );
 
-    String? updateChannelString = await storageService.getValue(
-      'updateChannel',
-    );
-    UpdateChannel updateChannel;
-    if (updateChannelString == null) {
-      updateChannel = UpdateChannel.stable;
-    } else {
-      updateChannel = UpdateChannel.values.byName(updateChannelString);
-    }
-
     return SettingsCubit(
       storageService,
       initialState: SettingsState(
         closeToTray: await storageService.getValue('closeToTray') ?? true,
         homeWidgetSelectedListId: homeWidgetSelectedListId ?? '',
         logToFile: await storageService.getValue('logToFile') ?? false,
-        updateAutomatically:
-            await storageService.getValue('updateAutomatically') ?? false,
-        updateChannel: updateChannel,
       ),
     );
-  }
-
-  Future<void> updateAutomaticUpdatesSetting(bool value) async {
-    emit(state.copyWith(updateAutomatically: value));
-    await _storageService.saveValue(key: 'updateAutomatically', value: value);
   }
 
   Future<void> updateCloseToTray(bool value) async {
@@ -63,13 +43,5 @@ class SettingsCubit extends Cubit<SettingsState> {
   Future<void> updateLogToFile(bool value) async {
     emit(state.copyWith(logToFile: value));
     await _storageService.saveValue(key: 'logToFile', value: value);
-  }
-
-  Future<void> setUpdateChannel(UpdateChannel? channel) async {
-    if (channel == null) return;
-
-    emit(state.copyWith(updateChannel: channel));
-    await _storageService.saveValue(key: 'updateChannel', value: channel.name);
-    appCubit.setUpdateChannel(channel);
   }
 }

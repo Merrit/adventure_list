@@ -7,15 +7,11 @@ class SettingsState extends Equatable {
   final String homeWidgetSelectedListId;
 
   final bool logToFile;
-  final bool updateAutomatically;
-  final UpdateChannel updateChannel;
 
   const SettingsState({
     required this.closeToTray,
     required this.homeWidgetSelectedListId,
     required this.logToFile,
-    required this.updateAutomatically,
-    required this.updateChannel,
   });
 
   @override
@@ -24,8 +20,6 @@ class SettingsState extends Equatable {
       closeToTray,
       homeWidgetSelectedListId,
       logToFile,
-      updateAutomatically,
-      updateChannel,
     ];
   }
 
@@ -33,16 +27,12 @@ class SettingsState extends Equatable {
     bool? closeToTray,
     String? homeWidgetSelectedListId,
     bool? logToFile,
-    bool? updateAutomatically,
-    UpdateChannel? updateChannel,
   }) {
     return SettingsState(
       closeToTray: closeToTray ?? this.closeToTray,
       homeWidgetSelectedListId:
           homeWidgetSelectedListId ?? this.homeWidgetSelectedListId,
       logToFile: logToFile ?? this.logToFile,
-      updateAutomatically: updateAutomatically ?? this.updateAutomatically,
-      updateChannel: updateChannel ?? this.updateChannel,
     );
   }
 }
