@@ -8,6 +8,7 @@ on:
 
 jobs:
   flutter_test:
+    name: Run Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
