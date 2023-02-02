@@ -27,10 +27,12 @@ jobs:
 
     steps:
       - name: Setup Linux build requirements
-        # libappindicator required for tray_manager
         run: |
           sudo apt-get update
+          # libappindicator required for tray_manager
           sudo apt-get install appindicator3-0.1 libappindicator3-dev
+          # keybinder required for global hotkeys
+          sudo apt-get install keybinder-3.0
 
       - name: Set pre-release environment variable
         if: inputs.pre-release == true
@@ -40,7 +42,7 @@ jobs:
         uses: subosito/flutter-action@v2.3.0
 
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Prepare for build
         run: |
@@ -58,7 +60,7 @@ jobs:
       # ---------------------------------- Upload ---------------------------- #
 
       - name: Upload artifacts to workflow
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: linux-artifacts
           path: output/*
