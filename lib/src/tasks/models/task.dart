@@ -74,6 +74,20 @@ class Task extends Equatable {
     );
   }
 
+  factory Task.empty() {
+    return Task._(
+      completed: false,
+      deleted: false,
+      description: null,
+      dueDate: null,
+      id: '',
+      index: -1,
+      parent: null,
+      title: '',
+      updated: DateTime.now(),
+    );
+  }
+
   @override
   List<Object?> get props {
     return [
