@@ -31,3 +31,10 @@ jobs:
     needs: call-tests
     uses: ./.github/workflows/build-android.yml
     secrets: inherit
+
+  verify-pull-request:
+    name: Verify Pull Request
+    needs: [call-tests, call-build-linux, call-build-windows, call-build-android]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Requirements passed, PR looks good!"
