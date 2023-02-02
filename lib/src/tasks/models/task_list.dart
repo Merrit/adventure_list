@@ -28,6 +28,16 @@ class TaskList extends Equatable {
     required this.title,
   }) : items = TaskListValidator.tasksInOrder(items);
 
+  factory TaskList.empty() {
+    return TaskList(
+      id: '',
+      index: -1,
+      items: const [],
+      synced: false,
+      title: '',
+    );
+  }
+
   @override
   List<Object> get props {
     return [

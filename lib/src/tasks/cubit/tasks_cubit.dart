@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:googleapis/calendar/v3.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
+import 'package:http/http.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../authentication/authentication.dart';
@@ -78,13 +81,39 @@ class TasksCubit extends Cubit<TasksState> {
     required AccessCredentials credentials,
     TasksRepository? tasksRepository,
   }) async {
-    /// If [tasksRepository] is non-null it was passed in as a mock.
-    tasksRepository ??= await GoogleCalendar.initialize(
-      clientId: GoogleAuthIds.clientId,
-      credentials: credentials,
-    );
+    if (tasksRepository == null) {
+      /// If [tasksRepository] is non-null it was passed in as a mock.
+      final client = await _getAuthClient();
+      final calendarApi = CalendarApi(client!);
+      tasksRepository ??= GoogleCalendar(calendarApi);
+    }
 
     initialize(tasksRepository);
+  }
+
+  /// Returns an `AuthClient` that can be used to make authenticated requests.
+  Future<AuthClient?> _getAuthClient() async {
+    final clientId = GoogleAuthIds.clientId;
+    final credentials = await _storageService.getValue('accessCredentials');
+    if (credentials == null) return null;
+
+    final accessCredentials = AccessCredentials.fromJson(
+      json.decode(credentials),
+    );
+
+    AuthClient? client;
+    // `google_sign_in` can't get us a refresh token, so.
+    if (accessCredentials.refreshToken != null) {
+      client = autoRefreshingClient(
+        clientId,
+        accessCredentials,
+        Client(),
+      );
+    } else {
+      client = await GoogleAuth.refreshAuthClient();
+    }
+
+    return client;
   }
 
   late TasksRepository _tasksRepository;
