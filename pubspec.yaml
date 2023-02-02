@@ -70,10 +70,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
   # Enable generation of localized Strings from arb files.
   generate: true
-
   assets:
     - assets/icons/
     - packaging/linux/codes.merritt.adventurelist.desktop
