@@ -1,0 +1,84 @@
+name: Publish Flatpak
+
+on:
+  # Enable manual run
+  workflow_dispatch:
+  # Build & deploy for published releases
+  release:
+    types:
+      - published
+
+# ${{ secrets.FLATHUB_TOKEN }} is a Personal Access Token to grant push access.
+# ${{ secrets.GIT_AUTO_COMMIT_TOKEN }} is a Personal Access Token.
+
+env:
+  project-id: codes.merritt.adventurelist
+
+jobs:
+  update-recipe:
+    name: Update Flatpak recipe files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: main
+          path: code
+          token: ${{ secrets.GIT_AUTO_COMMIT_TOKEN }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak
+          sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          sudo flatpak install -y flathub org.freedesktop.appstream-glib
+
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@v1.3
+
+      # ---------------------- Update AppStream metadata file ---------------------- #
+
+      - name: Update metadata file
+        working-directory: ${{ github.workspace }}/code
+        run: |
+          dart pub global activate --source git https://github.com/Merrit/linux_packaging_updater.git
+          updater --projectId codes.merritt.adventurelist --repository adventure_list --user merrit --metadata
+
+      - name: Commit updated AppStream metadata back to repo
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "chore: update linux metadata for new release"
+          file_pattern: "packaging/linux/*.metainfo.xml"
+          repository: code/
+
+      # --------------------------- Create FlatHub update -------------------------- #
+
+      - name: Checkout flathub repository
+        uses: actions/checkout@v3
+        with:
+          repository: flathub/${{ env.project-id }}
+          path: flathub
+          token: ${{ secrets.FLATHUB_TOKEN }}
+
+      - name: Update flatpak manifest
+        working-directory: ${{ github.workspace }}/flathub
+        run: updater --projectId codes.merritt.adventurelist --repository adventure_list --user merrit --manifest
+
+      - name: Push updated recipe to Flathub
+        working-directory: ${{ github.workspace }}/flathub
+        env:
+          GH_TOKEN: ${{ secrets.FLATHUB_TOKEN }}
+          REPO_KEY: ${{ secrets.FLATHUB_TOKEN }}
+          USERNAME: merrit
+        run: |
+          git config --local user.name "Kristen McWilliam"
+          git config --local user.email "9575627+Merrit@users.noreply.github.com"
+          git checkout -b flathub_update
+          git add -A
+          git commit -m "Update manifest"
+          git push -u origin flathub_update -f
+          gh pr create --fill --head flathub_update
+        # Disable auto-merge because they are disallowing it (╯°□°）╯︵ ┻━┻
+        # https://discourse.flathub.org/t/enforcing-pull-request-workflow-and-green-ci-status-of-prs/3109
+        # gh pr merge --rebase --delete-branch
+        # git push https://$USERNAME:$REPO_KEY@github.com/flathub/${{ env.project-id }}.git
