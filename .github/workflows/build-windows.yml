@@ -3,8 +3,6 @@ on:
   # Enable manual run
   workflow_dispatch:
   # Verify builds succeed on pull requests
-  pull_request:
-  # Allow being called by other workflows
   workflow_call:
     inputs:
       pre-release:
