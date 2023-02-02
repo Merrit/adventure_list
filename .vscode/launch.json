@@ -4,29 +4,60 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        // Debug
         {
-            "name": "adventure_list",
+            "name": "Debug",
             "request": "launch",
             "type": "dart",
-            "program": "lib/main.dart"
+            "program": "lib/main.dart",
+            "flutterMode": "debug",
         },
+        // Debug with verbose logging
         {
-            "name": "adventure_list (profile mode)",
+            "name": "Debug with verbose logging",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "flutterMode": "debug",
+            "program": "lib/main.dart",
+            "args": [
+                "--dart-entrypoint-args",
+                "--verbose",
+            ],
         },
+        // Debug with arguments
         {
-            "name": "adventure_list (release mode)",
+            "name": "Debug with arguments",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "flutterMode": "debug",
+            "program": "lib/main.dart",
+            // "args": [
+            //     "--dart-entrypoint-args",
+            //     "--toggle,--verbose",
+            // ],
         },
+        // Profile
         {
-            "name": "Website",
+            "name": "Profile",
             "request": "launch",
             "type": "dart",
-            "program": "website/lib/main.dart"
+            "program": "lib/main.dart",
+            "flutterMode": "profile",
+        },
+        // Release
+        {
+            "name": "Release",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "flutterMode": "release",
+        },
+        // Test current file
+        {
+            "name": "Test current file",
+            "type": "dart",
+            "request": "launch",
+            "program": "${file}"
         }
     ]
 }
