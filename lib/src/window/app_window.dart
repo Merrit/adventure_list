@@ -3,7 +3,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:window_manager/window_manager.dart';
@@ -13,29 +12,15 @@ import '../settings/settings.dart';
 import '../storage/storage_service.dart';
 import '../tasks/tasks.dart';
 
-final appWindow = AppWindow();
-
 class AppWindow {
-  AppWindow._() {
+  AppWindow() {
     instance = this;
   }
 
   static late final AppWindow instance;
-  static bool _initialized = false;
 
-  factory AppWindow() {
-    if (_initialized) return instance;
-
-    _initialized = true;
-    return AppWindow._();
-  }
-
-  void initialize() {
-    if (defaultTargetPlatform != TargetPlatform.linux &&
-        defaultTargetPlatform != TargetPlatform.windows &&
-        defaultTargetPlatform != TargetPlatform.macOS) {
-      return;
-    }
+  Future<void> initialize() async {
+    await windowManager.ensureInitialized();
 
     WindowOptions windowOptions = const WindowOptions();
     windowManager.waitUntilReadyToShow(windowOptions, () async {

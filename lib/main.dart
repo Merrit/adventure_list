@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 import 'package:home_widget/home_widget.dart';
-import 'package:window_manager/window_manager.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'firebase_options.dart';
@@ -24,8 +23,7 @@ import 'src/window/app_window.dart';
 
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
-  final storageService = await StorageService.initialize();
+
   await LoggingManager.initialize(verbose: args.contains('--log'));
 
   // Handle platform errors not caught by Flutter.
@@ -34,7 +32,9 @@ Future<void> main(List<String> args) async {
     return true;
   };
 
-  if (Platform.isLinux || Platform.isWindows) {
+  final storageService = await StorageService.initialize();
+
+  if (defaultTargetPlatform.isDesktop) {
     final appWindow = AppWindow() //
       ..initialize();
     final systemTray = SystemTrayManager(appWindow);
