@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:helpers/helpers.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -30,15 +32,19 @@ class App extends StatefulWidget {
 class _AppState extends State<App> with TrayListener, WindowListener {
   @override
   void initState() {
-    trayManager.addListener(this);
-    windowManager.addListener(this);
+    if (defaultTargetPlatform.isDesktop) {
+      trayManager.addListener(this);
+      windowManager.addListener(this);
+    }
     super.initState();
   }
 
   @override
   void dispose() {
-    trayManager.removeListener(this);
-    windowManager.removeListener(this);
+    if (defaultTargetPlatform.isDesktop) {
+      trayManager.removeListener(this);
+      windowManager.removeListener(this);
+    }
     super.dispose();
   }
 
@@ -47,7 +53,7 @@ class _AppState extends State<App> with TrayListener, WindowListener {
     /// This method from the `window_manager` package is only working on Windows
     /// for some reason. Linux will use `flutter_window_close` instead until it
     /// has been resolved.
-    final bool allowClose = await appWindow.handleWindowCloseEvent();
+    final bool allowClose = await AppWindow.instance.handleWindowCloseEvent();
     if (allowClose) super.onWindowClose();
   }
 
@@ -65,7 +71,7 @@ class _AppState extends State<App> with TrayListener, WindowListener {
       timer = Timer(
         const Duration(seconds: 30),
         () {
-          appWindow.saveWindowSizeAndPosition();
+          AppWindow.instance.saveWindowSizeAndPosition();
         },
       );
     }
