@@ -1,6 +1,6 @@
 import 'package:adventure_list/src/authentication/authentication.dart';
 import 'package:adventure_list/src/logs/logs.dart';
-import 'package:adventure_list/src/storage/storage_service.dart';
+import 'package:adventure_list/src/storage/storage_repository.dart';
 import 'package:adventure_list/src/tasks/tasks.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/foundation.dart';
@@ -11,7 +11,7 @@ import 'package:mocktail/mocktail.dart';
 class MockAuthenticationCubit extends MockCubit<AuthenticationState>
     implements AuthenticationCubit {}
 
-class MockStorageService extends Mock implements StorageService {}
+class MockStorageRepository extends Mock implements StorageRepository {}
 
 class MockTasksRepository extends Mock implements TasksRepository {}
 
@@ -20,7 +20,7 @@ class FakeTaskList extends Fake implements TaskList {}
 class FakeTask extends Fake implements Task {}
 
 late MockAuthenticationCubit _authCubit;
-late MockStorageService _storageService;
+late MockStorageRepository _storageRepository;
 late MockTasksRepository _tasksRepository;
 
 late TasksCubit _tasksCubit;
@@ -44,28 +44,28 @@ final AuthenticationState defaultAuthState = AuthenticationState(
 
 void main() {
   setUpAll(() async {
-    /* ----------------------------- StorageService ----------------------------- */
-    _storageService = MockStorageService();
-    StorageService.instance = _storageService;
+    /* ----------------------------- StorageRepository ----------------------------- */
+    _storageRepository = MockStorageRepository();
+    StorageRepository.instance = _storageRepository;
 
-    when(() => _storageService.deleteValue(any(),
+    when(() => _storageRepository.deleteValue(any(),
         storageArea: any(named: 'storageArea'))).thenAnswer((_) async {});
 
-    when(() => _storageService.getStorageAreaValues(any())).thenAnswer(
+    when(() => _storageRepository.getStorageAreaValues(any())).thenAnswer(
       (_) async => [],
     );
 
-    when(() => _storageService.getValue(
+    when(() => _storageRepository.getValue(
           any(),
           storageArea: any(named: 'storageArea'),
         )).thenAnswer((_) async => null);
 
-    when(() => _storageService.saveStorageAreaValues(
+    when(() => _storageRepository.saveStorageAreaValues(
           storageArea: any(named: 'storageArea'),
           entries: any(named: 'entries'),
         )).thenAnswer((_) async {});
 
-    when(() => _storageService.saveValue(
+    when(() => _storageRepository.saveValue(
           key: any(named: 'key'),
           value: any(named: 'value'),
           storageArea: any(named: 'storageArea'),

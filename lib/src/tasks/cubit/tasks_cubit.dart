@@ -15,7 +15,7 @@ import '../../authentication/authentication.dart';
 import '../../home_widget/home_widget_manager.dart';
 import '../../logs/logs.dart';
 import '../../settings/settings.dart';
-import '../../storage/storage_service.dart';
+import '../../storage/storage_repository.dart';
 import '../tasks.dart';
 
 part 'tasks_state.dart';
@@ -54,7 +54,8 @@ class TasksCubit extends Cubit<TasksState> {
   }
 
   Future<void> _getCachedData() async {
-    final List<String>? taskListsJson = await StorageService.instance.getValue(
+    final List<String>? taskListsJson =
+        await StorageRepository.instance.getValue(
       'taskListsJson',
       storageArea: 'cache',
     );
@@ -65,7 +66,7 @@ class TasksCubit extends Cubit<TasksState> {
         .map((e) => TaskList.fromJson(e))
         .toList();
 
-    final String? activeListId = await StorageService.instance.getValue(
+    final String? activeListId = await StorageRepository.instance.getValue(
       'activeList',
     );
 
@@ -93,7 +94,7 @@ class TasksCubit extends Cubit<TasksState> {
   /// Returns an `AuthClient` that can be used to make authenticated requests.
   Future<AuthClient?> _getAuthClient() async {
     final clientId = GoogleAuthIds.clientId;
-    final credentials = await StorageService.instance.getValue(
+    final credentials = await StorageRepository.instance.getValue(
       'accessCredentials',
     );
     if (credentials == null) return null;
@@ -135,7 +136,7 @@ class TasksCubit extends Cubit<TasksState> {
       return;
     }
 
-    final String? activeListId = await StorageService.instance.getValue(
+    final String? activeListId = await StorageRepository.instance.getValue(
       'activeList',
     );
     emit(state.copyWith(
@@ -217,7 +218,7 @@ class TasksCubit extends Cubit<TasksState> {
       activeList: list,
       activeTask: state.activeTask?.copyWith(id: ''),
     ));
-    StorageService.instance.saveValue(key: 'activeList', value: id);
+    StorageRepository.instance.saveValue(key: 'activeList', value: id);
   }
 
   Future<void> updateList(TaskList list) async {
@@ -336,7 +337,7 @@ class TasksCubit extends Cubit<TasksState> {
     ));
 
     // Save task to be batch synced periodically.
-    await StorageService.instance.saveValue(
+    await StorageRepository.instance.saveValue(
       key: task.id,
       value: {
         'taskListId': updatedTaskList.id,
@@ -363,7 +364,8 @@ class TasksCubit extends Cubit<TasksState> {
 
   /// Sync all tasks with changes to the remote repository.
   Future<void> _syncUpdatedTasks() async {
-    final tasksToBeSynced = await StorageService.instance.getStorageAreaValues(
+    final tasksToBeSynced =
+        await StorageRepository.instance.getStorageAreaValues(
       'tasksToBeSynced',
     );
 
@@ -378,7 +380,7 @@ class TasksCubit extends Cubit<TasksState> {
         updatedTask: task,
       );
 
-      await StorageService.instance.deleteValue(
+      await StorageRepository.instance.deleteValue(
         task.id,
         storageArea: 'tasksToBeSynced',
       );
@@ -467,7 +469,7 @@ class TasksCubit extends Cubit<TasksState> {
     if (!_clearTasksWasCancelled) {
       // Ensure pending task updates don't overwrite the cleared state.
       for (var task in updatedList.items) {
-        await StorageService.instance.deleteValue(
+        await StorageRepository.instance.deleteValue(
           task.id,
           storageArea: 'tasksToBeSynced',
         );
@@ -518,7 +520,7 @@ class TasksCubit extends Cubit<TasksState> {
         taskListsJson.add(taskList.toJson());
       }
 
-      await StorageService.instance.saveValue(
+      await StorageRepository.instance.saveValue(
         key: 'taskListsJson',
         value: taskListsJson,
         storageArea: 'cache',
