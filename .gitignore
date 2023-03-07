@@ -2,11 +2,16 @@
 #                                    Custom                                    #
 # ---------------------------------------------------------------------------- #
 
-# Some generated Flutter engine files keep getting added to git.
-generated*
+# Freezed
+*.freezed.dart
+*.g.dart
 
-# Test coverage report.
-coverage/
+# Generated code
+generated*
+Generated*
+
+# Test coverage
+lcov.info
 
 
 # ---------------------------------------------------------------------------- #

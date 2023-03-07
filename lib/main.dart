@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:http/http.dart' as http;
 import 'package:workmanager/workmanager.dart';
 
 import 'firebase_options.dart';
@@ -20,6 +21,7 @@ import 'src/settings/cubit/settings_cubit.dart';
 import 'src/storage/storage_repository.dart';
 import 'src/system_tray/system_tray_manager.dart';
 import 'src/tasks/tasks.dart';
+import 'src/updates/updates.dart';
 import 'src/window/app_window.dart';
 
 Future<void> main(List<String> args) async {
@@ -71,8 +73,13 @@ Future<void> main(List<String> args) async {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => AppCubit(settingsCubitInstance),
-            lazy: false,
+            create: (context) => AppCubit(
+              releaseNotesService: ReleaseNotesService(
+                client: http.Client(),
+                repository: 'merrit/adventure_list',
+              ),
+              updateService: UpdateService(),
+            ),
           ),
           BlocProvider.value(value: authenticationCubit),
           BlocProvider.value(value: settingsCubitInstance),

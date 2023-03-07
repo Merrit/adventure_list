@@ -17,7 +17,6 @@ import 'home_widget/widgets/home_widget_config_page.dart';
 import 'settings/settings.dart';
 import 'shortcuts/app_shortcuts.dart';
 import 'tasks/tasks.dart';
-import 'theme/theme.dart';
 import 'window/app_window.dart';
 
 class App extends StatefulWidget {
@@ -82,57 +81,59 @@ class _AppState extends State<App> with TrayListener, WindowListener {
   Widget build(BuildContext context) {
     return AppShortcuts(
       child: BlocBuilder<AuthenticationCubit, AuthenticationState>(
-        builder: (context, state) {
-          final bool signedIn = state.signedIn;
+        builder: (context, authState) {
+          final bool signedIn = authState.signedIn;
 
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            restorationScopeId: 'app',
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('en', ''),
-            ],
-            onGenerateTitle: (BuildContext context) =>
-                AppLocalizations.of(context)!.appTitle,
-            theme: lightTheme,
-            darkTheme: darkTheme,
-            themeMode: ThemeMode.system,
-            onGenerateRoute: (RouteSettings routeSettings) {
-              return MaterialPageRoute<void>(
-                settings: routeSettings,
-                builder: (BuildContext context) {
-                  if (!signedIn) return const SignInPage();
+          return BlocBuilder<SettingsCubit, SettingsState>(
+            builder: (context, settingsState) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                restorationScopeId: 'app',
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                supportedLocales: const [
+                  Locale('en', ''),
+                ],
+                onGenerateTitle: (BuildContext context) =>
+                    AppLocalizations.of(context)!.appTitle,
+                theme: settingsState.theme,
+                onGenerateRoute: (RouteSettings routeSettings) {
+                  return MaterialPageRoute<void>(
+                    settings: routeSettings,
+                    builder: (BuildContext context) {
+                      if (!signedIn) return const SignInPage();
 
-                  Widget child;
+                      Widget child;
 
-                  switch (routeSettings.name) {
-                    case HomeWidgetConfigPage.routeName:
-                      child = const HomeWidgetConfigPage();
-                      break;
-                    case SignInPage.routeName:
-                      child = const SignInPage();
-                      break;
-                    case TaskDetails.routeName:
-                      child = const TaskDetails();
-                      break;
-                    case TaskListSettingsPage.routeName:
-                      child = const TaskListSettingsPage();
-                      break;
-                    case SettingsPage.routeName:
-                      child = const SettingsPage();
-                      break;
-                    default:
-                      child = const TasksPage();
-                  }
+                      switch (routeSettings.name) {
+                        case HomeWidgetConfigPage.routeName:
+                          child = const HomeWidgetConfigPage();
+                          break;
+                        case SignInPage.routeName:
+                          child = const SignInPage();
+                          break;
+                        case TaskDetails.routeName:
+                          child = const TaskDetails();
+                          break;
+                        case TaskListSettingsPage.routeName:
+                          child = const TaskListSettingsPage();
+                          break;
+                        case SettingsPage.routeName:
+                          child = const SettingsPage();
+                          break;
+                        default:
+                          child = const TasksPage();
+                      }
 
-                  return Platform.isAndroid
-                      ? HomeScreenWidget(child: child)
-                      : child;
+                      return Platform.isAndroid
+                          ? HomeScreenWidget(child: child)
+                          : child;
+                    },
+                  );
                 },
               );
             },
