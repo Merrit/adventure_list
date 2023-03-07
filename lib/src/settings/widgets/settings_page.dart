@@ -118,8 +118,7 @@ class _SectionWidget extends StatelessWidget {
         ListTile(
           title: Text(
             title,
-            style: TextStyle(
-              color: Theme.of(context).primaryColor,
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
             ),
           ),
