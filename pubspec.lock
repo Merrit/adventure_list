@@ -484,10 +484,10 @@ packages:
     dependency: "direct main"
     description:
       name: home_widget
-      sha256: "9514c47422d511e87a3923ffed3fc4eb82540e168d7715d1560ceb1f02d5ec80"
+      sha256: c7a57566606ce702454f074a0b933ee156f05ea6ef1f79f4cb680a171afe59dd
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.6"
+    version: "0.2.0+1"
   http:
     dependency: "direct main"
     description:
@@ -619,11 +619,12 @@ packages:
   move_to_background:
     dependency: "direct main"
     description:
-      name: move_to_background
-      sha256: "00caad17a6ce149910777131503f43f8ed80025681f94684e3a6a87d979b914c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.2"
+      path: "."
+      ref: HEAD
+      resolved-ref: e5cc2eefd1667e8ef22f21f41b0ef012b060be6c
+      url: "https://github.com/ViliusP/move_to_background.git"
+    source: git
+    version: "2.0.0"
   msix:
     dependency: "direct dev"
     description:
