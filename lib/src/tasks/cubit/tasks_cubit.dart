@@ -54,8 +54,7 @@ class TasksCubit extends Cubit<TasksState> {
   }
 
   Future<void> _getCachedData() async {
-    final List<String>? taskListsJson =
-        await StorageRepository.instance.getValue(
+    final List<String>? taskListsJson = await StorageRepository.instance.get(
       'taskListsJson',
       storageArea: 'cache',
     );
@@ -66,7 +65,7 @@ class TasksCubit extends Cubit<TasksState> {
         .map((e) => TaskList.fromJson(e))
         .toList();
 
-    final String? activeListId = await StorageRepository.instance.getValue(
+    final String? activeListId = await StorageRepository.instance.get(
       'activeList',
     );
 
@@ -94,7 +93,7 @@ class TasksCubit extends Cubit<TasksState> {
   /// Returns an `AuthClient` that can be used to make authenticated requests.
   Future<AuthClient?> _getAuthClient() async {
     final clientId = GoogleAuthIds.clientId;
-    final credentials = await StorageRepository.instance.getValue(
+    final credentials = await StorageRepository.instance.get(
       'accessCredentials',
     );
     if (credentials == null) return null;
@@ -136,7 +135,7 @@ class TasksCubit extends Cubit<TasksState> {
       return;
     }
 
-    final String? activeListId = await StorageRepository.instance.getValue(
+    final String? activeListId = await StorageRepository.instance.get(
       'activeList',
     );
     emit(state.copyWith(
@@ -218,7 +217,7 @@ class TasksCubit extends Cubit<TasksState> {
       activeList: list,
       activeTask: state.activeTask?.copyWith(id: ''),
     ));
-    StorageRepository.instance.saveValue(key: 'activeList', value: id);
+    StorageRepository.instance.save(key: 'activeList', value: id);
   }
 
   Future<void> updateList(TaskList list) async {
@@ -337,7 +336,7 @@ class TasksCubit extends Cubit<TasksState> {
     ));
 
     // Save task to be batch synced periodically.
-    await StorageRepository.instance.saveValue(
+    await StorageRepository.instance.save(
       key: task.id,
       value: {
         'taskListId': updatedTaskList.id,
@@ -380,7 +379,7 @@ class TasksCubit extends Cubit<TasksState> {
         updatedTask: task,
       );
 
-      await StorageRepository.instance.deleteValue(
+      await StorageRepository.instance.delete(
         task.id,
         storageArea: 'tasksToBeSynced',
       );
@@ -469,7 +468,7 @@ class TasksCubit extends Cubit<TasksState> {
     if (!_clearTasksWasCancelled) {
       // Ensure pending task updates don't overwrite the cleared state.
       for (var task in updatedList.items) {
-        await StorageRepository.instance.deleteValue(
+        await StorageRepository.instance.delete(
           task.id,
           storageArea: 'tasksToBeSynced',
         );
@@ -520,7 +519,7 @@ class TasksCubit extends Cubit<TasksState> {
         taskListsJson.add(taskList.toJson());
       }
 
-      await StorageRepository.instance.saveValue(
+      await StorageRepository.instance.save(
         key: 'taskListsJson',
         value: taskListsJson,
         storageArea: 'cache',

@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:workmanager/workmanager.dart';
 
@@ -32,7 +33,7 @@ Future<void> main(List<String> args) async {
     return true;
   };
 
-  final storageRepository = await StorageRepository.initialize();
+  final storageRepository = await StorageRepository.initialize(Hive);
 
   if (defaultTargetPlatform.isDesktop) {
     final appWindow = AppWindow() //

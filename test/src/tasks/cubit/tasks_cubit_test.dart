@@ -48,14 +48,14 @@ void main() {
     _storageRepository = MockStorageRepository();
     StorageRepository.instance = _storageRepository;
 
-    when(() => _storageRepository.deleteValue(any(),
+    when(() => _storageRepository.delete(any(),
         storageArea: any(named: 'storageArea'))).thenAnswer((_) async {});
 
     when(() => _storageRepository.getStorageAreaValues(any())).thenAnswer(
       (_) async => [],
     );
 
-    when(() => _storageRepository.getValue(
+    when(() => _storageRepository.get(
           any(),
           storageArea: any(named: 'storageArea'),
         )).thenAnswer((_) async => null);
@@ -65,7 +65,7 @@ void main() {
           entries: any(named: 'entries'),
         )).thenAnswer((_) async {});
 
-    when(() => _storageRepository.saveValue(
+    when(() => _storageRepository.save(
           key: any(named: 'key'),
           value: any(named: 'value'),
           storageArea: any(named: 'storageArea'),

@@ -66,7 +66,7 @@ class AppWindow {
     print('Saving window size and position');
     final Rect bounds = await windowManager.getBounds();
 
-    await StorageRepository.instance.saveValue(
+    await StorageRepository.instance.save(
       key: 'windowSizeAndPosition',
       value: bounds.toJson(),
     );
@@ -76,7 +76,7 @@ class AppWindow {
     print('Setting window size and position.');
     Rect currentWindowFrame = await windowManager.getBounds();
 
-    String? targetWindowFrameJson = await StorageRepository.instance.getValue(
+    String? targetWindowFrameJson = await StorageRepository.instance.get(
       'windowSizeAndPosition',
     );
 
