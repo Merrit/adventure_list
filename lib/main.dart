@@ -74,7 +74,7 @@ Future<void> main(List<String> args) async {
             create: (context) => AppCubit(settingsCubitInstance),
             lazy: false,
           ),
-          BlocProvider(create: (context) => authenticationCubit),
+          BlocProvider.value(value: authenticationCubit),
           BlocProvider.value(value: settingsCubitInstance),
           BlocProvider.value(value: tasksCubit),
         ],
