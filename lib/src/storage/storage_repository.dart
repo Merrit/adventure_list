@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:helpers/helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
+
+import 'storage.dart';
 
 /// Interfaces with the host OS to store & retrieve data from disk.
 class StorageRepository {
@@ -11,52 +12,47 @@ class StorageRepository {
   /// Singleton instance of the service.
   static late StorageRepository instance;
 
+  /// Instance of Hive upon which to interface for storage.
+  final HiveInterface _hive;
+
   /// Private singleton constructor.
-  StorageRepository._singleton();
+  const StorageRepository._(this._hive);
 
   /// Initialize the storage access and [instance].
   /// Needs to be initialized only once, in the `main()` function.
-  static Future<StorageRepository> initialize() async {
+  static Future<StorageRepository> initialize(HiveInterface hive) async {
     /// On desktop platforms initialize to a specific directory.
-    if (platformIsDesktop()) {
-      final dir = await getApplicationSupportDirectory();
-      // Defaults to ~/.local/share/adventure_list/storage
-      Hive.init('${dir.path}/storage');
+    if (defaultTargetPlatform.isDesktop) {
+      final dir = await getSupportDirectory();
+      hive.init('${dir.path}/storage');
     } else {
       // On mobile and web initialize to default location.
-      await Hive.initFlutter();
+      await hive.initFlutter();
     }
 
-    instance = StorageRepository._singleton();
+    instance = StorageRepository._(hive);
     return instance;
   }
 
-  /// A generic storage pool, anything large should make its own box.
-  static const String _generalBox = 'general';
-
-  /// Persist a value to local disk storage.
-  Future<void> saveValue({
-    required String key,
-    required dynamic value,
-    String? storageArea,
-  }) async {
-    final Box box = await _getBox(storageArea);
-    await box.put(key, value);
+  /// Delete all values from [storageArea].
+  Future<void> clearStorageArea(String storageArea) async {
+    final Box box = await _hive.openBox(storageArea);
+    await box.clear();
   }
 
-  /// Save all values to disk.
-  Future<void> saveStorageAreaValues({
-    required String storageArea,
-    required Map<dynamic, dynamic> entries,
-  }) async {
+  /// Save and close all storage to ensure clean exit.
+  Future<void> close() async => await _hive.close();
+
+  /// Delete a key from storage.
+  Future<void> delete(String key, {String? storageArea}) async {
     final Box box = await _getBox(storageArea);
-    await box.putAll(entries);
+    await box.delete(key);
   }
 
   /// Get a value from local disk storage.
   ///
   /// If the [key] doesn't exist, `null` is returned.
-  Future<dynamic> getValue(String key, {String? storageArea}) async {
+  Future<dynamic> get(String key, {String? storageArea}) async {
     final Box box = await _getBox(storageArea);
     return box.get(key);
   }
@@ -67,21 +63,44 @@ class StorageRepository {
     return box.values;
   }
 
-  /// Delete a key from storage.
-  Future<void> deleteValue(String key, {String? storageArea}) async {
+  /// Persist a value to local disk storage.
+  ///
+  /// [key] is the key to access the data.
+  ///
+  /// [value] is the data to be saved.
+  ///
+  /// [storageArea] is the name of a specific storage area in which to save.
+  /// (Optional)
+  Future<void> save({
+    required String key,
+    required dynamic value,
+    String? storageArea,
+  }) async {
     final Box box = await _getBox(storageArea);
-    await box.delete(key);
+    await box.put(key, value);
+  }
+
+  /// Populate [storageArea] with [entries].
+  Future<void> saveStorageAreaValues({
+    required String storageArea,
+    required Map<dynamic, dynamic> entries,
+  }) async {
+    final Box box = await _getBox(storageArea);
+    await box.putAll(entries);
   }
 
   /// Get a Hive storage box, either the one associated with
   /// [storageAreaName], or the general storage box.
   Future<Box> _getBox(String? storageAreaName) async {
     try {
-      return await Hive.openBox(storageAreaName ?? _generalBox);
+      return await _hive.openBox(storageAreaName ?? _kGeneralBoxName);
     } on Exception catch (e) {
       debugPrint('Unable to access storage; is another app instance '
-          'already running? \n$e');
+          'already running? Error: $e');
       exit(1);
     }
   }
+
+  /// A generic storage pool, anything large should make its own box.
+  static const String _kGeneralBoxName = 'general';
 }

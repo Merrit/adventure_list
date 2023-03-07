@@ -24,7 +24,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   static Future<AuthenticationCubit> initialize({
     required GoogleAuth googleAuth,
   }) async {
-    final String? savedCredentials = await StorageRepository.instance.getValue(
+    final String? savedCredentials = await StorageRepository.instance.get(
       'accessCredentials',
     );
 
@@ -53,7 +53,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       signedIn: true,
     ));
 
-    await StorageRepository.instance.saveValue(
+    await StorageRepository.instance.save(
       key: 'accessCredentials',
       value: jsonEncode(accessCredentials.toJson()),
     );
@@ -61,7 +61,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
 
   Future<void> signOut() async {
     await _googleAuth.signOut();
-    await StorageRepository.instance.deleteValue('accessCredentials');
+    await StorageRepository.instance.delete('accessCredentials');
 
     emit(state.copyWith(
       accessCredentials: null,

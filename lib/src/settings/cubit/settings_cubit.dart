@@ -13,15 +13,14 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   static Future<SettingsCubit> initialize() async {
-    String? homeWidgetSelectedListId =
-        await StorageRepository.instance.getValue(
+    String? homeWidgetSelectedListId = await StorageRepository.instance.get(
       'homeWidgetSelectedListId',
     );
 
     return SettingsCubit(
       initialState: SettingsState(
         closeToTray:
-            await StorageRepository.instance.getValue('closeToTray') ?? true,
+            await StorageRepository.instance.get('closeToTray') ?? true,
         homeWidgetSelectedListId: homeWidgetSelectedListId ?? '',
       ),
     );
@@ -29,7 +28,7 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   Future<void> updateCloseToTray(bool value) async {
     emit(state.copyWith(closeToTray: value));
-    await StorageRepository.instance.saveValue(
+    await StorageRepository.instance.save(
       key: 'closeToTray',
       value: value,
     );
@@ -37,7 +36,7 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   Future<void> updateHomeWidgetSelectedListId(String id) async {
     emit(state.copyWith(homeWidgetSelectedListId: id));
-    await StorageRepository.instance.saveValue(
+    await StorageRepository.instance.save(
       key: 'homeWidgetSelectedListId',
       value: id,
     );
