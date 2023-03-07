@@ -9,7 +9,7 @@ import 'package:window_manager/window_manager.dart';
 
 import '../logs/logs.dart';
 import '../settings/settings.dart';
-import '../storage/storage_service.dart';
+import '../storage/storage_repository.dart';
 import '../tasks/tasks.dart';
 
 class AppWindow {
@@ -66,7 +66,7 @@ class AppWindow {
     print('Saving window size and position');
     final Rect bounds = await windowManager.getBounds();
 
-    await StorageService.instance.saveValue(
+    await StorageRepository.instance.saveValue(
       key: 'windowSizeAndPosition',
       value: bounds.toJson(),
     );
@@ -76,7 +76,7 @@ class AppWindow {
     print('Setting window size and position.');
     Rect currentWindowFrame = await windowManager.getBounds();
 
-    String? targetWindowFrameJson = await StorageService.instance.getValue(
+    String? targetWindowFrameJson = await StorageRepository.instance.getValue(
       'windowSizeAndPosition',
     );
 

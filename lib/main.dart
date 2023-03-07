@@ -16,7 +16,7 @@ import 'src/authentication/authentication.dart';
 import 'src/core/constants.dart';
 import 'src/logs/logs.dart';
 import 'src/settings/cubit/settings_cubit.dart';
-import 'src/storage/storage_service.dart';
+import 'src/storage/storage_repository.dart';
 import 'src/system_tray/system_tray_manager.dart';
 import 'src/tasks/tasks.dart';
 import 'src/window/app_window.dart';
@@ -32,7 +32,7 @@ Future<void> main(List<String> args) async {
     return true;
   };
 
-  final storageService = await StorageService.initialize();
+  final storageRepository = await StorageRepository.initialize();
 
   if (defaultTargetPlatform.isDesktop) {
     final appWindow = AppWindow() //
@@ -65,7 +65,7 @@ Future<void> main(List<String> args) async {
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: googleAuth),
-        RepositoryProvider.value(value: storageService),
+        RepositoryProvider.value(value: storageRepository),
       ],
       child: MultiBlocProvider(
         providers: [

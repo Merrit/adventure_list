@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
 
-import '../../storage/storage_service.dart';
+import '../../storage/storage_repository.dart';
 import '../google_auth.dart';
 
 part 'authentication_state.dart';
@@ -24,7 +24,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   static Future<AuthenticationCubit> initialize({
     required GoogleAuth googleAuth,
   }) async {
-    final String? savedCredentials = await StorageService.instance.getValue(
+    final String? savedCredentials = await StorageRepository.instance.getValue(
       'accessCredentials',
     );
 
@@ -53,7 +53,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
       signedIn: true,
     ));
 
-    await StorageService.instance.saveValue(
+    await StorageRepository.instance.saveValue(
       key: 'accessCredentials',
       value: jsonEncode(accessCredentials.toJson()),
     );
@@ -61,7 +61,7 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
 
   Future<void> signOut() async {
     await _googleAuth.signOut();
-    await StorageService.instance.deleteValue('accessCredentials');
+    await StorageRepository.instance.deleteValue('accessCredentials');
 
     emit(state.copyWith(
       accessCredentials: null,

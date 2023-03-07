@@ -6,17 +6,17 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// Interfaces with the host OS to store & retrieve data from disk.
-class StorageService {
+class StorageRepository {
   /// This class is a singleton.
   /// Singleton instance of the service.
-  static late StorageService instance;
+  static late StorageRepository instance;
 
   /// Private singleton constructor.
-  StorageService._singleton();
+  StorageRepository._singleton();
 
   /// Initialize the storage access and [instance].
   /// Needs to be initialized only once, in the `main()` function.
-  static Future<StorageService> initialize() async {
+  static Future<StorageRepository> initialize() async {
     /// On desktop platforms initialize to a specific directory.
     if (platformIsDesktop()) {
       final dir = await getApplicationSupportDirectory();
@@ -27,7 +27,7 @@ class StorageService {
       await Hive.initFlutter();
     }
 
-    instance = StorageService._singleton();
+    instance = StorageRepository._singleton();
     return instance;
   }
 

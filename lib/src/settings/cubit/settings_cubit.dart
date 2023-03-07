@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../storage/storage_service.dart';
+import '../../storage/storage_repository.dart';
 
 part 'settings_state.dart';
 
@@ -13,14 +13,15 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   static Future<SettingsCubit> initialize() async {
-    String? homeWidgetSelectedListId = await StorageService.instance.getValue(
+    String? homeWidgetSelectedListId =
+        await StorageRepository.instance.getValue(
       'homeWidgetSelectedListId',
     );
 
     return SettingsCubit(
       initialState: SettingsState(
         closeToTray:
-            await StorageService.instance.getValue('closeToTray') ?? true,
+            await StorageRepository.instance.getValue('closeToTray') ?? true,
         homeWidgetSelectedListId: homeWidgetSelectedListId ?? '',
       ),
     );
@@ -28,7 +29,7 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   Future<void> updateCloseToTray(bool value) async {
     emit(state.copyWith(closeToTray: value));
-    await StorageService.instance.saveValue(
+    await StorageRepository.instance.saveValue(
       key: 'closeToTray',
       value: value,
     );
@@ -36,7 +37,7 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   Future<void> updateHomeWidgetSelectedListId(String id) async {
     emit(state.copyWith(homeWidgetSelectedListId: id));
-    await StorageService.instance.saveValue(
+    await StorageRepository.instance.saveValue(
       key: 'homeWidgetSelectedListId',
       value: id,
     );
