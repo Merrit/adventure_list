@@ -1,49 +1,32 @@
 part of 'app_cubit.dart';
 
-class AppState extends Equatable {
-  final String appVersion;
-  final bool updateAutomatically;
-  final bool updateAvailable;
-  final bool updateDownloaded;
-  final String updateVersion;
-  final bool updateInProgress;
+@freezed
+class AppState with _$AppState {
+  const factory AppState({
+    /// True if this is the first run of the app.
+    required bool firstRun,
+    required String runningVersion,
+    required String? updateVersion,
+    required bool updateAvailable,
+    required bool showUpdateButton,
 
-  const AppState({
-    required this.appVersion,
-    required this.updateAutomatically,
-    required this.updateAvailable,
-    required this.updateDownloaded,
-    required this.updateVersion,
-    required this.updateInProgress,
-  });
+    /// True if a condition has been met requiring the user to be
+    /// prompted to purchase the pro upgrade.
+    required bool promptForProUpgrade,
 
-  @override
-  List<Object> get props {
-    return [
-      appVersion,
-      updateAutomatically,
-      updateAvailable,
-      updateDownloaded,
-      updateVersion,
-      updateInProgress,
-    ];
-  }
+    /// Release notes for the current version.
+    required ReleaseNotes? releaseNotes,
+  }) = _AppState;
 
-  AppState copyWith({
-    String? appVersion,
-    bool? updateAutomatically,
-    bool? updateAvailable,
-    bool? updateDownloaded,
-    String? updateVersion,
-    bool? updateInProgress,
-  }) {
-    return AppState(
-      appVersion: appVersion ?? this.appVersion,
-      updateAutomatically: updateAutomatically ?? this.updateAutomatically,
-      updateAvailable: updateAvailable ?? this.updateAvailable,
-      updateDownloaded: updateDownloaded ?? this.updateDownloaded,
-      updateVersion: updateVersion ?? this.updateVersion,
-      updateInProgress: updateInProgress ?? this.updateInProgress,
+  factory AppState.initial() {
+    return const AppState(
+      firstRun: false,
+      runningVersion: '',
+      updateVersion: null,
+      updateAvailable: false,
+      showUpdateButton: false,
+      promptForProUpgrade: false,
+      releaseNotes: null,
     );
   }
 }

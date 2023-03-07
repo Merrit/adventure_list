@@ -6,9 +6,12 @@ class SettingsState extends Equatable {
   /// The id of the list to show in the Android home widget / AppWidget.
   final String homeWidgetSelectedListId;
 
+  final ThemeData theme;
+
   const SettingsState({
     required this.closeToTray,
     required this.homeWidgetSelectedListId,
+    required this.theme,
   });
 
   @override
@@ -16,6 +19,7 @@ class SettingsState extends Equatable {
     return [
       closeToTray,
       homeWidgetSelectedListId,
+      theme,
     ];
   }
 
@@ -23,11 +27,13 @@ class SettingsState extends Equatable {
     bool? closeToTray,
     String? homeWidgetSelectedListId,
     bool? logToFile,
+    ThemeData? theme,
   }) {
     return SettingsState(
       closeToTray: closeToTray ?? this.closeToTray,
       homeWidgetSelectedListId:
           homeWidgetSelectedListId ?? this.homeWidgetSelectedListId,
+      theme: theme ?? this.theme,
     );
   }
 }

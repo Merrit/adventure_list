@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
@@ -50,47 +51,29 @@ class _NavContents extends StatelessWidget {
       children: const [
         _CreateListButton(),
         _ScrollingListTiles(),
-        _SettingsButton(),
+        _SettingsTile(),
       ],
     );
   }
 }
 
-class _SettingsButton extends StatelessWidget {
-  const _SettingsButton({Key? key}) : super(key: key);
+class _SettingsTile extends StatelessWidget {
+  const _SettingsTile({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Stack(
-        children: [
-          const Text('Settings'),
-          Positioned(
-            left: 64,
-            top: 4,
-            child: BlocBuilder<AppCubit, AppState>(
-              builder: (context, state) {
-                return Icon(
-                  Icons.circle,
-                  color: state.updateAvailable //
-                      ? Theme.of(context).colorScheme.secondary
-                      : Colors.transparent,
-                  size: 8,
-                );
-              },
+    return BlocBuilder<AppCubit, AppState>(
+      builder: (context, state) {
+        return ListTile(
+          title: badges.Badge(
+            showBadge: state.showUpdateButton,
+            badgeStyle: const badges.BadgeStyle(
+              badgeColor: Colors.lightBlue,
             ),
-          )
-        ],
-      ),
-      onTap: () {
-        if (platformIsMobile()) {
-          Navigator.pushNamed(context, SettingsPage.routeName);
-        } else {
-          showDialog(
-            context: context,
-            builder: (context) => const SettingsDialog(),
-          );
-        }
+            child: const Text('Settings'),
+          ),
+          onTap: () => Navigator.pushNamed(context, SettingsPage.routeName),
+        );
       },
     );
   }
