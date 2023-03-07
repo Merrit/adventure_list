@@ -46,6 +46,7 @@ void main() {
   setUpAll(() async {
     /* ----------------------------- StorageService ----------------------------- */
     _storageService = MockStorageService();
+    StorageService.instance = _storageService;
 
     when(() => _storageService.deleteValue(any(),
         storageArea: any(named: 'storageArea'))).thenAnswer((_) async {});
@@ -128,7 +129,6 @@ void main() {
     setUp(() {
       _tasksCubit = TasksCubit(
         _authCubit,
-        _storageService,
         tasksRepository: _tasksRepository,
       );
     });
@@ -147,7 +147,6 @@ void main() {
         // Prepare state with tasks.
         _tasksCubit = TasksCubit(
           _authCubit,
-          _storageService,
           tasksRepository: _tasksRepository,
         );
         await _tasksCubit.createList('Test List');

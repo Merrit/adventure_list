@@ -56,11 +56,10 @@ Future<void> main(List<String> args) async {
   final googleAuth = GoogleAuth();
   final authenticationCubit = await AuthenticationCubit.initialize(
     googleAuth: googleAuth,
-    storageService: storageService,
   );
 
-  final tasksCubit = TasksCubit(authenticationCubit, storageService);
-  final settingsCubitInstance = await SettingsCubit.initialize(storageService);
+  final tasksCubit = TasksCubit(authenticationCubit);
+  final settingsCubitInstance = await SettingsCubit.initialize();
 
   runApp(
     MultiRepositoryProvider(

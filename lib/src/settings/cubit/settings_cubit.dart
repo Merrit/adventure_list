@@ -8,22 +8,19 @@ part 'settings_state.dart';
 late final SettingsCubit settingsCubit;
 
 class SettingsCubit extends Cubit<SettingsState> {
-  final StorageService _storageService;
-
-  SettingsCubit(this._storageService, {required SettingsState initialState})
-      : super(initialState) {
+  SettingsCubit({required SettingsState initialState}) : super(initialState) {
     settingsCubit = this;
   }
 
-  static Future<SettingsCubit> initialize(StorageService storageService) async {
-    String? homeWidgetSelectedListId = await storageService.getValue(
+  static Future<SettingsCubit> initialize() async {
+    String? homeWidgetSelectedListId = await StorageService.instance.getValue(
       'homeWidgetSelectedListId',
     );
 
     return SettingsCubit(
-      storageService,
       initialState: SettingsState(
-        closeToTray: await storageService.getValue('closeToTray') ?? true,
+        closeToTray:
+            await StorageService.instance.getValue('closeToTray') ?? true,
         homeWidgetSelectedListId: homeWidgetSelectedListId ?? '',
       ),
     );
@@ -31,11 +28,17 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   Future<void> updateCloseToTray(bool value) async {
     emit(state.copyWith(closeToTray: value));
-    await _storageService.saveValue(key: 'closeToTray', value: value);
+    await StorageService.instance.saveValue(
+      key: 'closeToTray',
+      value: value,
+    );
   }
 
   Future<void> updateHomeWidgetSelectedListId(String id) async {
     emit(state.copyWith(homeWidgetSelectedListId: id));
-    await _storageService.saveValue(key: 'homeWidgetSelectedListId', value: id);
+    await StorageService.instance.saveValue(
+      key: 'homeWidgetSelectedListId',
+      value: id,
+    );
   }
 }
