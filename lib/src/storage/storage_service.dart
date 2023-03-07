@@ -9,7 +9,7 @@ import 'package:path_provider/path_provider.dart';
 class StorageService {
   /// This class is a singleton.
   /// Singleton instance of the service.
-  static StorageService? instance;
+  static late StorageService instance;
 
   /// Private singleton constructor.
   StorageService._singleton();
@@ -17,8 +17,6 @@ class StorageService {
   /// Initialize the storage access and [instance].
   /// Needs to be initialized only once, in the `main()` function.
   static Future<StorageService> initialize() async {
-    if (instance != null) return instance!;
-
     /// On desktop platforms initialize to a specific directory.
     if (platformIsDesktop()) {
       final dir = await getApplicationSupportDirectory();
@@ -30,7 +28,7 @@ class StorageService {
     }
 
     instance = StorageService._singleton();
-    return instance!;
+    return instance;
   }
 
   /// A generic storage pool, anything large should make its own box.
