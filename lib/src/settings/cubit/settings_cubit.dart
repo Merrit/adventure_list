@@ -1,12 +1,13 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:system_theme/system_theme.dart';
 
 import '../../storage/storage_repository.dart';
 import '../../theme/theme.dart';
 
 part 'settings_state.dart';
+part 'settings_cubit.freezed.dart';
 
 late final SettingsCubit settingsCubit;
 
