@@ -86,8 +86,10 @@ class TaskList with _$TaskList {
 }
 
 extension TaskListHelper on List<TaskList> {
+  /// Returns a copy of the list.
   List<TaskList> copy() => List<TaskList>.from(this);
 
+  /// Sorts [TaskList]s by their index.
   List<TaskList> sorted() {
     sort((a, b) => a.index.compareTo(b.index));
     return this;
