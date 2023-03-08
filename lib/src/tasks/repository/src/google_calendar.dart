@@ -228,15 +228,15 @@ extension CalendarHelper on Calendar {
 
 extension EventHelper on Event {
   Task toModel() {
-    return Task.fromJson(description!) //
+    return Task.fromJson(jsonDecode(description!)) //
         // The inital task didn't have id, so grab from Event.
-        .copyWith(id: id);
+        .copyWith(id: id!);
   }
 }
 
 extension GoogleTaskListHelper on TaskList {
   Calendar toGoogleCalendar() {
-    final map = toMap()..remove('items');
+    final map = toJson()..remove('items');
 
     return Calendar(
       // The description field appears to have a length limit, so we definitely
@@ -252,7 +252,7 @@ extension GoogleTaskListHelper on TaskList {
 extension TaskHelper on Task {
   Event toGoogleEvent() {
     return Event(
-      description: toJson(),
+      description: jsonEncode(toJson()),
       end: EventDateTime(date: DateTime(2022, 06, 27)),
       start: EventDateTime(date: DateTime(2022, 06, 27)),
       status: completed ? 'cancelled' : 'confirmed',

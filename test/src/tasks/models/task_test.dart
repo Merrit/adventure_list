@@ -36,12 +36,8 @@ void main() {
       updated: DateTime.fromMillisecondsSinceEpoch(updated),
     );
 
-    test('fromMap() works', () {
-      expect(Task.fromMap(taskMap), expectedTask);
-    });
-
     test('fromJson() works', () {
-      expect(Task.fromJson(json), expectedTask);
+      expect(Task.fromJson(jsonDecode(json)), expectedTask);
     });
   });
 }

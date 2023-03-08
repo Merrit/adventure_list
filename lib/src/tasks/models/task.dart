@@ -1,39 +1,63 @@
-import 'dart:convert';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'package:equatable/equatable.dart';
+part 'task.freezed.dart';
+part 'task.g.dart';
 
-class Task extends Equatable {
-  final bool completed;
+@freezed
+class Task with _$Task {
+  const factory Task._({
+    /// Whether the task is completed.
+    @JsonKey(defaultValue: false)
+        required bool completed,
 
-  final bool deleted;
+    /// Whether the task is deleted.
+    @JsonKey(defaultValue: false)
+        required bool deleted,
 
-  final String? description;
+    /// Description of the task.
+    required String? description,
 
-  final DateTime? dueDate;
+    /// Due date of the task.
+    @JsonKey(
+      fromJson: _dueDateFromJson,
+      toJson: _dueDateToJson,
+    )
+        required DateTime? dueDate,
 
-  final String id;
+    /// ID of the task.
+    @JsonKey(defaultValue: '')
+        required String id,
 
-  final int index;
+    /// Index of the task in the list.
+    @JsonKey(defaultValue: -1)
+        required int index,
 
-  /// The ID of the task considered the parent, only if this task is nested.
-  final String? parent;
+    /// The ID of the task considered the parent, only if this task is nested.
+    required String? parent,
 
-  /// Title of the task.
-  final String title;
+    /// Title of the task.
+    @JsonKey(defaultValue: '')
+        required String title,
 
-  final DateTime updated;
+    /// Last time the task was updated.
+    @JsonKey(
+      fromJson: _updateFromJson,
+      toJson: _updateToJson,
+    )
+        required DateTime updated,
+  }) = _Task;
 
-  const Task._({
-    required this.completed,
-    required this.deleted,
-    required this.description,
-    required this.dueDate,
-    required this.id,
-    required this.index,
-    required this.parent,
-    required this.title,
-    required this.updated,
-  });
+  factory Task.empty() => Task._(
+        completed: false,
+        deleted: false,
+        description: null,
+        dueDate: null,
+        id: '',
+        index: -1,
+        parent: null,
+        title: '',
+        updated: DateTime.now(),
+      );
 
   factory Task({
     bool completed = false,
@@ -74,90 +98,23 @@ class Task extends Equatable {
     );
   }
 
-  factory Task.empty() {
-    return Task._(
-      completed: false,
-      deleted: false,
-      description: null,
-      dueDate: null,
-      id: '',
-      index: -1,
-      parent: null,
-      title: '',
-      updated: DateTime.now(),
-    );
-  }
+  factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
+}
 
-  @override
-  List<Object?> get props {
-    return [
-      completed,
-      deleted,
-      description,
-      dueDate,
-      id,
-      index,
-      parent,
-      title,
-      updated,
-    ];
-  }
+DateTime? _dueDateFromJson(int? date) {
+  if (date == null) return null;
+  return DateTime.fromMillisecondsSinceEpoch(date);
+}
 
-  Task copyWith({
-    bool? completed,
-    bool? deleted,
-    String? description,
-    DateTime? dueDate,
-    String? id,
-    int? index,
-    String? parent,
-    String? title,
-    DateTime? updated,
-  }) {
-    return Task(
-      completed: completed ?? this.completed,
-      deleted: deleted ?? this.deleted,
-      description: description ?? this.description,
-      dueDate: dueDate ?? this.dueDate,
-      id: id ?? this.id,
-      index: index ?? this.index,
-      parent: parent ?? this.parent,
-      title: title ?? this.title,
-      updated: updated ?? this.updated,
-    );
-  }
+int? _dueDateToJson(DateTime? date) {
+  if (date == null) return null;
+  return date.millisecondsSinceEpoch;
+}
 
-  Map<String, dynamic> toMap() {
-    return {
-      'completed': completed,
-      'deleted': deleted,
-      'description': description,
-      'dueDate': dueDate?.millisecondsSinceEpoch,
-      'id': id,
-      'index': index,
-      'parent': parent,
-      'title': title,
-      'updated': updated.millisecondsSinceEpoch,
-    };
-  }
+DateTime _updateFromJson(int date) {
+  return DateTime.fromMillisecondsSinceEpoch(date);
+}
 
-  factory Task.fromMap(Map<String, dynamic> map) {
-    return Task(
-      completed: map['completed'] ?? false,
-      deleted: map['deleted'] ?? false,
-      description: map['description'],
-      dueDate: map['dueDate'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['dueDate'])
-          : null,
-      id: map['id'] ?? '',
-      index: map['index'] ?? -1,
-      parent: map['parent'],
-      title: map['title'] ?? '',
-      updated: DateTime.fromMillisecondsSinceEpoch(map['updated']),
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory Task.fromJson(String source) => Task.fromMap(json.decode(source));
+int _updateToJson(DateTime date) {
+  return date.millisecondsSinceEpoch;
 }

@@ -174,7 +174,7 @@ class _TitleRow extends StatelessWidget {
                 Checkbox(
                   value: tileState.task.completed,
                   onChanged: (bool? value) => tasksCubit.updateTask(
-                    tileState.task.copyWith(completed: value),
+                    tileState.task.copyWith(completed: value!),
                   ),
                   shape: roundedSquareBorder,
                 ),
