@@ -1,11 +1,13 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:helpers/helpers.dart';
 
 import '../../core/core.dart';
 import '../tasks.dart';
+
+part 'task_tile.freezed.dart';
 
 class TaskTileCubit extends Cubit<TaskTileState> {
   TaskTileCubit(
@@ -27,47 +29,15 @@ class TaskTileCubit extends Cubit<TaskTileState> {
   }
 }
 
-class TaskTileState extends Equatable {
-  final List<Task> childTasks;
-  final bool hasChildTasks;
-  final int index;
-  final bool isHovered;
-  final Task task;
-
-  const TaskTileState({
-    required this.childTasks,
-    required this.hasChildTasks,
-    required this.index,
-    required this.isHovered,
-    required this.task,
-  });
-
-  @override
-  List<Object> get props {
-    return [
-      childTasks,
-      hasChildTasks,
-      index,
-      isHovered,
-      task,
-    ];
-  }
-
-  TaskTileState copyWith({
-    List<Task>? childTasks,
-    bool? hasChildTasks,
-    int? index,
-    bool? isHovered,
-    Task? task,
-  }) {
-    return TaskTileState(
-      childTasks: childTasks ?? this.childTasks,
-      hasChildTasks: hasChildTasks ?? this.hasChildTasks,
-      index: index ?? this.index,
-      isHovered: isHovered ?? this.isHovered,
-      task: task ?? this.task,
-    );
-  }
+@freezed
+class TaskTileState with _$TaskTileState {
+  const factory TaskTileState({
+    required List<Task> childTasks,
+    required bool hasChildTasks,
+    required int index,
+    required bool isHovered,
+    required Task task,
+  }) = _TaskTileState;
 }
 
 class TaskTile extends StatelessWidget {
