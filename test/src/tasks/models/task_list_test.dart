@@ -6,6 +6,15 @@ import 'package:uuid/uuid.dart';
 
 void main() {
   group('TaskList:', () {
+    test('empty() works', () {
+      final taskList = TaskList.empty();
+      expect(taskList.id, '');
+      expect(taskList.index, -1);
+      expect(taskList.items, const []);
+      expect(taskList.synced, false);
+      expect(taskList.title, '');
+    });
+
     test('reordering top-level tasks works', () {
       final tasks = <Task>[
         Task(title: 'task0', index: 0),
@@ -91,6 +100,45 @@ void main() {
 
         expect(TaskList.fromJson(jsonDecode(json)), expectedTaskList);
       });
+    });
+  });
+  group('List<TaskList>:', () {
+    test('copy() works', () {
+      final taskList1 = TaskList(
+        id: 'id1',
+        index: 0,
+        items: const [],
+        title: 'title1',
+      );
+      final taskList2 = TaskList(
+        id: 'id2',
+        index: 1,
+        items: const [],
+        title: 'title2',
+      );
+      final taskLists = [taskList1, taskList2];
+      final copiedTaskLists = taskLists.copy();
+      expect(copiedTaskLists, taskLists);
+      expect(copiedTaskLists, isNot(same(taskLists)));
+    });
+
+    test('sorted() works', () {
+      final taskList1 = TaskList(
+        id: 'id1',
+        index: 1,
+        items: const [],
+        title: 'title1',
+      );
+      final taskList2 = TaskList(
+        id: 'id2',
+        index: 0,
+        items: const [],
+        title: 'title2',
+      );
+      final taskLists = [taskList1, taskList2];
+      final sortedTaskLists = taskLists.sorted();
+      expect(sortedTaskLists[0], taskList2);
+      expect(sortedTaskLists[1], taskList1);
     });
   });
 }
