@@ -63,7 +63,7 @@ class TasksCubit extends Cubit<TasksState> {
     if (taskListsJson == null) return;
 
     final List<TaskList> taskLists = taskListsJson //
-        .map((e) => TaskList.fromJson(e))
+        .map((e) => TaskList.fromJson(jsonDecode(e)))
         .toList();
 
     final String? activeListId = await StorageRepository.instance.get(
@@ -280,10 +280,10 @@ class TasksCubit extends Cubit<TasksState> {
       newTask: newTask,
     );
 
-    updatedItems = List<Task>.from(state.activeList!.items) //
+    updatedItems = List<Task>.from(updatedList.items) //
       ..removeWhere((e) => e.id == tempId)
       ..add(newTaskFromRepo!);
-    updatedList = state.activeList!.copyWith(items: updatedItems);
+    updatedList = updatedList.copyWith(items: updatedItems);
     updatedTaskLists = state.taskLists.copy()
       ..remove(state.activeList)
       ..add(updatedList);
@@ -356,13 +356,16 @@ class TasksCubit extends Cubit<TasksState> {
   Future<void> _syncUpdatedLists() async {
     final Iterable<TaskList> listsToBeSynced = state.taskLists //
         .where((element) => !element.synced);
+    final taskLists = [...state.taskLists];
+
     for (var list in listsToBeSynced) {
       await _tasksRepository.updateList(list: list);
-      final int index = state.taskLists.indexWhere((e) => e.id == list.id);
-      state.taskLists
-        ..removeAt(index)
-        ..insert(index, list.copyWith(synced: true));
+
+      final int index = taskLists.indexWhere((e) => e.id == list.id);
+      taskLists[index] = list.copyWith(synced: true);
     }
+
+    emit(state.copyWith(taskLists: taskLists));
   }
 
   /// Sync all tasks with changes to the remote repository.
@@ -374,7 +377,7 @@ class TasksCubit extends Cubit<TasksState> {
 
     for (var taskEntry in tasksToBeSynced) {
       final taskListId = taskEntry['taskListId'] as String;
-      final taskJson = taskEntry['task'] as String;
+      final taskJson = taskEntry['task'] as Map<String, dynamic>;
 
       final task = Task.fromJson(taskJson);
 
@@ -397,11 +400,6 @@ class TasksCubit extends Cubit<TasksState> {
   }
 
   void setActiveTask(String? id) {
-    if (id == null) {
-      emit(state.copyWith(activeTask: Task(title: '', id: '')));
-      return;
-    }
-
     emit(state.copyWith(
       activeTask: state.activeList?.items.singleWhereOrNull((e) => e.id == id),
     ));
@@ -520,7 +518,7 @@ class TasksCubit extends Cubit<TasksState> {
     _cacheTimer = Timer(const Duration(seconds: 10), () async {
       final taskListsJson = <String>[];
       for (var taskList in state.taskLists) {
-        taskListsJson.add(taskList.toJson());
+        taskListsJson.add(jsonEncode(taskList.toJson()));
       }
 
       await StorageRepository.instance.save(

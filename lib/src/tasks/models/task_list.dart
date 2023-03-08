@@ -1,32 +1,53 @@
-import 'dart:convert';
-
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../tasks.dart';
+
+part 'task_list.freezed.dart';
+part 'task_list.g.dart';
 
 /// A Todo list.
 ///
 /// Analogous to a `Calendar` object from the Google Calendar API.
-class TaskList extends Equatable {
-  /// Identifier of the calendar.
-  final String id;
+@freezed
+class TaskList with _$TaskList {
+  /// Private empty constructor enables methods on Freezed classes.
+  const TaskList._();
 
-  final int index;
+  const factory TaskList._internal({
+    /// Identifier of the calendar.
+    required String id,
 
-  final List<Task> items;
+    /// Index of the [TaskList] in the list of [TaskList]s.
+    required int index,
 
-  /// True if local changes have been synced to remote server.
-  final bool synced;
-
-  final String title;
-
-  TaskList({
+    /// Tasks in the list.
     required List<Task> items,
-    required this.id,
-    required this.index,
-    this.synced = false,
-    required this.title,
-  }) : items = TaskListValidator.tasksInOrder(items);
+
+    /// True if local changes have been synced to remote server.
+    @JsonKey(defaultValue: false) required bool synced,
+
+    /// Title of the list.
+    required String title,
+  }) = _TaskList;
+
+  factory TaskList({
+    required List<Task> items,
+    required String id,
+    required int index,
+    bool synced = false,
+    required String title,
+  }) {
+    return TaskList._internal(
+      id: id,
+      index: index,
+      items: TaskListValidator.tasksInOrder(items),
+      synced: synced,
+      title: title,
+    );
+  }
+
+  factory TaskList.fromJson(Map<String, dynamic> json) =>
+      _$TaskListFromJson(json);
 
   factory TaskList.empty() {
     return TaskList(
@@ -37,58 +58,6 @@ class TaskList extends Equatable {
       title: '',
     );
   }
-
-  @override
-  List<Object> get props {
-    return [
-      id,
-      index,
-      items,
-      synced,
-      title,
-    ];
-  }
-
-  TaskList copyWith({
-    String? id,
-    int? index,
-    List<Task>? items,
-    bool? synced,
-    String? title,
-  }) {
-    return TaskList(
-      id: id ?? this.id,
-      index: index ?? this.index,
-      items: items ?? this.items,
-      synced: synced ?? this.synced,
-      title: title ?? this.title,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'index': index,
-      'items': items.map((x) => x.toMap()).toList(),
-      'synced': synced,
-      'title': title,
-    };
-  }
-
-  factory TaskList.fromMap(Map<String, dynamic> map) {
-    return TaskList(
-      id: map['id'] ?? '',
-      index: map['index']?.toInt() ?? -1,
-      items: List<Task>.from(map['items']?.map((x) => Task.fromMap(x))),
-      synced: map['synced'] ?? false,
-      title: map['title'] ?? '',
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory TaskList.fromJson(String source) =>
-      TaskList.fromMap(json.decode(source));
 
   /// Task from [oldIndex] is moved to [newIndex].
   ///
@@ -113,11 +82,6 @@ class TaskList extends Equatable {
     updatedTasks.addAll(topLevelTasks);
 
     return copyWith(items: updatedTasks);
-  }
-
-  @override
-  String toString() {
-    return 'TaskList(id: $id, index: $index, items: $items, synced: $synced, title: $title)';
   }
 }
 

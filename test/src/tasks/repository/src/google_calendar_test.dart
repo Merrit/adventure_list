@@ -210,7 +210,13 @@ void main() {
 
         when(() => eventsResource.insert(any(), any()))
             .thenAnswer((Invocation invocation) async {
-          return invocation.positionalArguments[0] as Event;
+          final eventJson =
+              (invocation.positionalArguments[0] as Event).toJson();
+          // TODO: fix this
+          eventJson['id'] = 'fakeid';
+          eventJson['end'] = (eventJson['end'] as EventDateTime).toJson();
+          eventJson['start'] = (eventJson['start'] as EventDateTime).toJson();
+          return Event.fromJson(eventJson);
         });
 
         final result = await calendar.createTask(
@@ -218,7 +224,7 @@ void main() {
           newTask: fakeTask,
         );
 
-        expect(result, fakeTask);
+        expect(result, fakeTask.copyWith(id: 'fakeid'));
       });
     });
 
@@ -242,7 +248,13 @@ void main() {
 
         when(() => eventsResource.update(any(), any(), any()))
             .thenAnswer((Invocation invocation) async {
-          return invocation.positionalArguments[0] as Event;
+          final eventJson =
+              (invocation.positionalArguments[0] as Event).toJson();
+          // TODO: fix this
+          eventJson['id'] = 'fakeid';
+          eventJson['end'] = (eventJson['end'] as EventDateTime).toJson();
+          eventJson['start'] = (eventJson['start'] as EventDateTime).toJson();
+          return Event.fromJson(eventJson);
         });
 
         final result = await calendar.updateTask(
@@ -250,7 +262,7 @@ void main() {
           updatedTask: fakeTask,
         );
 
-        expect(result, fakeTask);
+        expect(result, fakeTask.copyWith(id: 'fakeid'));
       });
     });
   });
