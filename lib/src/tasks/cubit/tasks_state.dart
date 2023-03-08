@@ -1,56 +1,20 @@
 part of 'tasks_cubit.dart';
 
-class TasksState extends Equatable {
-  final TaskList? activeList;
-  final Task? activeTask;
-  final bool awaitingClearTasksUndo;
-  final bool loading;
-  final List<TaskList> taskLists;
-
-  const TasksState({
-    this.activeList,
-    this.activeTask,
-    this.awaitingClearTasksUndo = false,
-    required this.loading,
-    required this.taskLists,
-  });
+@freezed
+class TasksState with _$TasksState {
+  const factory TasksState({
+    TaskList? activeList,
+    Task? activeTask,
+    @Default(false) bool awaitingClearTasksUndo,
+    required bool loading,
+    required List<TaskList> taskLists,
+  }) = _TasksState;
 
   factory TasksState.empty() {
     return const TasksState(
+      awaitingClearTasksUndo: false,
       loading: false,
       taskLists: [],
-    );
-  }
-
-  @override
-  List<Object?> get props => [
-        activeList,
-        activeTask,
-        awaitingClearTasksUndo,
-        loading,
-        taskLists,
-      ];
-
-  TasksState copyWith({
-    TaskList? activeList,
-    Task? activeTask,
-    bool? awaitingClearTasksUndo,
-    bool? loading,
-    List<TaskList>? taskLists,
-  }) {
-    activeList ??= this.activeList;
-    if (activeList?.id == '') activeList = null;
-
-    activeTask ??= this.activeTask;
-    if (activeTask?.id == '') activeTask = null;
-
-    return TasksState(
-      activeList: activeList,
-      activeTask: activeTask,
-      awaitingClearTasksUndo:
-          awaitingClearTasksUndo ?? this.awaitingClearTasksUndo,
-      loading: loading ?? this.loading,
-      taskLists: taskLists ?? this.taskLists,
     );
   }
 }
