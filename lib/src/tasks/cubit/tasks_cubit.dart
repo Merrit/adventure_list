@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:googleapis/calendar/v3.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
 import 'package:http/http.dart';
@@ -19,6 +19,7 @@ import '../../storage/storage_repository.dart';
 import '../tasks.dart';
 
 part 'tasks_state.dart';
+part 'tasks_cubit.freezed.dart';
 
 /// Global instance of the [TasksCubit].
 ///
@@ -135,13 +136,16 @@ class TasksCubit extends Cubit<TasksState> {
       return;
     }
 
+    assert(taskLists != null);
+
     final String? activeListId = await StorageRepository.instance.get(
       'activeList',
     );
+
     emit(state.copyWith(
       activeList: taskLists?.singleWhereOrNull((e) => e.id == activeListId),
       loading: false,
-      taskLists: taskLists?.sorted(),
+      taskLists: taskLists!.sorted(),
     ));
 
     Timer.periodic(
@@ -489,7 +493,7 @@ class TasksCubit extends Cubit<TasksState> {
     emit(state.copyWith(
       activeList: _activeTaskListBeforeClear,
       awaitingClearTasksUndo: false,
-      taskLists: _taskListCollectionBeforeClear,
+      taskLists: _taskListCollectionBeforeClear!,
     ));
   }
 
