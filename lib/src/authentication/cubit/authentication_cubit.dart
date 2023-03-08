@@ -1,13 +1,14 @@
 import 'dart:convert';
 
-import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
 
 import '../../storage/storage_repository.dart';
 import '../google_auth.dart';
 
 part 'authentication_state.dart';
+part 'authentication_cubit.freezed.dart';
 
 late final AuthenticationCubit authCubit;
 
