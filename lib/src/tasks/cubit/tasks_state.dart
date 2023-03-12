@@ -10,11 +10,14 @@ class TasksState with _$TasksState {
     required List<TaskList> taskLists,
   }) = _TasksState;
 
-  factory TasksState.empty() {
+  factory TasksState.initial() {
     return const TasksState(
       awaitingClearTasksUndo: false,
-      loading: false,
+      loading: true,
       taskLists: [],
     );
   }
+
+  factory TasksState.fromJson(Map<String, dynamic> json) =>
+      _$TasksStateFromJson(json);
 }

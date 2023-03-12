@@ -20,17 +20,26 @@ import '../tasks.dart';
 
 part 'tasks_state.dart';
 part 'tasks_cubit.freezed.dart';
+part 'tasks_cubit.g.dart';
 
 /// Global instance of the [TasksCubit].
 ///
 /// Allows access without a [BuildContext].
 late TasksCubit tasksCubit;
 
+/// Cubit that manages the state of the tasks.
 class TasksCubit extends Cubit<TasksState> {
+  /// Uuid generator.
+  ///
+  /// Passed in as a dependency to allow for mocking in unit tests.
+  final Uuid _uuid;
+
   TasksCubit(
     AuthenticationCubit authCubit, {
     TasksRepository? tasksRepository,
-  }) : super(TasksState.empty()) {
+    Uuid? uuid,
+  })  : _uuid = uuid ?? const Uuid(),
+        super(TasksState.initial()) {
     tasksCubit = this;
 
     _getCachedData();
@@ -54,13 +63,19 @@ class TasksCubit extends Cubit<TasksState> {
     });
   }
 
+  /// Loads cached data from local storage.
+  ///
+  /// This is used to show the user something while the tasks are being fetched.
   Future<void> _getCachedData() async {
     final List<String>? taskListsJson = await StorageRepository.instance.get(
       'taskListsJson',
       storageArea: 'cache',
     );
 
-    if (taskListsJson == null) return;
+    if (taskListsJson == null) {
+      emit(state.copyWith(loading: false));
+      return;
+    }
 
     final List<TaskList> taskLists = taskListsJson //
         .map((e) => TaskList.fromJson(jsonDecode(e)))
@@ -77,6 +92,7 @@ class TasksCubit extends Cubit<TasksState> {
     ));
   }
 
+  /// Initializes the tasks repository.
   Future<void> _getTasksRepo({
     required AccessCredentials credentials,
     TasksRepository? tasksRepository,
@@ -120,6 +136,7 @@ class TasksCubit extends Cubit<TasksState> {
 
   late TasksRepository _tasksRepository;
 
+  /// Initializes the [TasksCubit].
   Future<void> initialize(TasksRepository tasksRepository) async {
     _tasksRepository = tasksRepository;
 
@@ -154,10 +171,14 @@ class TasksCubit extends Cubit<TasksState> {
     );
   }
 
+  /// Creates a new Todo list.
+  ///
+  /// The list is created in memory first, then synced with the repository.
+  /// This is done so the process feels fast to the user.
   Future<void> createList(String title) async {
     // Quickly create a list in memory for good UX.
     TaskList newList = TaskList(
-      id: UniqueKey().toString(),
+      id: _uuid.v4(),
       index: state.taskLists.length,
       items: const [],
       title: title,
@@ -183,6 +204,7 @@ class TasksCubit extends Cubit<TasksState> {
     ));
   }
 
+  /// Deletes the active list.
   Future<void> deleteList() async {
     final TaskList? activeList = state.activeList;
     if (activeList == null) return;
@@ -224,6 +246,7 @@ class TasksCubit extends Cubit<TasksState> {
     StorageRepository.instance.save(key: 'activeList', value: id);
   }
 
+  /// Updates the provided [TaskList].
   Future<void> updateList(TaskList list) async {
     list = list.copyWith(synced: false);
     final updatedLists = state.taskLists.copy()
@@ -236,12 +259,15 @@ class TasksCubit extends Cubit<TasksState> {
       activeList: activeList,
       taskLists: updatedLists.sorted(),
     ));
+
+    await _tasksRepository.updateList(list: list);
   }
 
+  /// Creates a new [Task].
   Future<Task> createTask(Task newTask) async {
     assert(state.activeList != null);
 
-    final tempId = const Uuid().v4();
+    final tempId = _uuid.v4();
     newTask = newTask.copyWith(id: tempId);
 
     final bool isSubTask = newTask.parent != null;
@@ -298,19 +324,33 @@ class TasksCubit extends Cubit<TasksState> {
 
   /// Called when the user is reordering Tasks.
   Future<void> reorderTasks(int oldIndex, int newIndex) async {
-    final updatedList = state.activeList!.reorderTasks(oldIndex, newIndex);
-
-    // Find every task that has changed and update them.
-    final updatedTasks = updatedList.items
-        .toSet()
-        .difference(state.activeList!.items.toSet())
-        .toList();
-
-    for (var task in updatedTasks) {
-      await updateTask(task);
+    if (oldIndex < newIndex) newIndex -= 1;
+    List<Task> items = state.activeList!.items.copy()
+      ..removeAt(oldIndex)
+      ..insert(newIndex, state.activeList!.items[oldIndex]);
+    for (var i = 0; i < items.length; i++) {
+      items[i] = items[i].copyWith(index: i, synced: false);
+    }
+    final TaskList updatedList = state.activeList!.copyWith(items: items);
+    final updatedLists = state.taskLists.copy()
+      ..remove(state.activeList)
+      ..add(updatedList);
+    emit(state.copyWith(
+      activeList: updatedList,
+      taskLists: updatedLists.sorted(),
+    ));
+    // sync tasks that have changed
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].index != i) {
+        await _tasksRepository.updateTask(
+          taskListId: state.activeList!.id,
+          updatedTask: items[i].copyWith(index: i),
+        );
+      }
     }
   }
 
+  /// Updates the provided [Task].
   Future<Task> updateTask(Task task) async {
     // If the task is unchanged, don't do anything.
     if (state.activeList!.items.contains(task)) return task;
@@ -399,16 +439,23 @@ class TasksCubit extends Cubit<TasksState> {
     await _syncUpdatedTasks();
   }
 
+  /// Sets the [Task] with the provided [id] as the active task.
   void setActiveTask(String? id) {
     emit(state.copyWith(
       activeTask: state.activeList?.items.singleWhereOrNull((e) => e.id == id),
     ));
   }
 
+  /// True if the user cancelled the clear operation.
   bool _clearTasksWasCancelled = false;
+
+  /// The [TaskList] before the user cleared completed tasks.
   TaskList? _activeTaskListBeforeClear;
+
+  /// The [TaskList] collection before the user cleared completed tasks.
   List<TaskList>? _taskListCollectionBeforeClear;
 
+  /// Clears all completed tasks from the active list.
   Future<void> clearCompletedTasks([String? parentId]) async {
     _clearTasksWasCancelled = false;
 
@@ -486,6 +533,7 @@ class TasksCubit extends Cubit<TasksState> {
     }
   }
 
+  /// Cancels the clear operation.
   void undoClearTasks() {
     _clearTasksWasCancelled = true;
     emit(state.copyWith(
@@ -509,6 +557,7 @@ class TasksCubit extends Cubit<TasksState> {
   /// Timer ensures we aren't caching constantly.
   Timer? _cacheTimer;
 
+  /// Caches the current state to local storage.
   Future<void> _cacheData(TasksState state) async {
     if (_cacheTimer?.isActive == true) {
       _cacheTimer?.cancel();
@@ -529,6 +578,7 @@ class TasksCubit extends Cubit<TasksState> {
     });
   }
 
+  /// Updates the Android home screen widget.
   void _updateAndroidWidget(TasksState data) {
     final selectedListId = settingsCubit.state.homeWidgetSelectedListId;
     final selectedList = data //

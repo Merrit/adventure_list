@@ -219,7 +219,12 @@ class _NewTaskButton extends StatelessWidget {
       leading: const Icon(Icons.add),
       placeholderText: 'New Task',
       retainFocus: true,
-      callback: (value) => tasksCubit.createTask(Task(title: value)),
+      callback: (value) => tasksCubit.createTask(
+        Task(
+          taskListId: tasksCubit.state.activeList!.id,
+          title: value,
+        ),
+      ),
     );
   }
 }
