@@ -6,21 +6,25 @@ void main() {
   group('TaskListValidator:', () {
     test('tasks are sorted correctly', () {
       final recycleTask = Task(
+        taskListId: 'test-task-list-id',
         title: 'Take out recycling',
         id: UniqueKey().toString(),
         index: 2,
       );
       final garbageTask = Task(
+        taskListId: 'test-task-list-id',
         title: 'Take out garbage',
         id: UniqueKey().toString(),
         index: 0,
       );
       final playTask = Task(
+        taskListId: 'test-task-list-id',
         title: 'Play video games',
         id: UniqueKey().toString(),
         index: 1,
       );
       final vacuumTask = Task(
+        taskListId: 'test-task-list-id',
         title: 'Vacuum rug',
         id: UniqueKey().toString(),
         index: 0,
@@ -28,12 +32,14 @@ void main() {
         deleted: true,
       );
       final garbageSubTask1 = Task(
+        taskListId: 'test-task-list-id',
         title: 'Bathroom',
         id: UniqueKey().toString(),
         index: 1,
         parent: garbageTask.id,
       );
       final garbageSubTask2 = Task(
+        taskListId: 'test-task-list-id',
         title: 'Kitchen',
         id: UniqueKey().toString(),
         index: 0,

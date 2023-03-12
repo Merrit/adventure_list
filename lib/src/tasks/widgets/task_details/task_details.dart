@@ -261,7 +261,13 @@ class _ParentSelectionWidgetState extends State<_ParentSelectionWidget> {
             .toList();
         if (tasks == null) return const SizedBox();
 
-        tasks.insert(0, Task(title: 'None'));
+        tasks.insert(
+          0,
+          Task(
+            taskListId: '',
+            title: 'None',
+          ),
+        );
 
         return ListTile(
           title: const Text('Parent task'),
@@ -314,8 +320,9 @@ class _AddSubTaskWidget extends StatelessWidget {
       callback: (String value) {
         tasksCubit.createTask(
           Task(
-            title: value,
             parent: parentTask.id,
+            taskListId: parentTask.taskListId,
+            title: value,
           ),
         );
       },

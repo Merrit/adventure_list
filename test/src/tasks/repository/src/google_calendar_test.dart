@@ -206,7 +206,10 @@ void main() {
       });
 
       test('returns Task if successful', () async {
-        final fakeTask = Task(title: 'fake task');
+        final fakeTask = Task(
+          taskListId: 'fakeid',
+          title: 'fake task',
+        );
 
         when(() => eventsResource.insert(any(), any()))
             .thenAnswer((Invocation invocation) async {
@@ -242,6 +245,7 @@ void main() {
       test('returns updated Task if successful', () async {
         final fakeTask = Task(
           id: 'fakeid',
+          taskListId: 'fakeid',
           title: 'fake task',
           completed: true,
         );
