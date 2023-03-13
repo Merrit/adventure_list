@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:adventure_list/src/tasks/tasks.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -34,6 +35,17 @@ void main() {
 
     test('toJson() works', () {
       expect(Task.fromJson(jsonDecode(json)).toJson(), expectedTask.toJson());
+    });
+
+    test('empty() works', () {
+      expect(Task.empty(), isA<Task>());
+    });
+
+    test('copyWith() works', () {
+      final updatedTask = expectedTask.copyWith(description: 'Firefox!');
+      expect(updatedTask, isA<Task>());
+      expect(updatedTask.description, 'Firefox!');
+      expect(updatedTask.id, id);
     });
   });
 }
