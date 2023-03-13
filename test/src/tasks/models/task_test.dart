@@ -31,5 +31,9 @@ void main() {
     test('fromJson() works', () {
       expect(Task.fromJson(jsonDecode(json)), expectedTask);
     });
+
+    test('toJson() works', () {
+      expect(Task.fromJson(jsonDecode(json)).toJson(), expectedTask.toJson());
+    });
   });
 }
