@@ -14,7 +14,10 @@
 			"problemMatcher": [
 				"$dart-build_runner"
 			],
-			"group": "build",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
 			"label": "build_runner watch",
 			"detail": ""
 		}
