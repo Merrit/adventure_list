@@ -4,6 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'task.freezed.dart';
 part 'task.g.dart';
 
+/// Represents a "task" or "todo" item.
 @freezed
 class Task with _$Task {
   const factory Task._({
@@ -50,8 +51,8 @@ class Task with _$Task {
 
     /// Last time the task was updated.
     @JsonKey(
-      fromJson: _updateFromJson,
-      toJson: _updateToJson,
+      fromJson: _updatedFromJson,
+      toJson: _updatedToJson,
     )
         required DateTime updated,
   }) = _Task;
@@ -116,21 +117,25 @@ class Task with _$Task {
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
 }
 
+/// Handles the fromJson for [Task.dueDate].
 DateTime? _dueDateFromJson(int? date) {
   if (date == null) return null;
   return DateTime.fromMillisecondsSinceEpoch(date);
 }
 
+/// Handles the toJson for [Task.dueDate].
 int? _dueDateToJson(DateTime? date) {
   if (date == null) return null;
   return date.millisecondsSinceEpoch;
 }
 
-DateTime _updateFromJson(int date) {
+/// Handles the fromJson for [Task.updated].
+DateTime _updatedFromJson(int date) {
   return DateTime.fromMillisecondsSinceEpoch(date);
 }
 
-int _updateToJson(DateTime date) {
+/// Handles the toJson for [Task.updated].
+int _updatedToJson(DateTime date) {
   return date.millisecondsSinceEpoch;
 }
 
