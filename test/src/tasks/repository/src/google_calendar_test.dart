@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:adventure_list/src/logs/logs.dart';
 import 'package:adventure_list/src/tasks/tasks.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -212,15 +214,17 @@ void main() {
         );
 
         when(() => eventsResource.insert(any(), any()))
-            .thenAnswer((Invocation invocation) async {
-          final eventJson =
-              (invocation.positionalArguments[0] as Event).toJson();
-          // TODO: fix this
-          eventJson['id'] = 'fakeid';
-          eventJson['end'] = (eventJson['end'] as EventDateTime).toJson();
-          eventJson['start'] = (eventJson['start'] as EventDateTime).toJson();
-          return Event.fromJson(eventJson);
-        });
+            .thenAnswer((_) async => Event(
+                  id: 'fakeid',
+                  description: jsonEncode(fakeTask.toJson()),
+                  summary: 'fake task',
+                  start: EventDateTime(
+                    dateTime: DateTime.now(),
+                  ),
+                  end: EventDateTime(
+                    dateTime: DateTime.now(),
+                  ),
+                ));
 
         final result = await calendar.createTask(
           taskListId: 'fakeid',
@@ -251,15 +255,17 @@ void main() {
         );
 
         when(() => eventsResource.update(any(), any(), any()))
-            .thenAnswer((Invocation invocation) async {
-          final eventJson =
-              (invocation.positionalArguments[0] as Event).toJson();
-          // TODO: fix this
-          eventJson['id'] = 'fakeid';
-          eventJson['end'] = (eventJson['end'] as EventDateTime).toJson();
-          eventJson['start'] = (eventJson['start'] as EventDateTime).toJson();
-          return Event.fromJson(eventJson);
-        });
+            .thenAnswer((_) async => Event(
+                  id: 'fakeid',
+                  description: jsonEncode(fakeTask.toJson()),
+                  summary: 'fake task',
+                  start: EventDateTime(
+                    dateTime: DateTime.now(),
+                  ),
+                  end: EventDateTime(
+                    dateTime: DateTime.now(),
+                  ),
+                ));
 
         final result = await calendar.updateTask(
           taskListId: 'fakeid',
