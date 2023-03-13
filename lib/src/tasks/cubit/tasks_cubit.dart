@@ -109,7 +109,6 @@ class TasksCubit extends Cubit<TasksState> {
 
   /// Returns an `AuthClient` that can be used to make authenticated requests.
   Future<AuthClient?> _getAuthClient() async {
-    final clientId = GoogleAuthIds.clientId;
     final credentials = await StorageRepository.instance.get(
       'accessCredentials',
     );
@@ -123,7 +122,7 @@ class TasksCubit extends Cubit<TasksState> {
     // `google_sign_in` can't get us a refresh token, so.
     if (accessCredentials.refreshToken != null) {
       client = autoRefreshingClient(
-        clientId,
+        GoogleAuthIds.clientId,
         accessCredentials,
         Client(),
       );
