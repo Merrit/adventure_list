@@ -93,7 +93,7 @@ class TaskList with _$TaskList {
   }
 }
 
-extension TaskListHelper on List<TaskList> {
+extension ListOfTaskListExtensions on List<TaskList> {
   /// Returns a copy of the list.
   List<TaskList> copy() => List<TaskList>.from(this);
 
@@ -113,11 +113,6 @@ extension TaskListHelper on List<TaskList> {
     return null;
   }
 
-  /// Returns the [TaskList] with the given [index].
-  TaskList? getTaskListByIndex(int index) {
-    return firstWhereOrNull((element) => element.index == index);
-  }
-
   /// Sorts [TaskList]s by their index.
   List<TaskList> sorted() {
     sort((a, b) => a.index.compareTo(b.index));
@@ -125,79 +120,143 @@ extension TaskListHelper on List<TaskList> {
   }
 
   /// Returns a copy of the list with the given [taskList] added.
+  ///
+  /// The [taskList] is added to the end of the list and its index is set to the
+  /// length of the list.
   List<TaskList> addTaskList(TaskList taskList) {
     final updatedTaskLists = List<TaskList>.from(this);
-    updatedTaskLists.add(taskList);
+    updatedTaskLists.add(taskList.copyWith(index: updatedTaskLists.length));
+    return updatedTaskLists;
+  }
+
+  /// Returns a copy of the list with the given [taskList] moved to the given
+  /// [newIndex].
+  ///
+  /// The index of all [TaskList]s between the old and new index are updated.
+  List<TaskList> reorderTaskLists(TaskList taskList, int newIndex) {
+    final updatedTaskLists = List<TaskList>.from(this);
+    final existingTaskList = updatedTaskLists.getTaskListById(taskList.id);
+    if (existingTaskList != null) {
+      updatedTaskLists.remove(existingTaskList);
+      updatedTaskLists.insert(newIndex, existingTaskList);
+      for (var i = 0; i < updatedTaskLists.length; i++) {
+        updatedTaskLists[i] = updatedTaskLists[i].copyWith(index: i);
+      }
+    }
     return updatedTaskLists;
   }
 
   /// Returns a copy of the list with the given [taskList] removed.
+  ///
+  /// The index of all [TaskList]s after the removed [taskList] is decremented.
+  ///
+  /// If the [taskList] does not exist, the list is returned unchanged.
   List<TaskList> removeTaskList(TaskList taskList) {
     final updatedTaskLists = List<TaskList>.from(this);
-    updatedTaskLists.remove(taskList);
+    final existingTaskList = updatedTaskLists.getTaskListById(taskList.id);
+    if (existingTaskList != null) {
+      updatedTaskLists.remove(existingTaskList);
+      for (var i = 0; i < updatedTaskLists.length; i++) {
+        updatedTaskLists[i] = updatedTaskLists[i].copyWith(index: i);
+      }
+    }
     return updatedTaskLists;
   }
 
   /// Returns a copy of the list with the given [TaskList] updated.
   ///
-  /// If the [TaskList] does not exist, it is added.
   /// If the [TaskList] exists, it is replaced.
+  /// If the [TaskList] does not exist, the list is returned unchanged.
+  ///
+  /// The index and position of all [TaskList]s will remain unchanged.
+  /// To reorder [TaskList]s, use [reorderTaskLists].
   List<TaskList> updateTaskList(TaskList taskList) {
-    final updatedTaskLists = List<TaskList>.from(this);
-    final existingTaskList = updatedTaskLists.getTaskListById(taskList.id);
-    if (existingTaskList != null) {
-      updatedTaskLists.remove(existingTaskList);
-    }
-    updatedTaskLists.add(taskList);
+    final updatedTaskLists = map(
+      (e) => e.id == taskList.id ? taskList : e,
+    ).toList();
     return updatedTaskLists;
   }
 
-  /// Returns a copy of the list with the given [task] added.
+  /// Returns a copy of the list with the given [task] added to the TaskList
+  /// with the [task.taskListId].
+  ///
+  /// If the [task] already exists, it is replaced.
+  ///
+  /// If the [task] does not exist, it is added to the end of the list and
+  /// its index is set to the length of the list.
   List<TaskList> addTask(Task task) {
     final updatedTaskLists = List<TaskList>.from(this);
     final taskList = updatedTaskLists.getTaskListById(task.taskListId);
     if (taskList != null) {
       updatedTaskLists.remove(taskList);
-      updatedTaskLists
-          .add(taskList.copyWith(items: taskList.items.addTask(task)));
+      updatedTaskLists.insert(
+        taskList.index,
+        taskList.copyWith(
+          items: taskList.items.addTask(
+            task.copyWith(index: taskList.items.length),
+          ),
+        ),
+      );
     }
     return updatedTaskLists;
   }
 
   /// Returns a copy of the list with the given [task] removed.
+  ///
+  /// If the [task] does not exist, the list is returned unchanged.
+  ///
+  /// The index of all [Task]s after the removed [task] is decremented.
   List<TaskList> removeTask(Task task) {
     final updatedTaskLists = List<TaskList>.from(this);
     final taskList = updatedTaskLists.getTaskListById(task.taskListId);
     if (taskList != null) {
       updatedTaskLists.remove(taskList);
-      updatedTaskLists
-          .add(taskList.copyWith(items: taskList.items.removeTask(task)));
+      updatedTaskLists.insert(
+        taskList.index,
+        taskList.copyWith(
+          items: taskList.items.removeTask(task),
+        ),
+      );
     }
     return updatedTaskLists;
   }
 
   /// Returns a copy of the list with the given [task] updated.
   ///
-  /// If the [task] does not exist, it is added.
+  /// If the [task] does not exist, the list is returned unchanged.
+  ///
   /// If the [task] exists, it is replaced.
+  ///
+  /// The index and position of all [Task]s will remain unchanged.
+  /// To reorder [Task]s, use [reorderTask].
   List<TaskList> updateTask(Task task) {
     final updatedTaskLists = List<TaskList>.from(this);
     final taskList = updatedTaskLists.getTaskListById(task.taskListId);
     if (taskList != null) {
       updatedTaskLists.remove(taskList);
-      updatedTaskLists
-          .add(taskList.copyWith(items: taskList.items.updateTask(task)));
+      updatedTaskLists.insert(
+        taskList.index,
+        taskList.copyWith(
+          items: taskList.items.updateTask(task),
+        ),
+      );
     }
     return updatedTaskLists;
   }
 
-  /// Returns a copy of the list with the given [task] reordered.
+  /// Returns a copy of the list with the given [task] reordered to the given
+  /// [newIndex].
+  ///
+  /// If the [task] does not exist, the list is returned unchanged.
+  ///
+  /// The index of all [Task]s between the old and new index are updated.
   List<TaskList> reorderTask(Task task, int newIndex) {
     final updatedTaskLists = List<TaskList>.from(this);
     final taskList = updatedTaskLists.getTaskListById(task.taskListId);
     if (taskList != null) {
       updatedTaskLists.remove(taskList);
-      updatedTaskLists.add(
+      updatedTaskLists.insert(
+        taskList.index,
         taskList.copyWith(
           items: taskList.items.reorderTasks(task, newIndex),
         ),
