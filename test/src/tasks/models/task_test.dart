@@ -206,9 +206,12 @@ void main() {
       final updatedTasks = tasks.reorderTasks(task1, 2);
       expect(updatedTasks, isA<List<Task>>());
       expect(updatedTasks.length, 3);
-      expect(updatedTasks.first, task2);
-      expect(updatedTasks[1], task3);
-      expect(updatedTasks.last, task1);
+      expect(updatedTasks[0].title, 'Test Task 2');
+      expect(updatedTasks[0].index, 0);
+      expect(updatedTasks[1].title, 'Test Task 3');
+      expect(updatedTasks[1].index, 1);
+      expect(updatedTasks[2].title, 'Test Task 1');
+      expect(updatedTasks[2].index, 2);
     });
 
     test('removeTask() works', () {
@@ -217,7 +220,8 @@ void main() {
       expect(updatedTasks, isA<List<Task>>());
       expect(updatedTasks.length, 2);
       expect(updatedTasks.first, task1);
-      expect(updatedTasks.last, task3);
+      expect(updatedTasks.last.title, 'Test Task 3');
+      expect(updatedTasks.last.index, 1);
     });
 
     test('sortedByDueDate() works', () {
