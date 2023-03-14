@@ -140,7 +140,7 @@ int _updatedToJson(DateTime date) {
 }
 
 /// Convenience extension methods for a list of tasks.
-extension TaskListExtensions on List<Task> {
+extension ListOfTasksExtensions on List<Task> {
   /// Returns a copy of the list with the task added.
   List<Task> addTask(Task task) {
     return [...this, task];
@@ -173,7 +173,7 @@ extension TaskListExtensions on List<Task> {
   }
 
   /// Returns a copy of the list with the task marked as uncompleted.
-  List<Task> markTaskUncompleted(Task task) {
+  List<Task> markTaskNotCompleted(Task task) {
     return map((t) => t.id == task.id ? task.copyWith(completed: false) : t)
         .toList();
   }
@@ -187,52 +187,25 @@ extension TaskListExtensions on List<Task> {
   }
 
   /// Returns a copy of the list with the task marked as undeleted.
-  List<Task> markTaskUndeleted(Task task) {
+  List<Task> markTaskNotDeleted(Task task) {
     return map((t) => t.id == task.id ? task.copyWith(deleted: false) : t)
         .toList();
   }
 
   /// Returns a copy of the list with the task updated to the new index.
   List<Task> reorderTasks(Task task, int newIndex) {
-    return map((t) {
-      if (t.id == task.id) {
-        return task.copyWith(index: newIndex);
-      } else if (t.index >= newIndex && t.index < task.index) {
-        return t.copyWith(index: t.index + 1);
-      } else if (t.index <= newIndex && t.index > task.index) {
-        return t.copyWith(index: t.index - 1);
-      } else {
-        return t;
-      }
-    }).toList();
+    final oldIndex = indexWhere((t) => t.id == task.id);
+    if (oldIndex == -1) return this;
+
+    final updatedTasks = [...this];
+    updatedTasks.removeAt(oldIndex);
+    updatedTasks.insert(newIndex, task);
+    return updatedTasks;
   }
 
   /// Returns a copy of the list with the task removed.
   List<Task> removeTask(Task task) {
     return where((t) => t.id != task.id).toList();
-  }
-
-  /// Returns a copy of the list with tasks sorted by completed status.
-  ///
-  /// Completed tasks are sorted to the bottom of the list.
-  List<Task> sortedByCompleted() {
-    return [...this]..sort((a, b) {
-        if (a.completed == b.completed) return 0;
-        if (a.completed) return 1;
-        return -1;
-      });
-  }
-
-  /// Returns a copy of the list with tasks sorted by completed status in
-  /// descending order.
-  ///
-  /// Completed tasks are sorted to the top of the list.
-  List<Task> sortedByCompletedDescending() {
-    return [...this]..sort((a, b) {
-        if (a.completed == b.completed) return 0;
-        if (a.completed) return -1;
-        return 1;
-      });
   }
 
   /// Returns a copy of the list with tasks sorted by due date.
@@ -245,25 +218,9 @@ extension TaskListExtensions on List<Task> {
       });
   }
 
-  /// Returns a copy of the list with tasks sorted by due date in descending
-  /// order.
-  List<Task> sortedByDueDateDescending() {
-    return [...this]..sort((a, b) {
-        if (a.dueDate == null && b.dueDate == null) return 0;
-        if (a.dueDate == null) return -1;
-        if (b.dueDate == null) return 1;
-        return b.dueDate!.compareTo(a.dueDate!);
-      });
-  }
-
   /// Returns a copy of the list with tasks sorted by index.
   List<Task> sortedByIndex() {
     return [...this]..sort((a, b) => a.index.compareTo(b.index));
-  }
-
-  /// Returns a copy of the list with tasks sorted by index in descending order.
-  List<Task> sortedByIndexDescending() {
-    return [...this]..sort((a, b) => b.index.compareTo(a.index));
   }
 
   /// Returns a copy of the list with tasks sorted by title.
@@ -271,20 +228,9 @@ extension TaskListExtensions on List<Task> {
     return [...this]..sort((a, b) => a.title.compareTo(b.title));
   }
 
-  /// Returns a copy of the list with tasks sorted by title in descending order.
-  List<Task> sortedByTitleDescending() {
-    return [...this]..sort((a, b) => b.title.compareTo(a.title));
-  }
-
   /// Returns a copy of the list with tasks sorted by updated date.
   List<Task> sortedByUpdated() {
     return [...this]..sort((a, b) => b.updated.compareTo(a.updated));
-  }
-
-  /// Returns a copy of the list with tasks sorted by updated date in descending
-  /// order.
-  List<Task> sortedByUpdatedDescending() {
-    return [...this]..sort((a, b) => a.updated.compareTo(b.updated));
   }
 
   /// Returns all [Task]s which are subtasks of the [Task] with the given [id].
