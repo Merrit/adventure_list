@@ -67,7 +67,7 @@ class TaskTile extends StatelessWidget {
             .length;
 
         Future<void> setActiveTaskCallback() async {
-          String? taskId = (tasksCubit.state.activeTask == task) //
+          final String? taskId = (tasksCubit.state.activeTask == task) //
               ? null
               : task.id;
           tasksCubit.setActiveTask(taskId);
@@ -142,7 +142,7 @@ class _TitleRow extends StatelessWidget {
           builder: (context, tileState) {
             final bool selected =
                 tasksState.activeTask?.id == tileState.task.id;
-            TextStyle titleTextStyle = TextStyle(
+            final TextStyle titleTextStyle = TextStyle(
               decoration:
                   tileState.task.completed ? TextDecoration.lineThrough : null,
               color: selected ? Theme.of(context).colorScheme.primary : null,

@@ -223,7 +223,7 @@ class TasksCubit extends Cubit<TasksState> {
   /// Called when the user is reordering the list of TaskLists.
   Future<void> reorderLists(int oldIndex, int newIndex) async {
     if (oldIndex < newIndex) newIndex -= 1;
-    List<TaskList> lists = state.taskLists.copy()
+    final List<TaskList> lists = state.taskLists.copy()
       ..removeAt(oldIndex)
       ..insert(newIndex, state.taskLists[oldIndex]);
     for (var i = 0; i < lists.length; i++) {
@@ -252,7 +252,8 @@ class TasksCubit extends Cubit<TasksState> {
       ..removeWhere((element) => element.id == list.id)
       ..add(list);
 
-    TaskList? activeList = (list.id == state.activeList?.id) ? list : null;
+    final TaskList? activeList =
+        (list.id == state.activeList?.id) ? list : null;
 
     emit(state.copyWith(
       activeList: activeList,
@@ -324,7 +325,7 @@ class TasksCubit extends Cubit<TasksState> {
   /// Called when the user is reordering Tasks.
   Future<void> reorderTasks(int oldIndex, int newIndex) async {
     if (oldIndex < newIndex) newIndex -= 1;
-    List<Task> items = state.activeList!.items.copy()
+    final List<Task> items = state.activeList!.items.copy()
       ..removeAt(oldIndex)
       ..insert(newIndex, state.activeList!.items[oldIndex]);
     for (var i = 0; i < items.length; i++) {
@@ -360,16 +361,16 @@ class TasksCubit extends Cubit<TasksState> {
     );
 
     // Update local state immediately.
-    var items = List<Task>.from(state.activeList!.items)
+    final items = List<Task>.from(state.activeList!.items)
       ..removeAt(index)
       ..insert(index, task);
     final int taskListIndex = state.taskLists.indexWhere(
       (element) => element.id == state.activeList!.id,
     );
-    TaskList updatedTaskList = state //
+    final TaskList updatedTaskList = state //
         .taskLists[taskListIndex]
         .copyWith(items: items);
-    List<TaskList> updatedAllTaskLists = state.taskLists.copy()
+    final List<TaskList> updatedAllTaskLists = state.taskLists.copy()
       ..[taskListIndex] = updatedTaskList;
 
     emit(state.copyWith(
@@ -466,7 +467,7 @@ class TasksCubit extends Cubit<TasksState> {
     _activeTaskListBeforeClear = state.activeList!.copyWith();
     _taskListCollectionBeforeClear = state.taskLists.copy();
 
-    List<Task> updatedTasks = state.activeList!.items.map((Task task) {
+    final List<Task> updatedTasks = state.activeList!.items.map((Task task) {
       final Task? parent = state //
           .activeList
           ?.items

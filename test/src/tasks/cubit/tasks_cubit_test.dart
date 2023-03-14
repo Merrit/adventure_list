@@ -486,7 +486,7 @@ void main() {
 
     test('undoClearTasks works', () async {
       await testCubit.createList('Tasks');
-      Task task = await testCubit.createTask(
+      final Task task = await testCubit.createTask(
         Task(
           taskListId: 'test-list-id',
           title: 'Do a thing',
@@ -502,7 +502,7 @@ void main() {
 
     test('updating sub-task works', () async {
       await testCubit.createList('Tasks');
-      Task task = await testCubit.createTask(
+      final Task task = await testCubit.createTask(
         Task(
           taskListId: 'test-list-id',
           title: 'Parent task',

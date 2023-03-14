@@ -22,7 +22,7 @@ class AppWindow {
   Future<void> initialize() async {
     await windowManager.ensureInitialized();
 
-    WindowOptions windowOptions = const WindowOptions();
+    const WindowOptions windowOptions = WindowOptions();
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await setWindowSizeAndPosition();
       await windowManager.show();
@@ -74,9 +74,9 @@ class AppWindow {
 
   Future<void> setWindowSizeAndPosition() async {
     print('Setting window size and position.');
-    Rect currentWindowFrame = await windowManager.getBounds();
+    final Rect currentWindowFrame = await windowManager.getBounds();
 
-    String? targetWindowFrameJson = await StorageRepository.instance.get(
+    final String? targetWindowFrameJson = await StorageRepository.instance.get(
       'windowSizeAndPosition',
     );
 

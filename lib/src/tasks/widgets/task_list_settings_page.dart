@@ -43,7 +43,7 @@ class TaskListSettingsView extends StatelessWidget {
                   ),
                   trailing: const Icon(Icons.edit),
                   onTap: () async {
-                    String? newName = await showInputDialog(
+                    final String? newName = await showInputDialog(
                       context: context,
                     );
 

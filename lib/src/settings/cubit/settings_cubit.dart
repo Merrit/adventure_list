@@ -17,9 +17,9 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   static Future<SettingsCubit> initialize() async {
-    String? homeWidgetSelectedListId = await StorageRepository.instance.get(
-      'homeWidgetSelectedListId',
-    );
+    final String? homeWidgetSelectedListId = await StorageRepository //
+        .instance
+        .get('homeWidgetSelectedListId');
 
     return SettingsCubit(
       initialState: SettingsState(
