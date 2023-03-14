@@ -11,7 +11,7 @@ class SystemTrayManager {
   SystemTrayManager(this._window);
 
   Future<void> initialize() async {
-    String iconPath = Platform.isWindows
+    final String iconPath = Platform.isWindows
         ? 'assets/icons/$kPackageId.ico'
         : 'assets/icons/$kPackageId.png';
 
