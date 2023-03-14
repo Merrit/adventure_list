@@ -193,19 +193,32 @@ extension ListOfTasksExtensions on List<Task> {
   }
 
   /// Returns a copy of the list with the task updated to the new index.
+  ///
+  /// The index of all the tasks is updated.
+  ///
+  /// If the task is not in the list, the list is returned unchanged.
   List<Task> reorderTasks(Task task, int newIndex) {
-    final oldIndex = indexWhere((t) => t.id == task.id);
-    if (oldIndex == -1) return this;
+    if (!contains(task)) return this;
 
     final updatedTasks = [...this];
-    updatedTasks.removeAt(oldIndex);
+    updatedTasks.remove(task);
     updatedTasks.insert(newIndex, task);
+    for (var i = 0; i < updatedTasks.length; i++) {
+      updatedTasks[i] = updatedTasks[i].copyWith(index: i);
+    }
     return updatedTasks;
   }
 
   /// Returns a copy of the list with the task removed.
+  ///
+  /// The index of the remaining tasks is updated.
   List<Task> removeTask(Task task) {
-    return where((t) => t.id != task.id).toList();
+    final updatedTasks = [...this];
+    updatedTasks.remove(task);
+    for (var i = 0; i < updatedTasks.length; i++) {
+      updatedTasks[i] = updatedTasks[i].copyWith(index: i);
+    }
+    return updatedTasks;
   }
 
   /// Returns a copy of the list with tasks sorted by due date.
