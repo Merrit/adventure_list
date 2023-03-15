@@ -262,20 +262,20 @@ class TasksCubit extends Cubit<TasksState> {
   }
 
   /// Updates the provided [TaskList].
+  ///
+  /// The list is updated in memory first, then synced with the repository to
+  /// ensure the process feels fast to the user.
+  ///
+  /// If the list is the active list, it is also updated in memory.
   Future<void> updateList(TaskList list) async {
-    list = list.copyWith(synced: false);
-    final updatedLists = state.taskLists.copy()
-      ..removeWhere((element) => element.id == list.id)
-      ..add(list);
-
-    final TaskList? activeList =
-        (list.id == state.activeList?.id) ? list : null;
-
+    final updatedLists = state.taskLists.updateTaskList(list);
+    final TaskList? activeList = (list.id == state.activeList?.id) //
+        ? list
+        : null;
     emit(state.copyWith(
       activeList: activeList,
-      taskLists: updatedLists.sorted(),
+      taskLists: updatedLists,
     ));
-
     await _tasksRepository.updateList(list: list);
   }
 
