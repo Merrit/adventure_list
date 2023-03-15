@@ -245,13 +245,20 @@ class TasksCubit extends Cubit<TasksState> {
     ));
   }
 
+  /// Sets the active list to the list with the provided [id].
+  ///
+  /// If the list with the provided [id] doesn't exist, the active list is set
+  /// to null.
+  ///
+  /// The active list id is saved to storage so it can be retrieved on app
+  /// restart.
   void setActiveList(String id) {
-    final list = state.taskLists.singleWhere((element) => element.id == id);
+    final TaskList? taskList = state.taskLists.getTaskListById(id);
     emit(state.copyWith(
-      activeList: list,
-      activeTask: state.activeTask?.copyWith(id: ''),
+      activeList: taskList,
+      activeTask: null,
     ));
-    StorageRepository.instance.save(key: 'activeList', value: id);
+    StorageRepository.instance.save(key: 'activeList', value: taskList?.id);
   }
 
   /// Updates the provided [TaskList].
