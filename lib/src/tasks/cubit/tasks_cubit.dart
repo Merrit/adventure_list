@@ -229,16 +229,19 @@ class TasksCubit extends Cubit<TasksState> {
   /// Called when the user is reordering the list of TaskLists.
   Future<void> reorderLists(int oldIndex, int newIndex) async {
     if (oldIndex < newIndex) newIndex -= 1;
-    final List<TaskList> lists = state.taskLists.copy()
-      ..removeAt(oldIndex)
-      ..insert(newIndex, state.taskLists[oldIndex]);
-    for (var i = 0; i < lists.length; i++) {
-      lists[i] = lists[i].copyWith(index: i, synced: false);
+    final List<TaskList> taskLists = state //
+        .taskLists
+        .reorderTaskLists(state.taskLists[oldIndex], newIndex);
+    for (var i = 0; i < taskLists.length; i++) {
+      taskLists[i] = taskLists[i].copyWith(synced: false);
     }
-    final String? activeListId = state.activeList?.id;
+    // Emit the active list again because its index might have changed.
+    final activeList = taskLists.singleWhereOrNull(
+      (e) => e.id == state.activeList?.id,
+    );
     emit(state.copyWith(
-      taskLists: lists,
-      activeList: lists.singleWhereOrNull((e) => e.id == activeListId),
+      taskLists: taskLists,
+      activeList: activeList,
     ));
   }
 
