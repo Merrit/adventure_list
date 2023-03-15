@@ -146,16 +146,16 @@ extension ListOfTaskListExtensions on List<TaskList> {
     return updatedTaskLists;
   }
 
-  /// Returns a copy of the list with the given [taskList] removed.
+  /// Returns a copy of the list with the desired [TaskList] removed.
   ///
-  /// The index of all [TaskList]s after the removed [taskList] is decremented.
+  /// If the [TaskList] does not exist, the list is returned unchanged.
   ///
-  /// If the [taskList] does not exist, the list is returned unchanged.
-  List<TaskList> removeTaskList(TaskList taskList) {
+  /// The index of all [TaskList]s is updated.
+  List<TaskList> removeTaskList(String id) {
     final updatedTaskLists = List<TaskList>.from(this);
-    final existingTaskList = updatedTaskLists.getTaskListById(taskList.id);
-    if (existingTaskList != null) {
-      updatedTaskLists.remove(existingTaskList);
+    final taskList = getTaskListById(id);
+    if (taskList != null) {
+      updatedTaskLists.remove(taskList);
       for (var i = 0; i < updatedTaskLists.length; i++) {
         updatedTaskLists[i] = updatedTaskLists[i].copyWith(index: i);
       }

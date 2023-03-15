@@ -183,7 +183,7 @@ void main() {
 
     test('removeTaskList() works', () {
       final taskLists = [taskList1, taskList2, taskList3];
-      final updatedTaskLists = taskLists.removeTaskList(taskList2);
+      final updatedTaskLists = taskLists.removeTaskList(taskList2.id);
       expect(updatedTaskLists.length, 2);
       final firstTaskList = updatedTaskLists[0];
       expect(firstTaskList.id, taskList1.id);
