@@ -65,32 +65,32 @@ void main() {
       parent: null,
     ));
 
+    await LoggingManager.initialize(verbose: false);
+  });
+
+  group('TasksCubit:', () {
+    late TasksCubit testCubit;
+
+    setUp(() async {
     /* -------------------------------- AuthCubit ------------------------------- */
     _authCubit = MockAuthenticationCubit();
-
     when(() => _authCubit.state).thenReturn(defaultAuthState);
 
     /* ----------------------------- TasksRepository ---------------------------- */
     _tasksRepository = MockTasksRepository();
-
     when(() => _tasksRepository.getAll()).thenAnswer((_) async => []);
-
     when(() => _tasksRepository.createList(any()))
         .thenAnswer((invokation) async => TaskList(
               id: UniqueKey().toString(),
               index: 0,
               items: const [],
               title: (invokation.positionalArguments.first as TaskList).title,
-              // invokation.namedArguments[const Symbol('title')] as String,
             ));
-
     when(() => _tasksRepository.deleteList(id: any(named: 'id')))
         .thenAnswer((_) async => true);
-
     when(() => _tasksRepository.updateList(list: any(named: 'list')))
         .thenAnswer((_) async =>
             TaskList(id: 'id', index: 0, items: const [], title: ''));
-
     when(() => _tasksRepository.createTask(
           newTask: any(named: 'newTask'),
           taskListId: any(named: 'taskListId'),
@@ -101,7 +101,6 @@ void main() {
         id: UniqueKey().toString(),
       );
     });
-
     when(() => _tasksRepository.updateTask(
           taskListId: any(named: 'taskListId'),
           updatedTask: any(named: 'updatedTask'),
@@ -114,24 +113,19 @@ void main() {
     /* ----------------------------- StorageRepository ----------------------------- */
     _storageRepository = MockStorageRepository();
     StorageRepository.instance = _storageRepository;
-
     when(() => _storageRepository.delete(any(),
         storageArea: any(named: 'storageArea'))).thenAnswer((_) async {});
-
     when(() => _storageRepository.getStorageAreaValues(any())).thenAnswer(
       (_) async => [],
     );
-
     when(() => _storageRepository.get(
           any(),
           storageArea: any(named: 'storageArea'),
         )).thenAnswer((_) async => null);
-
     when(() => _storageRepository.saveStorageAreaValues(
           storageArea: any(named: 'storageArea'),
           entries: any(named: 'entries'),
         )).thenAnswer((_) async {});
-
     when(() => _storageRepository.save(
           key: any(named: 'key'),
           value: any(named: 'value'),
@@ -141,13 +135,6 @@ void main() {
     // Mock the uuid generator
     when(() => _uuid.v4()).thenReturn('test-uuid');
 
-    await LoggingManager.initialize(verbose: false);
-  });
-
-  group('TasksCubit:', () {
-    late TasksCubit testCubit;
-
-    setUp(() async {
       testCubit = TasksCubit(
         _authCubit,
         tasksRepository: _tasksRepository,
@@ -159,7 +146,6 @@ void main() {
       }
     });
 
-    // singleton instance is accessible
     test('singleton instance is accessible', () {
       expect(tasksCubit, isNotNull);
     });
