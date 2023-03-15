@@ -578,14 +578,14 @@ void main() {
       );
 
       expect(
-        testCubit.state.activeList!.items.taskById(task.id)!.completed,
+        testCubit.state.activeList!.items.getTaskById(task.id)!.completed,
         isFalse,
       );
 
       await testCubit.updateTask(subTask.copyWith(completed: true));
 
       expect(
-        testCubit.state.activeList!.items.taskById(subTask.id)!.completed,
+        testCubit.state.activeList!.items.getTaskById(subTask.id)!.completed,
         isTrue,
       );
     });

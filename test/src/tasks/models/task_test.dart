@@ -157,6 +157,13 @@ void main() {
       expect(updatedDeletedTasks.first.deleted, true);
     });
 
+    test('getTaskById() works', () {
+      final tasks = <Task>[task1, task2, task3];
+      final task = tasks.getTaskById(task2.id);
+      expect(task, isA<Task>());
+      expect(task, task2);
+    });
+
     test('markTaskCompleted() works', () {
       final tasks = <Task>[task1, task2, task3];
       final updatedTasks = tasks.markTaskCompleted(task2);
@@ -307,13 +314,6 @@ void main() {
       final task3Subtasks = tasks.subtasksOf(task3.id);
       expect(task3Subtasks, isA<List<Task>>());
       expect(task3Subtasks.length, 0);
-    });
-
-    test('taskById() works', () {
-      final tasks = <Task>[task1, task2, task3];
-      final task = tasks.taskById(task2.id);
-      expect(task, isA<Task>());
-      expect(task, task2);
     });
 
     test('topLevelTasks() works', () {

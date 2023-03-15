@@ -105,7 +105,7 @@ extension ListOfTaskListExtensions on List<TaskList> {
   /// Returns the [Task] with the given [id].
   Task? getTaskById(String id) {
     for (var taskList in this) {
-      final task = taskList.items.taskById(id);
+      final task = taskList.items.getTaskById(id);
       if (task != null) {
         return task;
       }
