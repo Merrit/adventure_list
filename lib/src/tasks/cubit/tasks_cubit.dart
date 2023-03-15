@@ -217,16 +217,13 @@ class TasksCubit extends Cubit<TasksState> {
     final TaskList? activeList = state.activeList;
     if (activeList == null) return;
 
-    final String deletionListId = activeList.id;
-    final updatedLists = state.taskLists.copy() //
-      ..remove(activeList);
-    emit(TasksState(
+    final updatedLists = state.taskLists.removeTaskList(activeList.id);
+    emit(state.copyWith(
       activeList: null,
       activeTask: null,
-      loading: false,
-      taskLists: updatedLists.sorted(),
+      taskLists: updatedLists,
     ));
-    await _tasksRepository.deleteList(id: deletionListId);
+    await _tasksRepository.deleteList(id: activeList.id);
   }
 
   /// Called when the user is reordering the list of TaskLists.
