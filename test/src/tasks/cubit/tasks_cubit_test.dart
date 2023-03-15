@@ -72,68 +72,68 @@ void main() {
     late TasksCubit testCubit;
 
     setUp(() async {
-    /* -------------------------------- AuthCubit ------------------------------- */
-    _authCubit = MockAuthenticationCubit();
-    when(() => _authCubit.state).thenReturn(defaultAuthState);
+      /* -------------------------------- AuthCubit ------------------------------- */
+      _authCubit = MockAuthenticationCubit();
+      when(() => _authCubit.state).thenReturn(defaultAuthState);
 
-    /* ----------------------------- TasksRepository ---------------------------- */
-    _tasksRepository = MockTasksRepository();
-    when(() => _tasksRepository.getAll()).thenAnswer((_) async => []);
-    when(() => _tasksRepository.createList(any()))
-        .thenAnswer((invokation) async => TaskList(
-              id: UniqueKey().toString(),
-              index: 0,
-              items: const [],
-              title: (invokation.positionalArguments.first as TaskList).title,
-            ));
-    when(() => _tasksRepository.deleteList(id: any(named: 'id')))
-        .thenAnswer((_) async => true);
-    when(() => _tasksRepository.updateList(list: any(named: 'list')))
-        .thenAnswer((_) async =>
-            TaskList(id: 'id', index: 0, items: const [], title: ''));
-    when(() => _tasksRepository.createTask(
-          newTask: any(named: 'newTask'),
-          taskListId: any(named: 'taskListId'),
-        )).thenAnswer((invokation) async {
-      final providedTask =
-          invokation.namedArguments[const Symbol('newTask')] as Task;
-      return providedTask.copyWith(
-        id: UniqueKey().toString(),
+      /* ----------------------------- TasksRepository ---------------------------- */
+      _tasksRepository = MockTasksRepository();
+      when(() => _tasksRepository.getAll()).thenAnswer((_) async => []);
+      when(() => _tasksRepository.createList(any()))
+          .thenAnswer((invokation) async => TaskList(
+                id: UniqueKey().toString(),
+                index: 0,
+                items: const [],
+                title: (invokation.positionalArguments.first as TaskList).title,
+              ));
+      when(() => _tasksRepository.deleteList(id: any(named: 'id')))
+          .thenAnswer((_) async => true);
+      when(() => _tasksRepository.updateList(list: any(named: 'list')))
+          .thenAnswer((_) async =>
+              TaskList(id: 'id', index: 0, items: const [], title: ''));
+      when(() => _tasksRepository.createTask(
+            newTask: any(named: 'newTask'),
+            taskListId: any(named: 'taskListId'),
+          )).thenAnswer((invokation) async {
+        final providedTask =
+            invokation.namedArguments[const Symbol('newTask')] as Task;
+        return providedTask.copyWith(
+          id: UniqueKey().toString(),
+        );
+      });
+      when(() => _tasksRepository.updateTask(
+            taskListId: any(named: 'taskListId'),
+            updatedTask: any(named: 'updatedTask'),
+          )).thenAnswer((invokation) async {
+        final providedTask =
+            invokation.namedArguments[const Symbol('updatedTask')] as Task;
+        return providedTask;
+      });
+
+      /* ----------------------------- StorageRepository ----------------------------- */
+      _storageRepository = MockStorageRepository();
+      StorageRepository.instance = _storageRepository;
+      when(() => _storageRepository.delete(any(),
+          storageArea: any(named: 'storageArea'))).thenAnswer((_) async {});
+      when(() => _storageRepository.getStorageAreaValues(any())).thenAnswer(
+        (_) async => [],
       );
-    });
-    when(() => _tasksRepository.updateTask(
-          taskListId: any(named: 'taskListId'),
-          updatedTask: any(named: 'updatedTask'),
-        )).thenAnswer((invokation) async {
-      final providedTask =
-          invokation.namedArguments[const Symbol('updatedTask')] as Task;
-      return providedTask;
-    });
+      when(() => _storageRepository.get(
+            any(),
+            storageArea: any(named: 'storageArea'),
+          )).thenAnswer((_) async => null);
+      when(() => _storageRepository.saveStorageAreaValues(
+            storageArea: any(named: 'storageArea'),
+            entries: any(named: 'entries'),
+          )).thenAnswer((_) async {});
+      when(() => _storageRepository.save(
+            key: any(named: 'key'),
+            value: any(named: 'value'),
+            storageArea: any(named: 'storageArea'),
+          )).thenAnswer((_) async {});
 
-    /* ----------------------------- StorageRepository ----------------------------- */
-    _storageRepository = MockStorageRepository();
-    StorageRepository.instance = _storageRepository;
-    when(() => _storageRepository.delete(any(),
-        storageArea: any(named: 'storageArea'))).thenAnswer((_) async {});
-    when(() => _storageRepository.getStorageAreaValues(any())).thenAnswer(
-      (_) async => [],
-    );
-    when(() => _storageRepository.get(
-          any(),
-          storageArea: any(named: 'storageArea'),
-        )).thenAnswer((_) async => null);
-    when(() => _storageRepository.saveStorageAreaValues(
-          storageArea: any(named: 'storageArea'),
-          entries: any(named: 'entries'),
-        )).thenAnswer((_) async {});
-    when(() => _storageRepository.save(
-          key: any(named: 'key'),
-          value: any(named: 'value'),
-          storageArea: any(named: 'storageArea'),
-        )).thenAnswer((_) async {});
-
-    // Mock the uuid generator
-    when(() => _uuid.v4()).thenReturn('test-uuid');
+      // Mock the uuid generator
+      when(() => _uuid.v4()).thenReturn('test-uuid');
 
       testCubit = TasksCubit(
         _authCubit,
@@ -214,6 +214,81 @@ void main() {
               index: 0,
               items: [],
               synced: true,
+            ),
+          ],
+        ),
+      ],
+    );
+
+    blocTest<TasksCubit, TasksState>(
+      'createList() reverts to previous state if an error occurs',
+      setUp: () {
+        when(() => _tasksRepository.createList(any()))
+            .thenAnswer((_) async => null);
+        when(() => _uuid.v4()).thenReturn('test-list-id-2');
+      },
+      build: () => testCubit,
+      seed: () => TasksState(
+        activeList: TaskList(
+          id: 'test-list-id-1',
+          title: 'Chores',
+          index: 0,
+          items: [],
+        ),
+        loading: false,
+        taskLists: [
+          TaskList(
+            id: 'test-list-id-1',
+            title: 'Chores',
+            index: 0,
+            items: [],
+          ),
+        ],
+      ),
+      act: (cubit) => cubit.createList('New List'),
+      verify: (cubit) {
+        verify(() => _tasksRepository.createList(any())).called(1);
+        expect(cubit.state.taskLists.length, 1);
+        expect(cubit.state.taskLists.first.id, 'test-list-id-1');
+      },
+      expect: () => [
+        TasksState(
+          activeList: TaskList(
+            id: 'test-list-id-2',
+            title: 'New List',
+            index: 1,
+            items: [],
+          ),
+          loading: false,
+          taskLists: [
+            TaskList(
+              id: 'test-list-id-1',
+              title: 'Chores',
+              index: 0,
+              items: [],
+            ),
+            TaskList(
+              id: 'test-list-id-2',
+              title: 'New List',
+              index: 1,
+              items: [],
+            ),
+          ],
+        ),
+        TasksState(
+          activeList: TaskList(
+            id: 'test-list-id-1',
+            title: 'Chores',
+            index: 0,
+            items: [],
+          ),
+          loading: false,
+          taskLists: [
+            TaskList(
+              id: 'test-list-id-1',
+              title: 'Chores',
+              index: 0,
+              items: [],
             ),
           ],
         ),

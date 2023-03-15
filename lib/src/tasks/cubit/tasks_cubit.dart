@@ -175,28 +175,37 @@ class TasksCubit extends Cubit<TasksState> {
   /// The list is created in memory first, then synced with the repository.
   /// This is done so the process feels fast to the user.
   Future<void> createList(String title) async {
+    final TaskList? previousActiveList = state.activeList;
+
     // Quickly create a list in memory for good UX.
+    final newListTempId = _uuid.v4();
     TaskList newList = TaskList(
-      id: _uuid.v4(),
+      id: newListTempId,
       index: state.taskLists.length,
       items: const [],
       title: title,
     );
     emit(state.copyWith(
       activeList: newList,
-      taskLists: state.taskLists.copy()..add(newList),
+      taskLists: state.taskLists.addTaskList(newList),
     ));
 
     // Create list properly through repository to get id & etc.
     final newListFromRepo = await _tasksRepository.createList(newList);
-    if (newListFromRepo == null) return;
+    if (newListFromRepo == null) {
+      // If the list wasn't created properly, revert the changes.
+      emit(state.copyWith(
+        activeList: previousActiveList,
+        taskLists: state.taskLists.removeTaskList(newListTempId),
+      ));
+      return;
+    }
 
     newList = newList.copyWith(id: newListFromRepo.id, synced: true);
-
-    final taskLists = state.taskLists.copy();
-    if (taskLists.isNotEmpty) taskLists.removeLast();
-    taskLists.add(newList);
-
+    final List<TaskList> taskLists = state //
+        .taskLists
+        .removeTaskList(newListTempId)
+        .addTaskList(newList);
     emit(state.copyWith(
       activeList: newList,
       taskLists: taskLists,
