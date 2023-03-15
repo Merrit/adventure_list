@@ -161,6 +161,11 @@ extension ListOfTasksExtensions on List<Task> {
     return where((t) => t.deleted).toList();
   }
 
+  /// Returns the task with the given ID, or null if not found.
+  Task? getTaskById(String id) {
+    return firstWhereOrNull((t) => t.id == id);
+  }
+
   /// Returns all [Task]s that are not marked as completed.
   List<Task> incompleteTasks() {
     return where((t) => !t.completed).toList();
@@ -249,11 +254,6 @@ extension ListOfTasksExtensions on List<Task> {
   /// Returns all [Task]s which are subtasks of the [Task] with the given [id].
   List<Task> subtasksOf(String id) {
     return where((t) => t.parent == id).toList();
-  }
-
-  /// Returns the task with the given ID, or null if not found.
-  Task? taskById(String id) {
-    return firstWhereOrNull((t) => t.id == id);
   }
 
   /// Returns all top-level [Task]s.
