@@ -279,13 +279,65 @@ class TasksCubit extends Cubit<TasksState> {
     await _tasksRepository.updateList(list: list);
   }
 
-  /// Creates a new [Task].
-  Future<Task> createTask(Task newTask) async {
+  /// Creates a new [Task] in the active list.
+  ///
+  /// The task is created in memory first, then synced with the repository to
+  /// ensure the process feels fast to the user.
+  Future<Task?> createTask(Task newTask) async {
     assert(state.activeList != null);
 
+    final TaskList activeList = state.activeList!;
+    final List<TaskList> taskLists = state.taskLists;
     final tempId = _uuid.v4();
-    newTask = newTask.copyWith(id: tempId);
+    final index = _calculateNewTaskIndex(newTask);
+    newTask = newTask.copyWith(id: tempId, index: index);
+    List<Task> updatedTasks = activeList.items.addTask(newTask);
+    TaskList updatedTaskList = activeList.copyWith(items: updatedTasks);
+    List<TaskList> updatedTaskLists = taskLists.updateTaskList(updatedTaskList);
 
+    // Emit local cached task immediately.
+    emit(state.copyWith(
+      activeList: updatedTaskList,
+      taskLists: updatedTaskLists,
+    ));
+
+    // Create task with repository to get final id.
+    final newTaskFromRepo = await _tasksRepository.createTask(
+      taskListId: state.activeList!.id,
+      newTask: newTask,
+    );
+
+    // If creating the remote task failed, revert the changes.
+    if (newTaskFromRepo == null) {
+      emit(state.copyWith(
+        activeList: activeList,
+        taskLists: taskLists,
+      ));
+      return null;
+    }
+
+    updatedTasks = updatedTaskList.items //
+        .removeTask(newTask)
+        .addTask(newTaskFromRepo);
+    updatedTaskList = updatedTaskList.copyWith(items: updatedTasks);
+    updatedTaskLists = updatedTaskLists.updateTaskList(updatedTaskList);
+
+    emit(state.copyWith(
+      activeList: updatedTaskList,
+      taskLists: updatedTaskLists,
+    ));
+
+    return newTaskFromRepo;
+  }
+
+  /// Calculate the index of a new task.
+  ///
+  /// If the task is a subtask, the index is the number of subtasks of the
+  /// parent task.
+  ///
+  /// If the task is not a subtask, the index is the number of tasks without
+  /// a parent.
+  int _calculateNewTaskIndex(Task newTask) {
     final bool isSubTask = newTask.parent != null;
     final Task? parentTask = state.activeList!.items
         .singleWhereOrNull((element) => element.id == newTask.parent);
@@ -300,42 +352,7 @@ class TasksCubit extends Cubit<TasksState> {
           .where((element) => element.parent == null)
           .length;
     }
-
-    // Emit local cached task immediately.
-    newTask = newTask.copyWith(index: index);
-    List<Task> updatedItems = List<Task>.from(state.activeList!.items) //
-      ..add(newTask);
-    TaskList updatedList = state.activeList!.copyWith(items: updatedItems);
-    List<TaskList> updatedTaskLists = state.taskLists.copy()
-      ..remove(state.activeList)
-      ..add(updatedList);
-
-    emit(state.copyWith(
-      activeList: updatedList,
-      taskLists: updatedTaskLists.sorted(),
-    ));
-
-    // Create task with repository to get final id.
-    // TODO: Move to a batching / cache method on a timer.
-    final newTaskFromRepo = await _tasksRepository.createTask(
-      taskListId: state.activeList!.id,
-      newTask: newTask,
-    );
-
-    updatedItems = List<Task>.from(updatedList.items) //
-      ..removeWhere((e) => e.id == tempId)
-      ..add(newTaskFromRepo!);
-    updatedList = updatedList.copyWith(items: updatedItems);
-    updatedTaskLists = state.taskLists.copy()
-      ..remove(state.activeList)
-      ..add(updatedList);
-
-    emit(state.copyWith(
-      activeList: updatedList,
-      taskLists: updatedTaskLists.sorted(),
-    ));
-
-    return newTaskFromRepo;
+    return index;
   }
 
   /// Called when the user is reordering Tasks.

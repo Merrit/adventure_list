@@ -455,6 +455,48 @@ void main() {
       },
     );
 
+    blocTest<TasksCubit, TasksState>(
+      'createTask() reverts to previous state if task creation fails',
+      setUp: () {
+        when(() => _tasksRepository.createTask(
+              taskListId: any(named: 'taskListId'),
+              newTask: any(named: 'newTask'),
+            )).thenAnswer((_) async => null);
+      },
+      build: () => testCubit,
+      seed: () => TasksState(
+        activeList: TaskList(
+          id: 'test-list-id-5',
+          title: 'New List',
+          index: 0,
+          items: [],
+        ),
+        loading: false,
+        taskLists: [
+          TaskList(
+            id: 'test-list-id-5',
+            title: 'New List',
+            index: 0,
+            items: [],
+          ),
+        ],
+      ),
+      act: (cubit) => cubit.createTask(Task(
+        id: 'temp-test-task-id-5',
+        taskListId: 'test-list-id-5',
+        title: 'New Task',
+        index: 0,
+        completed: false,
+      )),
+      verify: (cubit) {
+        verify(() => _tasksRepository.createTask(
+              taskListId: any(named: 'taskListId'),
+              newTask: any(named: 'newTask'),
+            )).called(1);
+        expect(cubit.state.activeList?.items.length, 0);
+      },
+    );
+
     test('deleting list works', () async {
       await testCubit.createList('Chores');
       await testCubit.createList('Tasks');
@@ -524,9 +566,9 @@ void main() {
       // Reorder tasks.
       await testCubit.reorderTasks(2, 0);
       expect(testCubit.state.activeList?.items, [
-        task3.copyWith(index: 0),
-        task1.copyWith(index: 1),
-        task2.copyWith(index: 2),
+        task3?.copyWith(index: 0),
+        task1?.copyWith(index: 1),
+        task2?.copyWith(index: 2),
       ]);
     });
 
@@ -539,7 +581,7 @@ void main() {
         ),
       );
       expect(testCubit.state.activeTask, null);
-      testCubit.setActiveTask(task.id);
+      testCubit.setActiveTask(task?.id);
       expect(testCubit.state.activeTask, task);
       testCubit.setActiveTask(null);
       expect(testCubit.state.activeTask, null);
@@ -547,13 +589,14 @@ void main() {
 
     test('undoClearTasks works', () async {
       await testCubit.createList('Tasks');
-      final Task task = await testCubit.createTask(
+      final Task? task = await testCubit.createTask(
         Task(
           taskListId: 'test-list-id',
           title: 'Do a thing',
         ),
       );
-      await testCubit.updateTask(task.copyWith(completed: true));
+      expect(task, isNotNull);
+      await testCubit.updateTask(task!.copyWith(completed: true));
       testCubit.clearCompletedTasks();
       await Future.delayed(const Duration(seconds: 3));
       testCubit.undoClearTasks();
@@ -563,26 +606,28 @@ void main() {
 
     test('updating sub-task works', () async {
       await testCubit.createList('Tasks');
-      final Task task = await testCubit.createTask(
+      final Task? task = await testCubit.createTask(
         Task(
           taskListId: 'test-list-id',
           title: 'Parent task',
         ),
       );
-      final subTask = await testCubit.createTask(
+      expect(task, isNotNull);
+      final Task? subTask = await testCubit.createTask(
         Task(
           taskListId: 'test-list-id',
           title: 'sub-task',
-          parent: task.id,
+          parent: task!.id,
         ),
       );
+      expect(subTask, isNotNull);
 
       expect(
         testCubit.state.activeList!.items.getTaskById(task.id)!.completed,
         isFalse,
       );
 
-      await testCubit.updateTask(subTask.copyWith(completed: true));
+      await testCubit.updateTask(subTask!.copyWith(completed: true));
 
       expect(
         testCubit.state.activeList!.items.getTaskById(subTask.id)!.completed,
