@@ -450,7 +450,7 @@ class TasksCubit extends Cubit<TasksState> {
 
     for (var taskEntry in tasksToBeSynced) {
       final taskListId = taskEntry['taskListId'] as String;
-      final taskJson = taskEntry['task'] as Map<String, dynamic>;
+      final taskJson = Map<String, dynamic>.from(taskEntry['task']);
 
       final task = Task.fromJson(taskJson);
 

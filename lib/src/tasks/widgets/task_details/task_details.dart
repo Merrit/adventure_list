@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
+import '../../../core/helpers/helpers.dart';
 import '../../tasks.dart';
 import 'task_details_header.dart';
 
@@ -22,11 +23,13 @@ class TaskDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
         final Task? task = state.activeTask;
 
-        final mobileView = Scaffold(
+        final smallScreenView = Scaffold(
           appBar: AppBar(
             key: ValueKey(task),
             title: (task == null)
@@ -43,12 +46,9 @@ class TaskDetails extends StatelessWidget {
           body: const TaskDetailsView(),
         );
 
-        final largeScreenView = Expanded(
-          flex: (task == null) ? 0 : 1,
-          child: const TaskDetailsView(),
-        );
+        const largeScreenView = TaskDetailsView();
 
-        return (platformIsMobile()) ? mobileView : largeScreenView;
+        return (mediaQuery.isSmallScreen) ? smallScreenView : largeScreenView;
       },
     );
   }
@@ -59,6 +59,8 @@ class TaskDetailsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
         final Task? task = state.activeTask;
@@ -72,7 +74,7 @@ class TaskDetailsView extends StatelessWidget {
               padding: const EdgeInsets.all(12.0),
               controller: ScrollController(),
               children: [
-                if (!platformIsMobile()) const TaskDetailsHeader(),
+                if (!mediaQuery.isSmallScreen) const TaskDetailsHeader(),
                 const _DescriptionWidget(),
                 const _ParentSelectionWidget(),
                 const SizedBox(height: 20),
