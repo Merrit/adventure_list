@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
 import '../tasks.dart';
 
-class TasksPage extends StatelessWidget {
+class TasksPage extends StatefulWidget {
   static const routeName = '/';
 
   const TasksPage({Key? key}) : super(key: key);
 
   @override
+  State<TasksPage> createState() => _TasksPageState();
+}
+
+class _TasksPageState extends State<TasksPage> {
+  Widget body = const SizedBox();
+
+  @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+    final width = mediaQuery.size.width;
+    final bool isSmall = width < 600;
 
     return SafeArea(
       child: BlocBuilder<TasksCubit, TasksState>(
@@ -20,20 +30,50 @@ class TasksPage extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final Widget largeBody = Row(
-            children: const [
-              CustomNavigationRail(),
-              Flexible(child: TasksView()),
-              TaskDetails(),
+          final Widget bodyContainer = Row(
+            children: [
+              if (!isSmall) const VerticalDivider(),
+              const Flexible(
+                flex: 1,
+                child: TasksView(),
+              ),
             ],
           );
 
-          const Widget mobileBody = TasksView();
-
           return Scaffold(
             appBar: mediaQuery.isHandset ? const _TaskListAppBar() : null,
-            drawer: mediaQuery.isHandset ? const CustomDrawer() : null,
-            body: mediaQuery.isHandset ? mobileBody : largeBody,
+            drawer: (isSmall)
+                ? const CustomNavigationRail(breakpoint: Breakpoints.small)
+                : null,
+            body: AdaptiveLayout(
+              primaryNavigation: SlotLayout(
+                config: <Breakpoint, SlotLayoutConfig>{
+                  Breakpoints.mediumAndUp: SlotLayout.from(
+                    key: const Key('Primary Navigation Large'),
+                    // inAnimation: AdaptiveScaffold.leftOutIn,
+                    builder: (_) => const CustomNavigationRail(
+                      breakpoint: Breakpoints.large,
+                    ),
+                  ),
+                },
+              ),
+              body: SlotLayout(
+                config: {
+                  Breakpoints.standard: SlotLayout.from(
+                    key: const Key('Body Standard'),
+                    builder: (_) => bodyContainer,
+                  ),
+                },
+              ),
+              secondaryBody: SlotLayout(
+                config: {
+                  Breakpoints.large: SlotLayout.from(
+                    key: const Key('Secondary Body Standard'),
+                    builder: (_) => const TaskDetails(),
+                  ),
+                },
+              ),
+            ),
           );
         },
       ),

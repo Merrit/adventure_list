@@ -2,42 +2,40 @@ import 'dart:io';
 
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
+import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
 import '../../app/cubit/app_cubit.dart';
+import '../../core/helpers/helpers.dart';
 import '../../settings/widgets/settings_page.dart';
 import '../tasks.dart';
 
 class CustomNavigationRail extends StatelessWidget {
-  const CustomNavigationRail({Key? key}) : super(key: key);
+  final Breakpoint breakpoint;
+
+  const CustomNavigationRail({
+    Key? key,
+    required this.breakpoint,
+  }) : super(key: key);
+
+  static const double width = 192;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
-        // Currently a ListView because NavigationRail doesn't allow
-        // having fewer than 2 items.
-        // https://github.com/flutter/flutter/pull/104914
-        return const SizedBox(
-          width: 250,
-          child: Card(
-            margin: EdgeInsets.all(6),
+        if (breakpoint == Breakpoints.small) {
+          return const Drawer(
             child: _NavContents(),
-          ),
-        );
+          );
+        } else {
+          return ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: width),
+            child: const _NavContents(),
+          );
+        }
       },
-    );
-  }
-}
-
-class CustomDrawer extends StatelessWidget {
-  const CustomDrawer({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const Drawer(
-      child: _NavContents(),
     );
   }
 }
@@ -136,6 +134,8 @@ class __TaskListTileState extends State<_TaskListTile> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+
     return MouseRegion(
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
@@ -157,7 +157,7 @@ class __TaskListTileState extends State<_TaskListTile> {
                 : null,
             onTap: () {
               tasksCubit.setActiveList(taskList.id);
-              if (platformIsMobile()) Navigator.pop(context);
+              if (mediaQuery.isSmallScreen) Navigator.pop(context);
             },
           );
         },

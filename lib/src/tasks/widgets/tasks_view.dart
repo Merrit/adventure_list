@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide PopupMenuButton, PopupMenuItem;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:helpers/helpers.dart';
 
 import '../../core/core.dart';
 import '../tasks.dart';
@@ -11,6 +10,8 @@ class TasksView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+
     return BlocConsumer<TasksCubit, TasksState>(
       listener: (context, state) {
         if (state.awaitingClearTasksUndo) {
@@ -37,14 +38,14 @@ class TasksView extends StatelessWidget {
             .where((e) => !e.deleted && e.parent == null)
             .toList();
 
-        return SizedBox(
-          width: platformIsMobile() ? null : 600,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const _TasksHeader(),
-              const _NewTaskButton(),
-              Expanded(
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const _TasksHeader(),
+            const _NewTaskButton(),
+            Expanded(
+              child: SizedBox(
+                width: mediaQuery.size.width,
                 child: ReorderableListView.builder(
                   scrollController: ScrollController(),
                   buildDefaultDragHandles:
@@ -61,7 +62,11 @@ class TasksView extends StatelessWidget {
                       children: [
                         TaskTile(key: ValueKey(task), index: index, task: task),
                         if (index != tasks.length - 1)
-                          const Divider(height: 16),
+                          SizedBox(
+                            width: mediaQuery.size.width,
+                            child: const Divider(height: 16),
+                          ),
+                        // const Divider(height: 16),
                       ],
                     );
                   },
@@ -72,16 +77,8 @@ class TasksView extends StatelessWidget {
                   },
                 ),
               ),
-              // if (state.activeList!.items.any((element) => element.completed))
-              //   ExpansionTile(
-              //     title: const Text('Completed'),
-              //     children: state.activeList!.items
-              //         .where((element) => element.completed)
-              //         .map((e) => TaskTile(task: e))
-              //         .toList(),
-              //   ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
@@ -132,6 +129,7 @@ class _TasksHeader extends StatelessWidget {
           if (taskList == null) return const SizedBox();
 
           return Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 taskList.title,
@@ -141,6 +139,7 @@ class _TasksHeader extends StatelessWidget {
                 ),
               ),
               Flexible(
+                fit: FlexFit.loose,
                 child: Opacity(
                   opacity: 0.5,
                   child: Transform.scale(

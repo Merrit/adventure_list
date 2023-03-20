@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:helpers/helpers.dart';
 
 import '../../core/core.dart';
+import '../../core/helpers/helpers.dart';
 import '../tasks.dart';
 
 part 'task_tile.freezed.dart';
@@ -52,6 +52,8 @@ class TaskTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
         final TaskList? activeList = state.activeList;
@@ -72,7 +74,7 @@ class TaskTile extends StatelessWidget {
               : task.id;
           tasksCubit.setActiveTask(taskId);
 
-          if (platformIsMobile()) {
+          if (mediaQuery.isSmallScreen) {
             await Navigator.pushNamed(
               context,
               TaskDetails.routeName,
