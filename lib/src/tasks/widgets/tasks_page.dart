@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:helpers/helpers.dart';
 
+import '../../core/helpers/helpers.dart';
 import '../tasks.dart';
 
 class TasksPage extends StatefulWidget {
@@ -20,8 +20,6 @@ class _TasksPageState extends State<TasksPage> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    final width = mediaQuery.size.width;
-    final bool isSmall = width < 600;
 
     return SafeArea(
       child: BlocBuilder<TasksCubit, TasksState>(
@@ -32,7 +30,7 @@ class _TasksPageState extends State<TasksPage> {
 
           final Widget bodyContainer = Row(
             children: [
-              if (!isSmall) const VerticalDivider(),
+              if (!mediaQuery.isSmallScreen) const VerticalDivider(),
               const Flexible(
                 flex: 1,
                 child: TasksView(),
@@ -41,14 +39,14 @@ class _TasksPageState extends State<TasksPage> {
           );
 
           return Scaffold(
-            appBar: mediaQuery.isHandset ? const _TaskListAppBar() : null,
-            drawer: (isSmall)
+            appBar: mediaQuery.isSmallScreen ? const _TaskListAppBar() : null,
+            drawer: (mediaQuery.isSmallScreen)
                 ? const CustomNavigationRail(breakpoint: Breakpoints.small)
                 : null,
             body: AdaptiveLayout(
               primaryNavigation: SlotLayout(
                 config: <Breakpoint, SlotLayoutConfig>{
-                  Breakpoints.mediumAndUp: SlotLayout.from(
+                  Breakpoints.large: SlotLayout.from(
                     key: const Key('Primary Navigation Large'),
                     // inAnimation: AdaptiveScaffold.leftOutIn,
                     builder: (_) => const CustomNavigationRail(
