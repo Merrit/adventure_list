@@ -39,7 +39,7 @@ class _TasksPageState extends State<TasksPage> {
           );
 
           return Scaffold(
-            appBar: mediaQuery.isSmallScreen ? const _TaskListAppBar() : null,
+            appBar: (mediaQuery.isSmallScreen) ? const _TaskListAppBar() : null,
             drawer: (mediaQuery.isSmallScreen)
                 ? const CustomNavigationRail(breakpoint: Breakpoints.small)
                 : null,
@@ -89,16 +89,8 @@ class _TaskListAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TasksCubit, TasksState>(
-      builder: (context, state) {
-        if (state.activeList == null) return AppBar();
-
-        final TaskList activeList = state.activeList!;
-
-        return AppBar(
-          title: Text(activeList.title),
-        );
-      },
+    return AppBar(
+      title: const TasksHeader(),
     );
   }
 }
