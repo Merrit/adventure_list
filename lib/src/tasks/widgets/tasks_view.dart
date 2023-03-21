@@ -41,7 +41,7 @@ class TasksView extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _TasksHeader(),
+            const TasksHeader(),
             const _NewTaskButton(),
             Expanded(
               child: SizedBox(
@@ -108,106 +108,6 @@ class _CreateSelectListPrompt extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _TasksHeader extends StatelessWidget {
-  const _TasksHeader({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        top: 20,
-        left: 50,
-      ),
-      child: BlocBuilder<TasksCubit, TasksState>(
-        builder: (context, state) {
-          final TaskList? taskList = state.activeList;
-          if (taskList == null) return const SizedBox();
-
-          /// SingleChildScrollView is used to prevent the header from
-          /// overflowing when resizing the window.
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  taskList.title,
-                  style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Flexible(
-                  fit: FlexFit.loose,
-                  child: Opacity(
-                    opacity: 0.5,
-                    child: Transform.scale(
-                      scale: 0.9,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.settings),
-                            onPressed: () {
-                              if (MediaQuery.of(context).isHandset) {
-                                Navigator.pushNamed(
-                                  context,
-                                  TaskListSettingsPage.routeName,
-                                );
-                              } else {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    final mediaQuery = MediaQuery.of(context);
-
-                                    return AlertDialog(
-                                      title: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: const [
-                                          SizedBox(),
-                                          Text('List Settings'),
-                                          CloseButton(),
-                                        ],
-                                      ),
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                        vertical: 20.0,
-                                        horizontal: 100.0,
-                                      ),
-                                      content: SizedBox(
-                                        width: mediaQuery.size.width / 2,
-                                        child: const TaskListSettingsView(),
-                                      ),
-                                    );
-                                  },
-                                );
-                              }
-                            },
-                          ),
-                          PopupMenuButton(
-                            itemBuilder: (context) {
-                              return [
-                                PopupMenuItem(
-                                  onTap: () => tasksCubit.clearCompletedTasks(),
-                                  child: const Text('Clear completed'),
-                                ),
-                              ];
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
       ),
     );
   }
