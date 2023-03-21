@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
 extension MediaQueryHelpers on MediaQueryData {
-  bool get isSmallScreen => size.width < 600;
+  /// Matches the Large breakpoint from the flutter_adaptive_scaffold package.
+  bool get isSmallScreen => size.width < 840;
 }
