@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' hide PopupMenuButton, PopupMenuItem;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/core.dart';
+import '../../core/helpers/helpers.dart';
 import '../tasks.dart';
 
 class TasksView extends StatelessWidget {
@@ -38,10 +39,20 @@ class TasksView extends StatelessWidget {
             .where((e) => !e.deleted && e.parent == null)
             .toList();
 
+        final Widget tasksHeader = (mediaQuery.isSmallScreen) //
+            ? const SizedBox()
+            : const Padding(
+                padding: EdgeInsets.only(
+                  top: 20,
+                  left: 50,
+                ),
+                child: TasksHeader(),
+              );
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const TasksHeader(),
+            tasksHeader,
             const _NewTaskButton(),
             Expanded(
               child: SizedBox(
