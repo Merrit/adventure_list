@@ -58,6 +58,7 @@ class _TasksPageState extends State<TasksPage> {
                 flex: 1,
                 child: TasksView(),
               ),
+              if (!mediaQuery.isSmallScreen) const VerticalDivider(),
             ],
           );
 
