@@ -82,26 +82,23 @@ class TaskDetailsView extends StatelessWidget {
         final Task? task = state.activeTask;
         if (task == null) return const SizedBox();
 
-        final widgetContents = Card(
-          margin: const EdgeInsets.all(6),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListView(
-              padding: const EdgeInsets.all(12.0),
-              controller: ScrollController(),
-              children: [
-                if (!mediaQuery.isSmallScreen) const TaskDetailsHeader(),
-                const _DescriptionWidget(),
-                const _ParentSelectionWidget(),
-                const SizedBox(height: 20),
-                const Text('Sub-tasks'),
-                ...state.activeList!.items
-                    .where((e) => e.parent == task.id && !e.deleted)
-                    .map((e) => TaskTile(key: ValueKey(e), index: 0, task: e))
-                    .toList(),
-                _AddSubTaskWidget(parentTask: task),
-              ],
-            ),
+        final widgetContents = Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView(
+            padding: const EdgeInsets.all(12.0),
+            controller: ScrollController(),
+            children: [
+              if (!mediaQuery.isSmallScreen) const TaskDetailsHeader(),
+              const _DescriptionWidget(),
+              const _ParentSelectionWidget(),
+              const SizedBox(height: 20),
+              const Text('Sub-tasks'),
+              ...state.activeList!.items
+                  .where((e) => e.parent == task.id && !e.deleted)
+                  .map((e) => TaskTile(key: ValueKey(e), index: 0, task: e))
+                  .toList(),
+              _AddSubTaskWidget(parentTask: task),
+            ],
           ),
         );
 
