@@ -56,7 +56,7 @@ class HomeWidgetExampleProvider : HomeWidgetProvider() {
                 var tasksListString = ""
                 for (i in 0 until tasksList.size) {
                     val task: Map<String, Any> = tasksList[i]
-                    tasksListString += "\n${task["title"]}"
+                    tasksListString += "\n• ${task["title"]}"
                 }
 
 
