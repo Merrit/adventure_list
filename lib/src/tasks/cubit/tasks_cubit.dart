@@ -624,12 +624,11 @@ class TasksCubit extends Cubit<TasksState> {
     // Make a copy so we don't affect the actual list while preparing for
     // widget.
     final TaskList listCopy = selectedList.copyWith(
-      items: List<Task>.from(selectedList.items),
+      // Don't show completed/deleted items in widget.
+      items: selectedList.items
+          .where((e) => !e.completed && !e.deleted && e.parent == null)
+          .toList(),
     );
-    // Don't show completed/deleted items in widget.
-    listCopy //
-        .items
-        .removeWhere((e) => e.completed || e.deleted || e.parent != null);
-    updateHomeWidget('selectedList', listCopy.toJson());
+    updateHomeWidget('selectedList', jsonEncode(listCopy.toJson()));
   }
 }
