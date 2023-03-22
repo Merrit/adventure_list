@@ -25,25 +25,41 @@ class TaskDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
 
+    // If the screen is large enough, for example because the user resized the
+    // window, we want to show the task details in the same page as the list of
+    // tasks, so we return to the TasksPage.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mediaQuery.isSmallScreen) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+    });
+
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
         final Task? task = state.activeTask;
 
-        final smallScreenView = Scaffold(
-          appBar: AppBar(
-            key: ValueKey(task),
-            title: (task == null)
-                ? null
-                : TextInputListTile(
-                    editingPlaceholderText: true,
-                    placeholderText: task.title,
-                    unfocusedOpacity: 1.0,
-                    callback: (String value) => tasksCubit.updateTask(
-                      task.copyWith(title: value),
+        final smallScreenView = WillPopScope(
+          onWillPop: () async {
+            tasksCubit.setActiveTask(null);
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            return false;
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              key: ValueKey(task),
+              title: (task == null)
+                  ? null
+                  : TextInputListTile(
+                      editingPlaceholderText: true,
+                      placeholderText: task.title,
+                      unfocusedOpacity: 1.0,
+                      callback: (String value) => tasksCubit.updateTask(
+                        task.copyWith(title: value),
+                      ),
                     ),
-                  ),
+            ),
+            body: const TaskDetailsView(),
           ),
-          body: const TaskDetailsView(),
         );
 
         const largeScreenView = TaskDetailsView();

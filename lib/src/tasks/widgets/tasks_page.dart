@@ -17,12 +17,35 @@ class TasksPage extends StatefulWidget {
 class _TasksPageState extends State<TasksPage> {
   Widget body = const SizedBox();
 
+  /// Checks if there is an active task and what the current screen size is.
+  ///
+  /// If there is an active task and we are on a small screen, we want to
+  /// navigate to the task details page.
+  void checkForActiveTask(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final state = context.read<TasksCubit>().state;
+    if (state.activeTask != null && mediaQuery.isSmallScreen) {
+      Navigator.of(context).pushNamed(TaskDetails.routeName);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkForActiveTask(context);
+    });
+
     final mediaQuery = MediaQuery.of(context);
 
     return SafeArea(
-      child: BlocBuilder<TasksCubit, TasksState>(
+      child: BlocConsumer<TasksCubit, TasksState>(
+        listener: (context, state) {
+          // If there is an active task and we are on a small screen, we want to
+          // navigate to the task details page.
+          if (state.activeTask != null && mediaQuery.isSmallScreen) {
+            Navigator.of(context).pushNamed(TaskDetails.routeName);
+          }
+        },
         builder: (context, state) {
           if (state.loading) {
             return const Center(child: CircularProgressIndicator());
