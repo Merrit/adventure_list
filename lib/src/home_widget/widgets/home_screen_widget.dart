@@ -55,7 +55,13 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
         } else {
           tasksCubit
               .setActiveList(settingsCubit.state.homeWidgetSelectedListId);
-          Navigator.pushReplacementNamed(context, TasksPage.routeName);
+          // Ensure we are on the TasksPage when launched from the android
+          // widget.
+          navigator.popUntil((route) => route.isFirst);
+          // Check if the drawer is open and close it.
+          if (navigator.canPop()) {
+            navigator.pop();
+          }
         }
         return;
       default:
