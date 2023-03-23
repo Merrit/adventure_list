@@ -124,6 +124,21 @@ class GoogleCalendar implements TasksRepository {
   }
 
   @override
+  Future<bool> deleteTask({
+    required String taskListId,
+    required String taskId,
+  }) async {
+    try {
+      await _api.events.delete(taskListId, taskId);
+    } on Exception catch (e) {
+      log.e('Failed to delete task', e);
+      return false;
+    }
+
+    return true;
+  }
+
+  @override
   Future<TaskList?> updateList({required TaskList list}) async {
     final Calendar calendar;
     try {

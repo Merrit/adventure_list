@@ -67,9 +67,7 @@ class TaskList with _$TaskList {
   /// Task indexes are recalculated and the updated [TaskList] is returned.
   TaskList reorderTasks(int oldIndex, int newIndex) {
     final updatedTasks = List<Task>.from(items);
-    final topLevelTasks = updatedTasks
-        .where((element) => element.parent == null && !element.deleted)
-        .toList();
+    final topLevelTasks = updatedTasks.topLevelTasks();
 
     for (var task in topLevelTasks) {
       updatedTasks.remove(task);

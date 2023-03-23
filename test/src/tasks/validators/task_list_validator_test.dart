@@ -29,7 +29,6 @@ void main() {
         id: UniqueKey().toString(),
         index: 0,
         completed: true,
-        deleted: true,
       );
       final garbageSubTask1 = Task(
         taskListId: 'test-task-list-id',

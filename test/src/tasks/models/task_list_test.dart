@@ -9,7 +9,6 @@ void main() {
 
   final task1 = Task(
     completed: false,
-    deleted: false,
     description: null,
     dueDate: null,
     id: const Uuid().v4(),
@@ -22,7 +21,6 @@ void main() {
 
   final task2 = Task(
     completed: false,
-    deleted: false,
     description: null,
     dueDate: null,
     id: const Uuid().v4(),
@@ -35,7 +33,6 @@ void main() {
 
   final task3 = Task(
     completed: false,
-    deleted: false,
     description: null,
     dueDate: null,
     id: const Uuid().v4(),
@@ -48,7 +45,6 @@ void main() {
 
   final task4 = Task(
     completed: false,
-    deleted: false,
     description: null,
     dueDate: null,
     id: const Uuid().v4(),

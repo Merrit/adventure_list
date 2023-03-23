@@ -22,6 +22,14 @@ abstract class TasksRepository {
     required Task newTask,
   });
 
+  /// Delete the [Task] with [taskId].
+  ///
+  /// Returns `false` if unable to delete (ie, no network connection).
+  Future<bool> deleteTask({
+    required String taskListId,
+    required String taskId,
+  });
+
   /// Update the provided [Task] in the repository.
   Future<Task?> updateTask({
     required String taskListId,

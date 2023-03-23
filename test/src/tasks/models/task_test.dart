@@ -15,7 +15,6 @@ void main() {
 
     final expectedTask = Task(
       completed: true,
-      deleted: false,
       description: 'Gotta look good!',
       dueDate: DateTime.fromMillisecondsSinceEpoch(dueDate),
       id: id,
@@ -143,20 +142,6 @@ void main() {
       expect(updatedIncompleteTasks.last.completed, false);
     });
 
-    test('deletedTasks() works', () {
-      final tasks = <Task>[task1, task2, task3];
-      final deletedTasks = tasks.deletedTasks();
-      expect(deletedTasks, isA<List<Task>>());
-      expect(deletedTasks.length, 0);
-      final updatedTasks = tasks
-          .map((t) => t.copyWith(deleted: t.title == 'Test Task 2'))
-          .toList();
-      final updatedDeletedTasks = updatedTasks.deletedTasks();
-      expect(updatedDeletedTasks.length, 1);
-      expect(updatedDeletedTasks.first.title, 'Test Task 2');
-      expect(updatedDeletedTasks.first.deleted, true);
-    });
-
     test('getTaskById() works', () {
       final tasks = <Task>[task1, task2, task3];
       final task = tasks.getTaskById(task2.id);
@@ -186,28 +171,6 @@ void main() {
       expect(updatedTasks.last, task3);
     });
 
-    test('markTaskDeleted() works', () {
-      final tasks = <Task>[task1, task2, task3];
-      final updatedTasks = tasks.markTaskDeleted(task2);
-      expect(updatedTasks, isA<List<Task>>());
-      expect(updatedTasks.length, 3);
-      expect(updatedTasks.first, task1);
-      expect(updatedTasks[1].title, 'Test Task 2');
-      expect(updatedTasks[1].deleted, true);
-      expect(updatedTasks.last, task3);
-    });
-
-    test('markTaskNotDeleted() works', () {
-      final tasks = <Task>[task1, task2, task3];
-      final updatedTasks = tasks.markTaskNotDeleted(task2);
-      expect(updatedTasks, isA<List<Task>>());
-      expect(updatedTasks.length, 3);
-      expect(updatedTasks.first, task1);
-      expect(updatedTasks[1].title, 'Test Task 2');
-      expect(updatedTasks[1].deleted, false);
-      expect(updatedTasks.last, task3);
-    });
-
     test('reorderTasks() works', () {
       final tasks = <Task>[task1, task2, task3];
       final updatedTasks = tasks.reorderTasks(task1, 2);
@@ -229,6 +192,31 @@ void main() {
       expect(updatedTasks.first, task1);
       expect(updatedTasks.last.title, 'Test Task 3');
       expect(updatedTasks.last.index, 1);
+    });
+
+    test('removeTask() on parent also removes subtasks', () {
+      final tasks = <Task>[task1, task2, task3, subTask1, subTask2, subTask3];
+      final updatedTasks = tasks.removeTask(task2);
+      expect(updatedTasks, isA<List<Task>>());
+      expect(updatedTasks.length, 4);
+      expect(updatedTasks.first, task1);
+      expect(updatedTasks[1].title, 'Test Task 3');
+      expect(updatedTasks[1].index, 1);
+      expect(updatedTasks[2].title, 'Test Subtask 1');
+      expect(updatedTasks[2].index, 0);
+      expect(updatedTasks[3].title, 'Test Subtask 2');
+      expect(updatedTasks[3].index, 1);
+    });
+
+    test('removeTasks() works', () {
+      final tasks = <Task>[task1, task2, task3, subTask1, subTask2, subTask3];
+      final updatedTasks = tasks.removeTasks([task2, subTask1]);
+      expect(updatedTasks.length, 3);
+      expect(updatedTasks.first, task1);
+      expect(updatedTasks[1].title, 'Test Task 3');
+      expect(updatedTasks[1].index, 1);
+      expect(updatedTasks.last.title, 'Test Subtask 2');
+      expect(updatedTasks.last.index, 0);
     });
 
     test('sortedByDueDate() works', () {
@@ -324,6 +312,32 @@ void main() {
       expect(topLevelTasks.first, task1);
       expect(topLevelTasks[1], task2);
       expect(topLevelTasks.last, task3);
+    });
+
+    test('updateIndexes() works', () {
+      final tasks = <Task>[
+        task1.copyWith(index: 2),
+        task2.copyWith(index: 3),
+        task3.copyWith(index: 6),
+        subTask1.copyWith(index: 4),
+        subTask2.copyWith(index: 5),
+        subTask3.copyWith(index: 1),
+      ];
+      final updatedTasks = tasks.updateIndexes();
+      expect(updatedTasks, isA<List<Task>>());
+      expect(updatedTasks.length, 6);
+      expect(updatedTasks.first.index, 0);
+      expect(updatedTasks.first.title, 'Test Task 1');
+      expect(updatedTasks[1].index, 1);
+      expect(updatedTasks[1].title, 'Test Task 2');
+      expect(updatedTasks[2].index, 2);
+      expect(updatedTasks[2].title, 'Test Task 3');
+      expect(updatedTasks[3].index, 0);
+      expect(updatedTasks[3].title, 'Test Subtask 1');
+      expect(updatedTasks[4].index, 1);
+      expect(updatedTasks[4].title, 'Test Subtask 2');
+      expect(updatedTasks.last.index, 0);
+      expect(updatedTasks.last.title, 'Test Subtask 3');
     });
 
     test('updateTask() works', () {
