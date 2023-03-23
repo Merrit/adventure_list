@@ -22,7 +22,7 @@ class TasksView extends StatelessWidget {
               action: SnackBarAction(
                 label: 'Undo',
                 onPressed: () {
-                  tasksCubit.undoClearTasks();
+                  tasksCubit.undoClearCompletedTasks();
                   ScaffoldMessenger.of(context).clearSnackBars();
                 },
               ),
@@ -36,8 +36,7 @@ class TasksView extends StatelessWidget {
 
         final tasks = activeList //
             .items
-            .where((e) => !e.deleted && e.parent == null)
-            .toList();
+            .topLevelTasks();
 
         final Widget tasksHeader = (mediaQuery.isSmallScreen) //
             ? const SizedBox()

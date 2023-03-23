@@ -94,7 +94,7 @@ class TaskDetailsView extends StatelessWidget {
               const SizedBox(height: 20),
               const Text('Sub-tasks'),
               ...state.activeList!.items
-                  .where((e) => e.parent == task.id && !e.deleted)
+                  .subtasksOf(task.id)
                   .map((e) => TaskTile(key: ValueKey(e), index: 0, task: e))
                   .toList(),
               _AddSubTaskWidget(parentTask: task),
@@ -269,10 +269,8 @@ class _ParentSelectionWidgetState extends State<_ParentSelectionWidget> {
         if (task == null) return const SizedBox();
 
         final tasks = state.activeList?.items //
-            .where((e) =>
-                !e.deleted &&
-                e.id != task.id &&
-                (e.parent == null || e.parent == ''))
+            .where(
+                (e) => e.id != task.id && (e.parent == null || e.parent == ''))
             .toList();
         if (tasks == null) return const SizedBox();
 

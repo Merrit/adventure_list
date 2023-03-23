@@ -60,9 +60,7 @@ class TaskTile extends StatelessWidget {
 
         if (activeList == null) return const SizedBox();
 
-        final childTasks = state.activeList!.items
-            .where((element) => element.parent == task.id && !element.deleted)
-            .toList();
+        final childTasks = state.activeList!.items.subtasksOf(task.id);
 
         final completedTasks = childTasks //
             .where((element) => element.completed)

@@ -53,6 +53,7 @@ void main() {
     when(() => calendarListResource.update(any(), any()))
         .thenAnswer((_) async => CalendarListEntry());
 
+    when(() => eventsResource.delete(any(), any())).thenAnswer((_) async {});
     when(() => eventsResource.list(
           any(),
           showDeleted: any(named: 'showDeleted'),
@@ -156,6 +157,26 @@ void main() {
 
       test('returns true if successful', () async {
         final result = await calendar.deleteList(id: 'fakeid');
+        expect(result, isTrue);
+      });
+    });
+
+    group('deleteTask:', () {
+      test('returns false if api call fails', () async {
+        when(() => eventsResource.delete(any(), any()))
+            .thenThrow(Exception('Failed to delete task'));
+        final result = await calendar.deleteTask(
+          taskListId: 'fakeid',
+          taskId: 'fakeid',
+        );
+        expect(result, isFalse);
+      });
+
+      test('returns true if successful', () async {
+        final result = await calendar.deleteTask(
+          taskListId: 'fakeid',
+          taskId: 'fakeid',
+        );
         expect(result, isTrue);
       });
     });

@@ -59,7 +59,6 @@ void main() {
       taskListId: '',
       updated: DateTime.now(),
       completed: false,
-      deleted: false,
       description: null,
       dueDate: null,
       parent: null,
@@ -146,6 +145,111 @@ void main() {
       }
     });
 
+    const testTaskListId = 'test-task-list-id';
+
+    final testTaskList = TaskList(
+      id: testTaskListId,
+      title: 'Test Task List',
+      index: 0,
+      items: const [],
+    );
+
+    final task1 = Task(
+      id: 'test-task-id-1',
+      title: 'Test Task 1',
+      index: 0,
+      taskListId: testTaskListId,
+      updated: DateTime.now(),
+      completed: false,
+      description: null,
+      dueDate: null,
+      parent: null,
+    );
+
+    final task2 = Task(
+      id: 'test-task-id-2',
+      title: 'Test Task 2',
+      index: 1,
+      taskListId: testTaskListId,
+      updated: DateTime.now(),
+      completed: false,
+      description: null,
+      dueDate: null,
+      parent: null,
+    );
+
+    final task3 = Task(
+      id: 'test-task-id-3',
+      title: 'Test Task 3',
+      index: 2,
+      taskListId: testTaskListId,
+      updated: DateTime.now(),
+      completed: false,
+      description: null,
+      dueDate: null,
+      parent: null,
+    );
+
+    final task4 = Task(
+      id: 'test-task-id-4',
+      title: 'Test Task 4',
+      index: 3,
+      taskListId: testTaskListId,
+      updated: DateTime.now(),
+      completed: false,
+      description: null,
+      dueDate: null,
+      parent: null,
+    );
+
+    final subTask1 = Task(
+      id: 'test-sub-task-id-1',
+      title: 'Test Sub Task 1',
+      index: 0,
+      taskListId: testTaskListId,
+      updated: DateTime.now(),
+      completed: false,
+      description: null,
+      dueDate: null,
+      parent: task1.id,
+    );
+
+    final subTask2 = Task(
+      id: 'test-sub-task-id-2',
+      title: 'Test Sub Task 2',
+      index: 1,
+      taskListId: testTaskListId,
+      updated: DateTime.now(),
+      completed: false,
+      description: null,
+      dueDate: null,
+      parent: task1.id,
+    );
+
+    final subTask3 = Task(
+      id: 'test-sub-task-id-3',
+      title: 'Test Sub Task 3',
+      index: 2,
+      taskListId: testTaskListId,
+      updated: DateTime.now(),
+      completed: false,
+      description: null,
+      dueDate: null,
+      parent: task1.id,
+    );
+
+    final subTask4 = Task(
+      id: 'test-sub-task-id-4',
+      title: 'Test Sub Task 4',
+      index: 0,
+      taskListId: testTaskListId,
+      updated: DateTime.now(),
+      completed: false,
+      description: null,
+      dueDate: null,
+      parent: task3.id,
+    );
+
     test('singleton instance is accessible', () {
       expect(tasksCubit, isNotNull);
     });
@@ -158,6 +262,49 @@ void main() {
       ),
       expect: () => [TasksState.initial().copyWith(loading: false)],
     );
+
+    test('clearCompletedTasks() works', () async {
+      when(() => _tasksRepository.deleteTask(
+            taskListId: any(named: 'taskListId'),
+            taskId: any(named: 'taskId'),
+          )).thenAnswer((_) async => true);
+
+      // Seed the state with a task list and tasks
+      final taskList = testTaskList.copyWith(
+        items: [
+          task1.copyWith(completed: true),
+          task2.copyWith(completed: true),
+          task3.copyWith(completed: false),
+          task4.copyWith(completed: false),
+          subTask1.copyWith(completed: false),
+          subTask2.copyWith(completed: true),
+          subTask3.copyWith(completed: false),
+          subTask4.copyWith(completed: false),
+        ],
+      );
+      testCubit.emit(TasksState(
+        loading: false,
+        activeList: taskList,
+        taskLists: [taskList],
+      ));
+
+      // Clear the completed tasks
+      await testCubit.clearCompletedTasks();
+
+      // Verify that the tasks that were not completed remain
+      final updatedTaskList = testCubit.state.activeList;
+      if (updatedTaskList == null) fail('Task list is null');
+      expect(updatedTaskList.items.length, 3);
+      expect(updatedTaskList.items[0].id, task3.id);
+      expect(updatedTaskList.items[0].completed, false);
+      expect(updatedTaskList.items[0].index, 0);
+      expect(updatedTaskList.items[1].id, task4.id);
+      expect(updatedTaskList.items[1].completed, false);
+      expect(updatedTaskList.items[1].index, 1);
+      expect(updatedTaskList.items[2].id, subTask4.id);
+      expect(updatedTaskList.items[2].completed, false);
+      expect(updatedTaskList.items[2].index, 0);
+    });
 
     blocTest<TasksCubit, TasksState>(
       'createList() creates a new task list',
@@ -599,7 +746,7 @@ void main() {
       await testCubit.updateTask(task!.copyWith(completed: true));
       testCubit.clearCompletedTasks();
       await Future.delayed(const Duration(seconds: 3));
-      testCubit.undoClearTasks();
+      testCubit.undoClearCompletedTasks();
       expect(testCubit.state.activeList!.items.first,
           task.copyWith(completed: true));
     });

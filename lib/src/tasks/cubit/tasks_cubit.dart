@@ -479,101 +479,107 @@ class TasksCubit extends Cubit<TasksState> {
     ));
   }
 
-  /// True if the user cancelled the clear operation.
-  bool _clearTasksWasCancelled = false;
+  /// Holds the [Task](s) that were cleared until the timer expires and they
+  /// are deleted, or the user cancels the clear operation.
+  List<Task>? _clearedTasks;
 
-  /// The [TaskList] before the user cleared completed tasks.
-  TaskList? _activeTaskListBeforeClear;
-
-  /// The [TaskList] collection before the user cleared completed tasks.
-  List<TaskList>? _taskListCollectionBeforeClear;
+  /// Timer giving the user time to cancel the clear operation.
+  Timer? _clearTimer;
 
   /// Clears all completed tasks from the active list.
+  ///
+  /// If [parentId] is provided, only that parent task and its sub-tasks will be
+  /// cleared.
+  ///
+  /// A task is marked "completed" when it is checked, but this does not remove
+  /// it from the list, rather it is displayed differently; for example crossed
+  /// out, hidden in a dropdown, etc. By "clearing" we are actually deleting the
+  /// task.
+  ///
+  /// The user can cancel the clear operation by calling
+  /// [undoClearCompletedTasks].
   Future<void> clearCompletedTasks([String? parentId]) async {
-    _clearTasksWasCancelled = false;
+    final activeList = state.activeList;
+    if (activeList == null) return;
 
-    // A task is marked "completed" when it is checked, but this does not remove
-    // it from the list. By "clearing" we are also setting the "deleted"
-    // property to true - which doesn't *actually* delete it, but hides it. This
-    // gives us the option of retrieving "deleted" items.
+    final List<Task> tasksToBeCleared = [];
 
-    _activeTaskListBeforeClear = state.activeList!.copyWith();
-    _taskListCollectionBeforeClear = state.taskLists.copy();
+    if (parentId != null) {
+      final parentTask = activeList.items.getTaskById(parentId);
+      tasksToBeCleared.addAll(activeList.items.subtasksOf(parentId));
+      tasksToBeCleared.add(parentTask!);
+    } else {
+      tasksToBeCleared.addAll(activeList.items.completedTasks());
+    }
 
-    final List<Task> updatedTasks = state.activeList!.items.map((Task task) {
-      final Task? parent = state //
-          .activeList
-          ?.items
-          .singleWhereOrNull((element) => element.id == task.parent);
+    // If there are no tasks to be cleared, don't do anything.
+    if (tasksToBeCleared.isEmpty) return;
 
-      // If a parent task is being completed, sub-tasks should be as well.
-      if (parent != null && parent.completed) {
-        return task.copyWith(completed: true, deleted: true);
-      }
+    // Save the tasks to be cleared in case the user wants to undo the clear.
+    _clearedTasks = tasksToBeCleared;
 
-      // Not completed.
-      if (!task.completed) return task;
+    // Remove the tasks from the list.
+    final List<Task> updatedTasks = activeList //
+        .items
+        .removeTasks(tasksToBeCleared);
 
-      // Completed top-level tasks.
-      if (parentId == null && task.parent == null) {
-        return task.copyWith(deleted: true);
-      }
-
-      // Completed sub-tasks.
-      if (parentId != null && task.parent == parentId) {
-        return task.copyWith(deleted: true);
-      }
-
-      // Default.
-      return task;
-    }).toList();
-
-    final TaskList updatedList = state //
-        .activeList!
-        .copyWith(items: updatedTasks);
-    final int index = state.taskLists.indexWhere((e) => e.id == updatedList.id);
-
-    final taskLists = state.taskLists.copy()
-      ..removeAt(index)
-      ..insert(index, updatedList);
+    // Update the active list.
+    final int index = state.taskLists.indexWhere(
+      (element) => element.id == activeList.id,
+    );
+    final TaskList updatedTaskList = activeList.copyWith(items: updatedTasks);
+    final List<TaskList> updatedAllTaskLists = state.taskLists.copy()
+      ..[index] = updatedTaskList;
 
     emit(state.copyWith(
-      activeList: updatedList,
+      activeList: updatedTaskList,
       awaitingClearTasksUndo: true,
-      taskLists: taskLists.sorted(),
+      taskLists: updatedAllTaskLists,
     ));
 
-    // Give the user a chance to undo.
-    await Future.delayed(const Duration(seconds: 5));
-    emit(state.copyWith(awaitingClearTasksUndo: false));
+    // Start the timer to clear the tasks.
+    _clearTimer = Timer(const Duration(seconds: 10), () async {
+      emit(state.copyWith(awaitingClearTasksUndo: false));
 
-    if (!_clearTasksWasCancelled) {
-      // Ensure pending task updates don't overwrite the cleared state.
-      for (var task in updatedList.items) {
-        await StorageRepository.instance.delete(
-          task.id,
-          storageArea: 'tasksToBeSynced',
+      for (var task in tasksToBeCleared) {
+        await _tasksRepository.deleteTask(
+          taskListId: activeList.id,
+          taskId: task.id,
         );
       }
 
-      // Commit to clearing changes.
-      for (var task in updatedList.items) {
-        await _tasksRepository.updateTask(
-          taskListId: updatedList.id,
-          updatedTask: task,
-        );
-      }
-    }
+      _clearedTasks = null;
+      _clearTimer = null;
+    });
   }
 
-  /// Cancels the clear operation.
-  void undoClearTasks() {
-    _clearTasksWasCancelled = true;
+  /// Cancels the clear operation and restores the tasks that were cleared.
+  void undoClearCompletedTasks() {
+    if (_clearedTasks == null) return;
+
+    final activeList = state.activeList;
+    if (activeList == null) return;
+
+    final List<Task> updatedTasks = activeList.items.copy()
+      ..addAll(_clearedTasks!);
+
+    // Update the active list.
+    final int index = state.taskLists.indexWhere(
+      (element) => element.id == activeList.id,
+    );
+    final TaskList updatedTaskList = activeList.copyWith(items: updatedTasks);
+    final List<TaskList> updatedAllTaskLists = state.taskLists.copy()
+      ..[index] = updatedTaskList;
+
     emit(state.copyWith(
-      activeList: _activeTaskListBeforeClear,
+      activeList: updatedTaskList,
       awaitingClearTasksUndo: false,
-      taskLists: _taskListCollectionBeforeClear!,
+      taskLists: updatedAllTaskLists,
     ));
+
+    _clearedTasks = null;
+    _clearTimer?.cancel();
+    _clearTimer = null;
   }
 
   @override
@@ -626,7 +632,7 @@ class TasksCubit extends Cubit<TasksState> {
     final TaskList listCopy = selectedList.copyWith(
       // Don't show completed/deleted items in widget.
       items: selectedList.items
-          .where((e) => !e.completed && !e.deleted && e.parent == null)
+          .where((e) => !e.completed && e.parent == null)
           .toList(),
     );
     updateHomeWidget('selectedList', jsonEncode(listCopy.toJson()));

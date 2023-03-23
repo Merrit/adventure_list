@@ -12,10 +12,6 @@ class Task with _$Task {
     @JsonKey(defaultValue: false)
         required bool completed,
 
-    /// Whether the task is deleted.
-    @JsonKey(defaultValue: false)
-        required bool deleted,
-
     /// Description of the task.
     required String? description,
 
@@ -59,7 +55,6 @@ class Task with _$Task {
 
   factory Task.empty() => Task._(
         completed: false,
-        deleted: false,
         description: null,
         dueDate: null,
         id: '',
@@ -73,7 +68,6 @@ class Task with _$Task {
 
   factory Task({
     bool completed = false,
-    bool deleted = false,
     String? description,
     DateTime? dueDate,
     String id = '',
@@ -101,7 +95,6 @@ class Task with _$Task {
 
     return Task._(
       completed: completed,
-      deleted: deleted,
       description: description,
       dueDate: dueDate,
       id: id,
@@ -156,11 +149,6 @@ extension ListOfTasksExtensions on List<Task> {
     return where((t) => t.completed).toList();
   }
 
-  /// Returns all [Task]s which are deleted.
-  List<Task> deletedTasks() {
-    return where((t) => t.deleted).toList();
-  }
-
   /// Returns the task with the given ID, or null if not found.
   Task? getTaskById(String id) {
     return firstWhereOrNull((t) => t.id == id);
@@ -183,20 +171,6 @@ extension ListOfTasksExtensions on List<Task> {
         .toList();
   }
 
-  /// Returns a copy of the list with the task marked as deleted.
-  ///
-  /// The task is not actually removed from the list.
-  List<Task> markTaskDeleted(Task task) {
-    return map((t) => t.id == task.id ? task.copyWith(deleted: true) : t)
-        .toList();
-  }
-
-  /// Returns a copy of the list with the task marked as undeleted.
-  List<Task> markTaskNotDeleted(Task task) {
-    return map((t) => t.id == task.id ? task.copyWith(deleted: false) : t)
-        .toList();
-  }
-
   /// Returns a copy of the list with the task updated to the new index.
   ///
   /// The index of all the tasks is updated.
@@ -216,13 +190,29 @@ extension ListOfTasksExtensions on List<Task> {
 
   /// Returns a copy of the list with the task removed.
   ///
+  /// If the task has subtasks, they are also removed.
+  ///
   /// The index of the remaining tasks is updated.
   List<Task> removeTask(Task task) {
-    final updatedTasks = [...this];
-    updatedTasks.remove(task);
-    for (var i = 0; i < updatedTasks.length; i++) {
-      updatedTasks[i] = updatedTasks[i].copyWith(index: i);
-    }
+    List<Task> updatedTasks = [...this]
+      ..remove(task)
+      ..removeWhere((t) => t.parent == task.id);
+
+    updatedTasks = updatedTasks.updateIndexes();
+    return updatedTasks;
+  }
+
+  /// Returns a copy of the list with all the given [Task]s removed.
+  ///
+  /// If any of the tasks have subtasks, they are also removed.
+  ///
+  /// The index of the remaining tasks is updated.
+  List<Task> removeTasks(List<Task> tasks) {
+    List<Task> updatedTasks = [...this]
+      ..removeWhere((t) => tasks.contains(t))
+      ..removeWhere((t) => tasks.any((task) => task.id == t.parent));
+
+    updatedTasks = updatedTasks.updateIndexes();
     return updatedTasks;
   }
 
@@ -259,6 +249,31 @@ extension ListOfTasksExtensions on List<Task> {
   /// Returns all top-level [Task]s.
   List<Task> topLevelTasks() {
     return where((t) => t.parent == null).toList();
+  }
+
+  /// Returns a copy of the list with the task indexes updated.
+  ///
+  /// Subtasks have a separate index than top-level tasks.
+  List<Task> updateIndexes() {
+    final updatedTasks = <Task>[];
+
+    // Update the top-level tasks.
+    final topLevelTasks = this.topLevelTasks();
+    for (var i = 0; i < topLevelTasks.length; i++) {
+      topLevelTasks[i] = topLevelTasks[i].copyWith(index: i);
+    }
+    updatedTasks.addAll(topLevelTasks);
+
+    // Update the subtasks.
+    for (var task in topLevelTasks) {
+      final subtasks = subtasksOf(task.id);
+      for (var i = 0; i < subtasks.length; i++) {
+        subtasks[i] = subtasks[i].copyWith(index: i);
+      }
+      updatedTasks.addAll(subtasks);
+    }
+
+    return updatedTasks;
   }
 
   /// Returns a copy of the list with the task updated.
