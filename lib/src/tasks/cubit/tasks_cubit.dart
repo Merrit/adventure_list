@@ -479,9 +479,13 @@ class TasksCubit extends Cubit<TasksState> {
     ));
   }
 
-  /// Holds the [Task](s) that were cleared until the timer expires and they
-  /// are deleted, or the user cancels the clear operation.
-  List<Task>? _clearedTasks;
+  /// Holds the `activeList` as it was before the tasks were cleared until the
+  /// timer expires and they are deleted, or the user cancels the clear
+  /// operation and this list is restored.
+  ///
+  /// If the user takes any other actions aside from canceling the clear
+  /// operation, this list is discarded.
+  TaskList? _activeListBeforeClear;
 
   /// Timer giving the user time to cancel the clear operation.
   Timer? _clearTimer;
@@ -498,7 +502,7 @@ class TasksCubit extends Cubit<TasksState> {
   ///
   /// The user can cancel the clear operation by calling
   /// [undoClearCompletedTasks].
-  Future<void> clearCompletedTasks([String? parentId]) async {
+  Future<void> clearCompletedTasks({String? parentId}) async {
     final activeList = state.activeList;
     if (activeList == null) return;
 
@@ -515,8 +519,9 @@ class TasksCubit extends Cubit<TasksState> {
     // If there are no tasks to be cleared, don't do anything.
     if (tasksToBeCleared.isEmpty) return;
 
-    // Save the tasks to be cleared in case the user wants to undo the clear.
-    _clearedTasks = tasksToBeCleared;
+    // Save state before clearing tasks so that it can be restored if the user
+    // cancels the clear operation.
+    _activeListBeforeClear = activeList;
 
     // Remove the tasks from the list.
     final List<Task> updatedTasks = activeList //
@@ -548,49 +553,50 @@ class TasksCubit extends Cubit<TasksState> {
         );
       }
 
-      _clearedTasks = null;
+      _activeListBeforeClear = null;
       _clearTimer = null;
     });
   }
 
   /// Cancels the clear operation and restores the tasks that were cleared.
   void undoClearCompletedTasks() {
-    if (_clearedTasks == null) return;
+    if (_activeListBeforeClear == null) return;
 
-    final activeList = state.activeList;
-    if (activeList == null) return;
-
-    final List<Task> updatedTasks = activeList.items.copy()
-      ..addAll(_clearedTasks!);
-
-    // Update the active list.
+    final activeListBeforeClear = _activeListBeforeClear!;
     final int index = state.taskLists.indexWhere(
-      (element) => element.id == activeList.id,
+      (element) => element.id == activeListBeforeClear.id,
     );
-    final TaskList updatedTaskList = activeList.copyWith(items: updatedTasks);
     final List<TaskList> updatedAllTaskLists = state.taskLists.copy()
-      ..[index] = updatedTaskList;
+      ..[index] = activeListBeforeClear;
 
     emit(state.copyWith(
-      activeList: updatedTaskList,
+      activeList: activeListBeforeClear,
       awaitingClearTasksUndo: false,
       taskLists: updatedAllTaskLists,
     ));
 
-    _clearedTasks = null;
+    _activeListBeforeClear = null;
     _clearTimer?.cancel();
     _clearTimer = null;
   }
 
   @override
   void onChange(Change<TasksState> change) {
+    super.onChange(change);
+
+    // If the user has taken an action while the clear timer is active, consider
+    // the clear operation committed.
+    if (change.currentState.awaitingClearTasksUndo &&
+        change.nextState.awaitingClearTasksUndo) {
+      _activeListBeforeClear = null;
+      emit(state.copyWith(awaitingClearTasksUndo: false));
+    }
+
     if (change.currentState != change.nextState) {
       _cacheData(change.nextState);
     }
 
     if (Platform.isAndroid) _updateAndroidWidget(change.nextState);
-
-    super.onChange(change);
   }
 
   /// Timer ensures we aren't caching constantly.

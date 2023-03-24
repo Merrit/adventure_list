@@ -28,7 +28,7 @@ class TaskDetailsHeader extends StatelessWidget {
                       final task = tasksCubit.state.activeTask;
                       if (task == null) return;
 
-                      tasksCubit.clearCompletedTasks(task.id);
+                      tasksCubit.clearCompletedTasks(parentId: task.id);
                     },
                     child: const Text('Clear completed sub-tasks'),
                   ),
