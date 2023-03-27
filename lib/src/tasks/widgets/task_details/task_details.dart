@@ -8,7 +8,6 @@ import 'package:intl/intl.dart';
 
 import '../../../core/helpers/helpers.dart';
 import '../../tasks.dart';
-import 'task_details_header.dart';
 
 class TaskDetails extends StatelessWidget {
   static const routeName = 'task_details';
@@ -48,16 +47,9 @@ class TaskDetails extends StatelessWidget {
           child: Scaffold(
             appBar: AppBar(
               key: ValueKey(task),
-              title: (task == null)
-                  ? null
-                  : TextInputListTile(
-                      editingPlaceholderText: true,
-                      placeholderText: task.title,
-                      unfocusedOpacity: 1.0,
-                      callback: (String value) => tasksCubit.updateTask(
-                        task.copyWith(title: value),
-                      ),
-                    ),
+              actions: const [
+                _MoreActionsButton(),
+              ],
             ),
             body: const TaskDetailsView(),
           ),
@@ -89,7 +81,12 @@ class TaskDetailsView extends StatelessWidget {
             padding: const EdgeInsets.all(12.0),
             controller: ScrollController(),
             children: [
-              if (!mediaQuery.isSmallScreen) const TaskDetailsHeader(),
+              if (!mediaQuery.isSmallScreen)
+                const Align(
+                  alignment: Alignment.centerRight,
+                  child: _MoreActionsButton(),
+                ),
+              const _TitleWidget(),
               const _DueDateWidget(),
               const _DescriptionWidget(),
               const _ParentSelectionWidget(),
@@ -115,6 +112,80 @@ class TaskDetailsView extends StatelessWidget {
             child: child,
           ),
           child: widgetContents,
+        );
+      },
+    );
+  }
+}
+
+/// A button that shows a popup menu with more actions.
+class _MoreActionsButton extends StatelessWidget {
+  const _MoreActionsButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton(
+      itemBuilder: (context) {
+        return [
+          PopupMenuItem(
+            onTap: () {
+              final task = tasksCubit.state.activeTask;
+              if (task == null) return;
+
+              tasksCubit.clearCompletedTasks(parentId: task.id);
+            },
+            child: const Text('Clear completed sub-tasks'),
+          ),
+        ];
+      },
+    );
+  }
+}
+
+class _TitleWidget extends StatelessWidget {
+  const _TitleWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        final task = state.activeTask;
+        if (task == null) return const SizedBox.shrink();
+
+        return ListTile(
+          leading: const Icon(Icons.title),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text('Task name'),
+                  content: TextField(
+                    controller: TextEditingController(text: task.title),
+                    autofocus: true,
+                    onSubmitted: (value) {
+                      tasksCubit.updateTask(task.copyWith(title: value));
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        tasksCubit.updateTask(task.copyWith(title: task.title));
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Save'),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+          title: Text(task.title),
         );
       },
     );
