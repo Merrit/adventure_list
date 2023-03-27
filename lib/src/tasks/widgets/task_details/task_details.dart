@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 import 'package:intl/intl.dart';
@@ -158,10 +157,12 @@ class _TitleWidget extends StatelessWidget {
             showDialog(
               context: context,
               builder: (context) {
+                final controller = TextEditingController(text: task.title);
+
                 return AlertDialog(
                   title: const Text('Task name'),
                   content: TextField(
-                    controller: TextEditingController(text: task.title),
+                    controller: controller,
                     autofocus: true,
                     onSubmitted: (value) {
                       tasksCubit.updateTask(task.copyWith(title: value));
@@ -175,7 +176,9 @@ class _TitleWidget extends StatelessWidget {
                     ),
                     TextButton(
                       onPressed: () {
-                        tasksCubit.updateTask(task.copyWith(title: task.title));
+                        tasksCubit.updateTask(
+                          task.copyWith(title: controller.text),
+                        );
                         Navigator.of(context).pop();
                       },
                       child: const Text('Save'),
@@ -311,116 +314,62 @@ class _DueDateWidgetState extends State<_DueDateWidget> {
   }
 }
 
-class _DescriptionWidget extends StatefulWidget {
+/// Displays the description of the task and allows the user to change it.
+class _DescriptionWidget extends StatelessWidget {
   const _DescriptionWidget({Key? key}) : super(key: key);
-
-  @override
-  State<_DescriptionWidget> createState() => _DescriptionWidgetState();
-}
-
-class _DescriptionWidgetState extends State<_DescriptionWidget> {
-  @override
-  void initState() {
-    super.initState();
-    final Task? task = tasksCubit.state.activeTask;
-    if (task == null) return;
-
-    controller.text = task.description ?? '';
-    updatedDescription = task.description ?? '';
-
-    focusNode.addListener(() {
-      if (focusNode.hasFocus) {
-        setState(() {
-          showControls = true;
-          descriptionBorder = const OutlineInputBorder();
-        });
-      } else {
-        setState(() {
-          descriptionBorder = InputBorder.none;
-        });
-      }
-    });
-  }
-
-  final controller = TextEditingController();
-  final focusNode = FocusNode();
-  InputBorder descriptionBorder = InputBorder.none;
-  bool showControls = false;
-  late String updatedDescription;
-
-  void _submitUpdatedDescription() {
-    tasksCubit.updateTask(
-      task!.copyWith(description: updatedDescription),
-    );
-    setState(() => showControls = false);
-  }
-
-  Task? task;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
-        task = state.activeTask;
-        if (task == null) return const SizedBox();
+        final task = state.activeTask;
+        if (task == null) return const SizedBox.shrink();
 
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CallbackShortcuts(
-              bindings: {
-                const SingleActivator(
-                  LogicalKeyboardKey.enter,
-                  control: true,
-                ): () => _submitUpdatedDescription(),
-              },
-              child: TextField(
-                controller: controller,
-                decoration: InputDecoration(
-                  border: const OutlineInputBorder(),
-                  fillColor: Colors.transparent,
-                  enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(
-                      style: BorderStyle.none,
-                    ),
+        final Widget? subtitle = (task.description != null) //
+            ? Text(task.description!)
+            : null;
+
+        return ListTile(
+          leading: const Icon(Icons.description),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                final controller = TextEditingController(
+                  text: task.description,
+                );
+
+                return AlertDialog(
+                  title: const Text('Task description'),
+                  content: TextField(
+                    controller: controller,
+                    autofocus: true,
+                    onSubmitted: (value) {
+                      tasksCubit.updateTask(task.copyWith(description: value));
+                      Navigator.of(context).pop();
+                    },
                   ),
-                  focusedBorder: Theme.of(context)
-                      .inputDecorationTheme
-                      .focusedBorder
-                      ?.copyWith(),
-                  label: const Text('Description'),
-                ),
-                enableInteractiveSelection: true,
-                focusNode: focusNode,
-                maxLines: null,
-                onChanged: (value) {
-                  updatedDescription = value;
-                },
-              ),
-            ),
-            const SizedBox(height: 5),
-            if (showControls)
-              Flexible(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
+                  actions: [
                     TextButton(
-                      onPressed: () {
-                        setState(() => showControls = false);
-                        controller.text = task?.description ?? '';
-                        updatedDescription = task?.description ?? '';
-                      },
+                      onPressed: () => Navigator.of(context).pop(),
                       child: const Text('Cancel'),
                     ),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                      onPressed: () => _submitUpdatedDescription(),
+                    TextButton(
+                      onPressed: () {
+                        tasksCubit.updateTask(
+                          task.copyWith(description: controller.text),
+                        );
+                        Navigator.of(context).pop();
+                      },
                       child: const Text('Save'),
                     ),
                   ],
-                ),
-              ),
-          ],
+                );
+              },
+            );
+          },
+          title: const Text('Description'),
+          subtitle: subtitle,
         );
       },
     );
