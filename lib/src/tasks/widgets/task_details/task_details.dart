@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/helpers/helpers.dart';
 import '../../tasks.dart';
@@ -89,6 +90,7 @@ class TaskDetailsView extends StatelessWidget {
             controller: ScrollController(),
             children: [
               if (!mediaQuery.isSmallScreen) const TaskDetailsHeader(),
+              const _DueDateWidget(),
               const _DescriptionWidget(),
               const _ParentSelectionWidget(),
               const SizedBox(height: 20),
@@ -113,6 +115,125 @@ class TaskDetailsView extends StatelessWidget {
             child: child,
           ),
           child: widgetContents,
+        );
+      },
+    );
+  }
+}
+
+/// Due date widget.
+///
+/// Displays the due date of the task and allows the user to change it.
+class _DueDateWidget extends StatefulWidget {
+  const _DueDateWidget({Key? key}) : super(key: key);
+
+  @override
+  State<_DueDateWidget> createState() => _DueDateWidgetState();
+}
+
+class _DueDateWidgetState extends State<_DueDateWidget> {
+  @override
+  void initState() {
+    super.initState();
+    final Task? task = tasksCubit.state.activeTask;
+    if (task == null) return;
+
+    selectedDate = task.dueDate ?? noneDate;
+  }
+
+  final dateFocusNode = FocusNode();
+
+  final noneDate = DateTime(1900);
+  DateTime? selectedDate;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        final Task? task = state.activeTask;
+        if (task == null) return const SizedBox();
+
+        final todayDate = DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day,
+          8,
+        );
+
+        final tomorrowDate = DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day + 1,
+          8,
+        );
+
+        final bool selectedDateIsCustom = selectedDate != noneDate &&
+            selectedDate != todayDate &&
+            selectedDate != tomorrowDate;
+
+        final List<DropdownMenuItem<DateTime>> dropdownItems = [
+          DropdownMenuItem(
+            value: noneDate,
+            child: const Text('None'),
+          ),
+          DropdownMenuItem(
+            value: todayDate,
+            child: const Text('Today'),
+          ),
+          DropdownMenuItem(
+            value: tomorrowDate,
+            child: const Text('Tomorrow'),
+          ),
+          const DropdownMenuItem(
+            value: null,
+            child: Text('Pick a date'),
+          ),
+          if (selectedDateIsCustom)
+            DropdownMenuItem(
+              value: selectedDate,
+              child: Text(
+                DateFormat('EEEE, MMMM d').format(selectedDate!),
+              ),
+            ),
+        ];
+
+        return ListTile(
+          leading: const Icon(Icons.calendar_today),
+          title: const Text('Due date'),
+          trailing: IntrinsicWidth(
+            child: DropdownButtonFormField<DateTime>(
+              value: selectedDate,
+              // Focus color is transparent so that the dropdown button doesn't
+              // remain hightlighted after is has been closed.
+              // Related issue: https://github.com/flutter/flutter/issues/94605
+              focusColor: Colors.transparent,
+              focusNode: dateFocusNode,
+              onChanged: (DateTime? value) async {
+                dateFocusNode.unfocus();
+
+                DateTime? selectedDate;
+
+                // Value is null when the selected dropdown item is Custom.
+                if (value == null) {
+                  selectedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                  );
+                } else {
+                  selectedDate = value;
+                }
+
+                if (value == noneDate) {
+                  tasksCubit.updateTask(task.copyWith(dueDate: null));
+                } else {
+                  tasksCubit.updateTask(task.copyWith(dueDate: selectedDate));
+                }
+              },
+              items: dropdownItems,
+            ),
+          ),
         );
       },
     );
