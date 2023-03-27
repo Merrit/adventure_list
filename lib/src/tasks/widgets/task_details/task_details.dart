@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -376,82 +375,83 @@ class _DescriptionWidget extends StatelessWidget {
   }
 }
 
-class _ParentSelectionWidget extends StatefulWidget {
+/// Displays the parent task of the active task and allows the user to change
+/// it.
+class _ParentSelectionWidget extends StatelessWidget {
   const _ParentSelectionWidget({Key? key}) : super(key: key);
-
-  @override
-  State<_ParentSelectionWidget> createState() => _ParentSelectionWidgetState();
-}
-
-class _ParentSelectionWidgetState extends State<_ParentSelectionWidget> {
-  @override
-  void initState() {
-    super.initState();
-    focusNode = FocusNode(debugLabel: 'parentSelectorFocusNode')
-      ..addListener(() {
-        // If the DropdownButton is deselected it should not be highlighted.
-        if (focusNode.hasPrimaryFocus) focusNode.unfocus();
-      });
-  }
-
-  @override
-  void dispose() {
-    focusNode.dispose();
-    super.dispose();
-  }
-
-  late final FocusNode focusNode;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
         final task = state.activeTask;
-        if (task == null) return const SizedBox();
+        if (task == null) return const SizedBox.shrink();
 
-        final tasks = state.activeList?.items //
-            .where(
-                (e) => e.id != task.id && (e.parent == null || e.parent == ''))
-            .toList();
-        if (tasks == null) return const SizedBox();
+        final activeList = state.activeList;
+        if (activeList == null) return const SizedBox.shrink();
 
-        tasks.insert(
-          0,
-          Task(
-            taskListId: '',
-            title: 'None',
-          ),
-        );
+        final Task? parentTask = activeList //
+            .items
+            .getTaskById(task.parent ?? '');
+
+        final Widget subtitle = Text(parentTask?.title ?? 'None');
 
         return ListTile(
-          title: const Text('Parent task'),
-          trailing: SizedBox(
-            width: 200,
-            child: DropdownButton<Task>(
-              focusNode: focusNode,
-              isExpanded: true,
-              hint: const Text('None'),
-              items: tasks
-                  .map((e) => DropdownMenuItem<Task>(
-                        value: e,
-                        child: Text(
-                          e.title,
-                          overflow: TextOverflow.ellipsis,
+          leading: const Icon(Icons.arrow_upward),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text('Parent task'),
+                  content: BlocBuilder<TasksCubit, TasksState>(
+                    builder: (context, state) {
+                      final List<Task> tasks = activeList.items
+                          .topLevelTasks()
+                          .where((t) => t.id != task.id)
+                          .toList();
+
+                      return SingleChildScrollView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              onTap: () {
+                                tasksCubit.updateTask(
+                                  task.copyWith(parent: null),
+                                );
+                                Navigator.of(context).pop();
+                              },
+                              title: const Text('None'),
+                            ),
+                            ...tasks.map(
+                              (t) => ListTile(
+                                onTap: () {
+                                  tasksCubit.updateTask(
+                                    task.copyWith(parent: t.id),
+                                  );
+                                  Navigator.of(context).pop();
+                                },
+                                title: Text(t.title),
+                              ),
+                            ),
+                          ],
                         ),
-                      ))
-                  .toList(),
-              value: tasks
-                  .firstWhereOrNull((element) => element.id == task.parent),
-              onChanged: (Task? value) {
-                if (value == null) return;
-                if (value.title == 'None') {
-                  tasksCubit.updateTask(task.copyWith(parent: ''));
-                } else {
-                  tasksCubit.updateTask(task.copyWith(parent: value.id));
-                }
+                      );
+                    },
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text('Cancel'),
+                    ),
+                  ],
+                );
               },
-            ),
-          ),
+            );
+          },
+          title: const Text('Parent task'),
+          subtitle: subtitle,
         );
       },
     );
