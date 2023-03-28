@@ -86,6 +86,7 @@ class TaskDetailsView extends StatelessWidget {
                 ),
               const _TitleWidget(),
               const _DueDateWidget(),
+              const _DueTimeWidget(),
               const _DescriptionWidget(),
               const _ParentSelectionWidget(),
               const SizedBox(height: 20),
@@ -307,6 +308,57 @@ class _DueDateWidgetState extends State<_DueDateWidget> {
               items: dropdownItems,
             ),
           ),
+        );
+      },
+    );
+  }
+}
+
+/// Displays the due time of the task and allows the user to change it.
+///
+/// This widget is only visible if the task has a due date.
+class _DueTimeWidget extends StatelessWidget {
+  const _DueTimeWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        final task = state.activeTask;
+        if (task == null || task.dueDate == null) {
+          return const SizedBox.shrink();
+        }
+
+        final dueTime = TimeOfDay.fromDateTime(task.dueDate!);
+
+        final trailing = Text(
+          DateFormat('h:mm a').format(task.dueDate!),
+        );
+
+        return ListTile(
+          leading: const Icon(Icons.access_time),
+          onTap: () async {
+            final TimeOfDay? timeOfDay = await showTimePicker(
+              context: context,
+              initialTime: dueTime,
+            );
+
+            if (timeOfDay == null) return;
+
+            tasksCubit.updateTask(
+              task.copyWith(
+                dueDate: DateTime(
+                  task.dueDate!.year,
+                  task.dueDate!.month,
+                  task.dueDate!.day,
+                  timeOfDay.hour,
+                  timeOfDay.minute,
+                ),
+              ),
+            );
+          },
+          title: const Text('Due time'),
+          trailing: trailing,
         );
       },
     );
