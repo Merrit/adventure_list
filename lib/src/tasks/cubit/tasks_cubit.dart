@@ -163,11 +163,6 @@ class TasksCubit extends Cubit<TasksState> {
       loading: false,
       taskLists: taskLists!.sorted(),
     ));
-
-    Timer.periodic(
-      const Duration(minutes: 1),
-      (timer) => syncWithRepo(),
-    );
   }
 
   /// Creates a new Todo list.
@@ -385,25 +380,25 @@ class TasksCubit extends Cubit<TasksState> {
 
   /// Updates the provided [Task].
   Future<Task> updateTask(Task task) async {
+    final activeList = state.activeList;
+    if (activeList == null) throw Exception('No active list');
+
     // If the task is unchanged, don't do anything.
-    if (state.activeList!.items.contains(task)) return task;
+    if (activeList.items.contains(task)) return task;
 
     final bool isActiveTask = (state.activeTask?.id == task.id);
-    final int index = state.activeList!.items.indexWhere(
-      (element) => element.id == task.id,
-    );
+    final int index = activeList.items.indexWhere((t) => t.id == task.id);
 
     // Update local state immediately.
-    final items = List<Task>.from(state.activeList!.items)
+    final items = List<Task>.from(activeList.items)
       ..removeAt(index)
       ..insert(index, task);
-    final int taskListIndex = state.taskLists.indexWhere(
+    final taskLists = state.taskLists;
+    final int taskListIndex = taskLists.indexWhere(
       (element) => element.id == state.activeList!.id,
     );
-    final TaskList updatedTaskList = state //
-        .taskLists[taskListIndex]
-        .copyWith(items: items);
-    final List<TaskList> updatedAllTaskLists = state.taskLists.copy()
+    final TaskList updatedTaskList = activeList.copyWith(items: items);
+    final List<TaskList> updatedAllTaskLists = taskLists.copy()
       ..[taskListIndex] = updatedTaskList;
 
     emit(state.copyWith(
@@ -412,64 +407,41 @@ class TasksCubit extends Cubit<TasksState> {
       taskLists: updatedAllTaskLists,
     ));
 
-    // Save task to be batch synced periodically.
-    await StorageRepository.instance.save(
-      key: task.id,
-      value: {
-        'taskListId': updatedTaskList.id,
-        'task': task.toJson(),
-      },
-      storageArea: 'tasksToBeSynced',
+    // Update with repository.
+    final updatedTask = await _tasksRepository.updateTask(
+      taskListId: state.activeList!.id,
+      updatedTask: task,
     );
 
-    return task;
-  }
-
-  /// Sync all lists with changes to the remote repository.
-  Future<void> _syncUpdatedLists() async {
-    final Iterable<TaskList> listsToBeSynced = state.taskLists //
-        .where((element) => !element.synced);
-    final taskLists = [...state.taskLists];
-
-    for (var list in listsToBeSynced) {
-      await _tasksRepository.updateList(list: list);
-
-      final int index = taskLists.indexWhere((e) => e.id == list.id);
-      taskLists[index] = list.copyWith(synced: true);
+    // If the update failed, revert the changes.
+    if (updatedTask == null) {
+      emit(state.copyWith(
+        activeList: activeList,
+        activeTask: isActiveTask ? task : null,
+        taskLists: taskLists,
+      ));
+      return task;
     }
 
-    emit(state.copyWith(taskLists: taskLists));
-  }
+    // Update local state with updated task.
+    final updatedItems = List<Task>.from(activeList.items)
+      ..removeAt(index)
+      ..insert(index, updatedTask);
 
-  /// Sync all tasks with changes to the remote repository.
-  Future<void> _syncUpdatedTasks() async {
-    final tasksToBeSynced =
-        await StorageRepository.instance.getStorageAreaValues(
-      'tasksToBeSynced',
+    final updatedTaskListWithUpdatedTask = activeList.copyWith(
+      items: updatedItems,
     );
 
-    for (var taskEntry in tasksToBeSynced) {
-      final taskListId = taskEntry['taskListId'] as String;
-      final taskJson = Map<String, dynamic>.from(taskEntry['task']);
+    final updatedAllTaskListsWithUpdatedTask = taskLists.copy()
+      ..[taskListIndex] = updatedTaskListWithUpdatedTask;
 
-      final task = Task.fromJson(taskJson);
+    emit(state.copyWith(
+      activeList: updatedTaskListWithUpdatedTask,
+      activeTask: isActiveTask ? updatedTask : null,
+      taskLists: updatedAllTaskListsWithUpdatedTask,
+    ));
 
-      await _tasksRepository.updateTask(
-        taskListId: taskListId,
-        updatedTask: task,
-      );
-
-      await StorageRepository.instance.delete(
-        task.id,
-        storageArea: 'tasksToBeSynced',
-      );
-    }
-  }
-
-  /// Sync all changes to the remote repository.
-  Future<void> syncWithRepo() async {
-    await _syncUpdatedLists();
-    await _syncUpdatedTasks();
+    return updatedTask;
   }
 
   /// Sets the [Task] with the provided [id] as the active task.
