@@ -10,7 +10,6 @@ import 'package:window_manager/window_manager.dart';
 import '../logs/logs.dart';
 import '../settings/settings.dart';
 import '../storage/storage_repository.dart';
-import '../tasks/tasks.dart';
 
 class AppWindow {
   AppWindow() {
@@ -52,7 +51,7 @@ class AppWindow {
       // Hide window while performing sync, then exit.
       hide();
       log.i('Syncing before exit.');
-      await tasksCubit.syncWithRepo();
+      await Future.delayed(const Duration(seconds: 5));
       log.i('Sync finished, exiting.');
       return true;
     }
