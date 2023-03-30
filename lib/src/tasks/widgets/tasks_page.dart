@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/helpers/helpers.dart';
+import '../../notifications/notifications.dart';
 import '../tasks.dart';
 
 class TasksPage extends StatefulWidget {
@@ -62,8 +64,20 @@ class _TasksPageState extends State<TasksPage> {
             ],
           );
 
+          final PreferredSizeWidget? appBar;
+          if (mediaQuery.isSmallScreen) {
+            appBar = const _TaskListAppBar();
+          } else if (kDebugMode) {
+            appBar = AppBar(
+              title: const Text('Debug'),
+              actions: const [_DebugMenuButton()],
+            );
+          } else {
+            appBar = null;
+          }
+
           return Scaffold(
-            appBar: (mediaQuery.isSmallScreen) ? const _TaskListAppBar() : null,
+            appBar: appBar,
             drawer: (mediaQuery.isSmallScreen)
                 ? const CustomNavigationRail(breakpoint: Breakpoints.small)
                 : null,
@@ -115,6 +129,35 @@ class _TaskListAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: const TasksHeader(),
+      actions: const [_DebugMenuButton()],
+    );
+  }
+}
+
+/// A button that shows a popup menu with debug options.
+class _DebugMenuButton extends StatelessWidget {
+  const _DebugMenuButton();
+
+  @override
+  Widget build(BuildContext context) {
+    if (!kDebugMode) return const SizedBox();
+
+    return PopupMenuButton(
+      itemBuilder: (context) {
+        return [
+          PopupMenuItem(
+            child: const Text('Show notification'),
+            onTap: () async {
+              await Future.delayed(const Duration(seconds: 5));
+              NotificationsCubit.instance.showNotification(
+                title: 'Test notification',
+                body: 'This is a test notification',
+                payload: 'test payload',
+              );
+            },
+          ),
+        ];
+      },
     );
   }
 }

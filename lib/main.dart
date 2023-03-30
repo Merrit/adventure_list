@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:helpers/helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
@@ -17,6 +18,7 @@ import 'src/app/cubit/app_cubit.dart';
 import 'src/authentication/authentication.dart';
 import 'src/core/constants.dart';
 import 'src/logs/logs.dart';
+import 'src/notifications/notifications.dart';
 import 'src/settings/cubit/settings_cubit.dart';
 import 'src/storage/storage_repository.dart';
 import 'src/system_tray/system_tray_manager.dart';
@@ -61,6 +63,10 @@ Future<void> main(List<String> args) async {
     googleAuth: googleAuth,
   );
 
+  final notificationsCubit = await NotificationsCubit.initialize(
+    flutterLocalNotificationsPlugin: FlutterLocalNotificationsPlugin(),
+  );
+
   final tasksCubit = TasksCubit(authenticationCubit);
   final settingsCubitInstance = await SettingsCubit.initialize();
 
@@ -82,6 +88,7 @@ Future<void> main(List<String> args) async {
             ),
           ),
           BlocProvider.value(value: authenticationCubit),
+          BlocProvider.value(value: notificationsCubit),
           BlocProvider.value(value: settingsCubitInstance),
           BlocProvider.value(value: tasksCubit),
         ],
