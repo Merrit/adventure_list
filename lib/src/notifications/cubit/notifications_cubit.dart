@@ -1,12 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'
+    hide RepeatInterval;
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../core/core.dart';
 import '../../logs/logging_manager.dart';
+import '../../tasks/tasks.dart';
+import '../../window/app_window.dart';
 
 part 'notifications_state.dart';
 part 'notifications_cubit.freezed.dart';
@@ -82,8 +87,26 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   );
 
   static const _linuxNotificationDetails = LinuxNotificationDetails(
+    actions: [
+      LinuxNotificationAction(
+        key: 'complete',
+        label: 'Complete',
+      ),
+      LinuxNotificationAction(
+        key: 'snooze',
+        label: 'Snooze',
+      ),
+    ],
+    category: LinuxNotificationCategory('adventurelist'),
     defaultActionName: 'Open notification',
+    urgency: LinuxNotificationUrgency.critical,
   );
+
+  /// Notification timers.
+  ///
+  /// This is a map of task ids to timers. The timers are used to schedule
+  /// notifications for tasks on desktop.
+  final _timers = <String, Timer>{};
 
   /// Disable notifications.
   ///
@@ -96,6 +119,35 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   /// Enable notifications.
   Future<void> enable() async {
     emit(state.copyWith(enabled: true));
+  }
+
+  /// Schedule a notification for a task.
+  ///
+  /// This will only schedule a notification if notifications are enabled and
+  /// permission has been granted.
+  Future<void> scheduleNotification(Task task) async {
+    log.v('Scheduling notification for task: ${task.id}');
+
+    if (!state.enabled) {
+      log.v('Notifications are disabled. Not scheduling notification.');
+      return;
+    }
+
+    if (!state.permissionGranted) {
+      await _requestPermission();
+      if (!state.permissionGranted) {
+        log.v(
+          'Notifications permission not granted. Not scheduling notification.',
+        );
+        return;
+      }
+    }
+
+    if (defaultTargetPlatform.isDesktop) {
+      await _scheduleNotificationDesktop(task);
+    } else {
+      await _scheduleNotificationMobile(task);
+    }
   }
 
   /// Show a notification.
@@ -128,10 +180,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       }
     }
 
-    // Generate a random id if one is not provided.
-    //
-    // Ensure it fits within a 32-bit integer as required by the plugin.
-    id ??= DateTime.now().millisecondsSinceEpoch & 0xFFFFFFFF;
+    id ??= _generateNotificationId();
 
     const notificationDetails = NotificationDetails(
       android: _androidNotificationDetails,
@@ -174,16 +223,11 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     ));
   }
 
-  /// Called when the user taps on a notification.
-  static Future<void> _notificationCallback(
-    NotificationResponse response,
-  ) async {
-    log.i('notificationCallback:\n'
-        'id: ${response.id}\n'
-        'actionId: ${response.actionId}\n'
-        'input: ${response.input}\n'
-        'payload: ${response.payload}\n'
-        'notificationResponseType: ${response.notificationResponseType}');
+  /// Generate a random id for a notification.
+  ///
+  /// The id will fit within a 32-bit integer as required by the plugin.
+  int _generateNotificationId() {
+    return DateTime.now().millisecondsSinceEpoch & 0xFFFFFFFF;
   }
 
   /// Request permission to show notifications.
@@ -211,6 +255,124 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
     emit(state.copyWith(permissionGranted: permissionGranted));
   }
+
+  /// Schedule a notification on desktop.
+  ///
+  /// This will create a timer that will show the notification when the timer
+  /// expires.
+  Future<void> _scheduleNotificationDesktop(Task task) async {
+    log.v('Scheduling notification for task: ${task.id}');
+
+    if (!state.enabled) {
+      log.v('Notifications are disabled. Not scheduling notification.');
+      return;
+    }
+
+    final dueDate = task.dueDate;
+    if (dueDate == null) {
+      log.v('Task has no due date. Not scheduling notification.');
+      return;
+    }
+
+    // If the task is already overdue, show the notification immediately.
+    if (dueDate.isBefore(DateTime.now())) {
+      log.v('Task is already overdue. Showing notification immediately.');
+      await showNotification(
+        title: task.title,
+        body: 'This task is overdue.',
+        payload: task.id,
+      );
+      return;
+    }
+
+    final timer = Timer(
+      dueDate.difference(DateTime.now()),
+      () async {
+        log.v('Showing scheduled notification for task: ${task.id}');
+        await showNotification(
+          title: task.title,
+          body: '',
+          payload: task.id,
+        );
+      },
+    );
+
+    _timers[task.id] = timer;
+    log.v('Scheduled notification for task: ${task.id}');
+  }
+
+  /// Schedule a notification on mobile.
+  ///
+  /// This will register a notification with the OS.
+  Future<void> _scheduleNotificationMobile(Task task) async {
+    log.v('Scheduling notification for task: ${task.id}');
+
+    if (!state.enabled) {
+      log.v('Notifications are disabled. Not scheduling notification.');
+      return;
+    }
+
+    final dueDate = task.dueDate;
+    if (dueDate == null) {
+      log.v('Task has no due date. Not scheduling notification.');
+      return;
+    }
+
+    // If the task is already overdue, show the notification immediately.
+    if (dueDate.isBefore(DateTime.now())) {
+      log.v('Task is already overdue. Showing notification immediately.');
+      await showNotification(
+        title: task.title,
+        body: 'This task is overdue.',
+        payload: task.id,
+      );
+      return;
+    }
+
+    await _scheduleNotificationWithSystem(
+      title: task.title,
+      body: '',
+      scheduledDate: dueDate,
+      payload: task.id,
+    );
+  }
+
+  /// Schedule a notification with the host OS.
+  ///
+  /// [id] is a unique identifier for the notification. If not specified, a
+  /// random id will be generated. The id must fit within a 32-bit integer.
+  ///
+  /// [scheduledDate] is the date and time the notification should be shown.
+  ///
+  /// [payload] is an optional string that will be passed to the app when the
+  /// notification is tapped.
+  Future<void> _scheduleNotificationWithSystem({
+    required String title,
+    required String body,
+    required DateTime scheduledDate,
+    String? payload,
+  }) async {
+    log.v('Scheduling notification: $title');
+
+    const notificationDetails = NotificationDetails(
+      android: _androidNotificationDetails,
+      iOS: _iOSNotificationDetails,
+      macOS: _macOSNotificationDetails,
+      linux: _linuxNotificationDetails,
+    );
+
+    await _notificationsPlugin.zonedSchedule(
+      0,
+      title,
+      body,
+      tz.TZDateTime.from(scheduledDate, tz.local),
+      notificationDetails,
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      payload: payload,
+    );
+  }
 }
 
 /// Handle background notification actions.
@@ -220,5 +382,21 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 /// On all platforms except Linux this runs in a separate isolate.
 @pragma('vm:entry-point')
 void _notificationBackgroundCallback(NotificationResponse response) {
-  log.i('notificationBackgroundCallback');
+  throw UnimplementedError();
+}
+
+/// Called when the user taps on a notification.
+Future<void> _notificationCallback(NotificationResponse response) async {
+  // response.payload is the id of the task.
+  switch (response.notificationResponseType) {
+    case NotificationResponseType.selectedNotification:
+      await AppWindow.instance.show();
+      await AppWindow.instance.focus();
+      break;
+    case NotificationResponseType.selectedNotificationAction:
+      // response.actionId will be either `complete` or `snooze`.
+      await AppWindow.instance.show();
+      await AppWindow.instance.focus();
+      break;
+  }
 }

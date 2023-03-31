@@ -1,13 +1,19 @@
 import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'models.dart';
+
 part 'task.freezed.dart';
 part 'task.g.dart';
 
 /// Represents a "task" or "todo" item.
 @freezed
 class Task with _$Task {
-  const factory Task._({
+  /// Private empty constructor required by [Freezed] to enable
+  /// getters and methods.
+  const Task._();
+
+  const factory Task._internal({
     /// Whether the task is completed.
     @JsonKey(defaultValue: false)
         required bool completed,
@@ -33,6 +39,12 @@ class Task with _$Task {
     /// The ID of the task considered the parent, only if this task is nested.
     required String? parent,
 
+    /// The repeat interval of the task.
+    ///
+    /// If null, the task is not recurring.
+    @JsonKey(defaultValue: null)
+        required RepeatInterval? repeatInterval,
+
     /// Whether the task has been synced with the server.
     @JsonKey(defaultValue: false)
         required bool synced,
@@ -53,13 +65,14 @@ class Task with _$Task {
         required DateTime updated,
   }) = _Task;
 
-  factory Task.empty() => Task._(
+  factory Task.empty() => Task._internal(
         completed: false,
         description: null,
         dueDate: null,
         id: '',
         index: -1,
         parent: null,
+        repeatInterval: null,
         synced: false,
         taskListId: '',
         title: '',
@@ -73,6 +86,7 @@ class Task with _$Task {
     String id = '',
     int index = -1,
     String? parent,
+    RepeatInterval? repeatInterval,
     bool synced = false,
     required String taskListId,
     required String title,
@@ -93,13 +107,14 @@ class Task with _$Task {
       updated.millisecondsSinceEpoch,
     );
 
-    return Task._(
+    return Task._internal(
       completed: completed,
       description: description,
       dueDate: dueDate,
       id: id,
       index: index,
       parent: parent,
+      repeatInterval: repeatInterval,
       synced: synced,
       taskListId: taskListId,
       title: title,
@@ -108,6 +123,46 @@ class Task with _$Task {
   }
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
+
+  /// Update the due date of the task to the next occurrence.
+  ///
+  /// If the task is not recurring, the returned task is unchanged.
+  ///
+  /// If the task is recurring, the returned task has the due date updated to
+  /// the next occurrence if the current due date is in the past.
+  Task updateDueDate() {
+    if (repeatInterval == null) return this;
+
+    final now = DateTime.now();
+    if (dueDate == null || dueDate!.isAfter(now)) return this;
+
+    DateTime newDueDate = dueDate!;
+    switch (repeatInterval!.unit) {
+      case RepeatIntervalUnit.day:
+        while (newDueDate.isBefore(now)) {
+          newDueDate = newDueDate.add(const Duration(days: 1));
+        }
+        break;
+      case RepeatIntervalUnit.week:
+        while (newDueDate.isBefore(now)) {
+          newDueDate = newDueDate.add(const Duration(days: 7));
+        }
+        break;
+      case RepeatIntervalUnit.month:
+        while (newDueDate.isBefore(now)) {
+          // This is not perfect, but it's good enough for now.
+          newDueDate = newDueDate.add(const Duration(days: 30));
+        }
+        break;
+      case RepeatIntervalUnit.year:
+        while (newDueDate.isBefore(now)) {
+          newDueDate = newDueDate.add(const Duration(days: 365));
+        }
+        break;
+    }
+
+    return copyWith(dueDate: newDueDate);
+  }
 }
 
 /// Handles the fromJson for [Task.dueDate].

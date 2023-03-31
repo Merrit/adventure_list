@@ -14,6 +14,7 @@ import 'package:uuid/uuid.dart';
 import '../../authentication/authentication.dart';
 import '../../home_widget/home_widget_manager.dart';
 import '../../logs/logs.dart';
+import '../../notifications/notifications.dart';
 import '../../settings/settings.dart';
 import '../../storage/storage_repository.dart';
 import '../tasks.dart';
@@ -163,6 +164,15 @@ class TasksCubit extends Cubit<TasksState> {
       loading: false,
       taskLists: taskLists!.sorted(),
     ));
+
+    // Schedule notifications.
+    for (final taskList in taskLists) {
+      for (final task in taskList.items) {
+        if (task.dueDate != null) {
+          await NotificationsCubit.instance.scheduleNotification(task);
+        }
+      }
+    }
   }
 
   /// Creates a new Todo list.
