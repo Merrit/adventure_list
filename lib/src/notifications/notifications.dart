@@ -1,1 +1,1 @@
-export 'cubit/cubit.dart';
+export 'cubit/notifications_cubit.dart';

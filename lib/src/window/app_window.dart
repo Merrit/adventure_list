@@ -58,7 +58,12 @@ class AppWindow {
   }
 
   void close() => exit(0);
+
+  /// Focuses the window.
+  Future<void> focus() async => await windowManager.focus();
+
   Future<void> hide() async => await windowManager.hide();
+
   Future<void> show() async => await windowManager.show();
 
   Future<void> saveWindowSizeAndPosition() async {
