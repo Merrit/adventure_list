@@ -104,6 +104,7 @@ class TaskTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const _TitleRow(),
+                      const _OverdueIndicator(),
                       Padding(
                         padding: const EdgeInsets.only(left: 62),
                         child: Opacity(
@@ -187,6 +188,37 @@ class _TitleRow extends StatelessWidget {
               ],
             );
           },
+        );
+      },
+    );
+  }
+}
+
+/// Displays an "Overdue" label if the task is overdue.
+class _OverdueIndicator extends StatelessWidget {
+  const _OverdueIndicator({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TaskTileCubit, TaskTileState>(
+      builder: (context, tileState) {
+        final task = tileState.task;
+
+        final bool isOverdue = task.dueDate != null &&
+            task.dueDate!.isBefore(DateTime.now()) &&
+            !task.completed;
+
+        return Visibility(
+          visible: isOverdue,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 62),
+            child: Text(
+              'Overdue',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+              ),
+            ),
+          ),
         );
       },
     );
