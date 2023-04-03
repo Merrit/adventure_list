@@ -250,6 +250,39 @@ void main() {
       parent: task3.id,
     );
 
+    const testTaskListId2 = 'test-task-list-id-2';
+
+    final testTaskList2 = TaskList(
+      id: testTaskListId2,
+      title: 'Test Task List 2',
+      index: 1,
+      items: const [],
+    );
+
+    final task1ForTaskList2 = Task(
+      id: 'test-task-id-1-for-task-list-2',
+      title: 'Test Task 1 for Task List 2',
+      index: 0,
+      taskListId: testTaskListId2,
+      updated: DateTime.now(),
+      completed: false,
+      description: null,
+      dueDate: null,
+      parent: null,
+    );
+
+    final task2ForTaskList2 = Task(
+      id: 'test-task-id-2-for-task-list-2',
+      title: 'Test Task 2 for Task List 2',
+      index: 1,
+      taskListId: testTaskListId2,
+      updated: DateTime.now(),
+      completed: false,
+      description: null,
+      dueDate: null,
+      parent: null,
+    );
+
     test('singleton instance is accessible', () {
       expect(tasksCubit, isNotNull);
     });
@@ -827,7 +860,7 @@ void main() {
       ]);
     });
 
-    test('setting active task works', () async {
+    test('setActiveTask() works', () async {
       await testCubit.createList('Tasks');
       final task = await testCubit.createTask(
         Task(
@@ -840,6 +873,37 @@ void main() {
       expect(testCubit.state.activeTask, task);
       testCubit.setActiveTask(null);
       expect(testCubit.state.activeTask, null);
+    });
+
+    test('setActiveTask() additionally sets active list if needed', () async {
+      // Seed the cubit with state.
+      final taskList1 = testTaskList.copyWith(items: [
+        task1,
+        task2,
+      ]);
+
+      final taskList2 = testTaskList2.copyWith(items: [
+        task1ForTaskList2,
+        task2ForTaskList2,
+      ]);
+
+      testCubit.emit(TasksState(
+        activeList: taskList2,
+        activeTask: task2ForTaskList2,
+        loading: false,
+        taskLists: [
+          taskList1,
+          taskList2,
+        ],
+      ));
+
+      // Verify initial state.
+      expect(testCubit.state.activeTask, task2ForTaskList2);
+      expect(testCubit.state.activeList, taskList2);
+      // Set active task.
+      testCubit.setActiveTask(task1.id);
+      expect(testCubit.state.activeTask, task1);
+      expect(testCubit.state.activeList, taskList1);
     });
 
     test('undoClearCompletedTasks works', () async {
