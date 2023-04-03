@@ -43,7 +43,7 @@ class TaskList with _$TaskList {
     return TaskList._internal(
       id: id,
       index: index,
-      items: TaskListValidator.tasksInOrder(items),
+      items: TaskListValidator.validateTasks(taskListId: id, tasks: items),
       synced: synced,
       title: title,
     );

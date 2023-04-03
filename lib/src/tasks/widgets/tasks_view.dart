@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/core.dart';
 import '../../core/helpers/helpers.dart';
-import '../../notifications/notifications.dart';
 import '../tasks.dart';
 
 class TasksView extends StatelessWidget {
@@ -12,33 +11,6 @@ class TasksView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // If the app was opened from a notification,
-    if (NotificationsCubit.instance.state.notificationResponse != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('Notification'),
-              content: Text(
-                NotificationsCubit
-                        .instance.state.notificationResponse?.payload ??
-                    'no payload!',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      });
-    }
-
     final mediaQuery = MediaQuery.of(context);
 
     return BlocConsumer<TasksCubit, TasksState>(

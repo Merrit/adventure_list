@@ -52,7 +52,12 @@ void main() {
         garbageTask,
         playTask,
       ];
-      final validatedTasks = TaskListValidator.tasksInOrder(unvalidatedTasks);
+
+      final validatedTasks = TaskListValidator.validateTasks(
+        taskListId: 'test-task-list-id',
+        tasks: unvalidatedTasks,
+      );
+
       expect(validatedTasks, [
         vacuumTask,
         garbageTask,
