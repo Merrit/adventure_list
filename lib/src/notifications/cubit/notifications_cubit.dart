@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     hide RepeatInterval;
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:intl/intl.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -111,6 +112,11 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   /// notifications for tasks on desktop.
   final _timers = <String, Timer>{};
 
+  /// Cancel a notification.
+  Future<void> cancelNotification(int id) async {
+    await _notificationsPlugin.cancel(id);
+  }
+
   /// Disable notifications.
   ///
   /// This will also cancel all scheduled notifications.
@@ -146,10 +152,16 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       }
     }
 
+    // The due date in local time and user-friendly format: 'March 1, 2021 12:00 AM'
+    final dueDate = task.dueDate?.toLocal();
+    final dueDateFormatted = (dueDate != null) //
+        ? DateFormat.yMMMMd().add_jm().format(dueDate)
+        : null;
+
     final notification = Notification(
       id: task.notificationId,
       title: task.title,
-      body: task.dueDate?.toLocal().toIso8601String() ?? '',
+      body: dueDateFormatted ?? '',
       payload: jsonEncode(task.toJson()),
     );
 
@@ -206,6 +218,16 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       notificationDetails,
       payload: payload,
     );
+  }
+
+  /// Snooze a task's notification.
+  Future<void> snoozeTask(Task task) async {
+    log.v('Snoozing notification for task: ${task.id}');
+    await cancelNotification(task.notificationId);
+    const snoozeDuration = Duration(minutes: 10);
+    final snoozeTime = DateTime.now().add(snoozeDuration);
+    final updatedTask = task.copyWith(dueDate: snoozeTime);
+    await scheduleNotification(updatedTask);
   }
 
   /// Check if the app was started from a notification.
@@ -411,15 +433,14 @@ void _notificationBackgroundCallback(NotificationResponse response) {
 
 /// Called when the user taps on a notification.
 Future<void> _notificationCallback(NotificationResponse response) async {
-  if (defaultTargetPlatform.isDesktop) {
-    // On desktop, the app is already running so we can just show the window.
-    await AppWindow.instance.show();
-    await AppWindow.instance.focus();
-  }
-
-  // response.payload is the id of the task.
   switch (response.notificationResponseType) {
     case NotificationResponseType.selectedNotification:
+      if (defaultTargetPlatform.isDesktop) {
+        // On desktop, the app is already running so we can just show the window.
+        await AppWindow.instance.show();
+        await AppWindow.instance.focus();
+      }
+
       notificationResponseStream.add(response);
       break;
     case NotificationResponseType.selectedNotificationAction:
