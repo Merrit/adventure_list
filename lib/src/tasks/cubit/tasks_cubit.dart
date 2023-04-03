@@ -650,12 +650,8 @@ class TasksCubit extends Cubit<TasksState> {
         jsonDecode(response.payload!) as Map<String, dynamic>,
       );
 
-      final taskList = state.taskLists.getTaskListById(task.taskListId);
-
-      emit(state.copyWith(
-        activeList: taskList,
-        activeTask: task,
-      ));
+      setActiveList(task.taskListId);
+      setActiveTask(task.id);
     });
   }
 
