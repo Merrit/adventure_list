@@ -153,6 +153,13 @@ class _TitleWidget extends StatelessWidget {
         final task = state.activeTask;
         if (task == null) return const SizedBox.shrink();
 
+        TextStyle? textStyle;
+        if (task.completed) {
+          textStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+                decoration: TextDecoration.lineThrough,
+              );
+        }
+
         return ListTile(
           leading: const Icon(Icons.title),
           onTap: () {
@@ -190,7 +197,16 @@ class _TitleWidget extends StatelessWidget {
               },
             );
           },
-          title: Text(task.title),
+          title: Text(
+            task.title,
+            style: textStyle,
+          ),
+          trailing: Checkbox(
+            value: task.completed,
+            onChanged: (value) {
+              tasksCubit.updateTask(task.copyWith(completed: value ?? false));
+            },
+          ),
         );
       },
     );
