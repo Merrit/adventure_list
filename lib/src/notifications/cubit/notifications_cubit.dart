@@ -14,6 +14,7 @@ import '../../core/core.dart';
 import '../../logs/logging_manager.dart';
 import '../../tasks/tasks.dart';
 import '../../window/app_window.dart';
+import '../notifications.dart';
 
 part 'notifications_state.dart';
 part 'notifications_cubit.freezed.dart';
@@ -145,10 +146,17 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       }
     }
 
+    final notification = Notification(
+      id: task.notificationId,
+      title: task.title,
+      body: task.dueDate?.toLocal().toIso8601String() ?? '',
+      payload: jsonEncode(task.toJson()),
+    );
+
     if (defaultTargetPlatform.isDesktop) {
-      await _scheduleNotificationDesktop(task);
+      await _scheduleNotificationDesktop(notification);
     } else {
-      await _scheduleNotificationMobile(task);
+      await _scheduleNotificationMobile(notification);
     }
   }
 
@@ -262,7 +270,9 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   ///
   /// This will create a timer that will show the notification when the timer
   /// expires.
-  Future<void> _scheduleNotificationDesktop(Task task) async {
+  Future<void> _scheduleNotificationDesktop(Notification notification) async {
+    final task = Task.fromJson(jsonDecode(notification.payload!));
+
     log.v('Scheduling notification for task: ${task.id}');
 
     if (!state.enabled) {
@@ -280,9 +290,10 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     if (dueDate.isBefore(DateTime.now())) {
       log.v('Task is already overdue. Showing notification immediately.');
       await showNotification(
-        title: task.title,
-        body: 'This task is overdue.',
-        payload: jsonEncode(task.toJson()),
+        id: notification.id,
+        title: notification.title,
+        body: notification.body,
+        payload: notification.payload,
       );
       return;
     }
@@ -292,10 +303,10 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       () async {
         log.v('Showing scheduled notification for task: ${task.id}');
         await showNotification(
-          id: task.notificationId,
-          title: task.title,
-          body: '',
-          payload: jsonEncode(task.toJson()),
+          id: notification.id,
+          title: notification.title,
+          body: notification.body,
+          payload: notification.payload,
         );
       },
     );
@@ -307,7 +318,9 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   /// Schedule a notification on mobile.
   ///
   /// This will register a notification with the OS.
-  Future<void> _scheduleNotificationMobile(Task task) async {
+  Future<void> _scheduleNotificationMobile(Notification notification) async {
+    final task = Task.fromJson(jsonDecode(notification.payload!));
+
     log.v('Scheduling notification for task: ${task.id}');
 
     if (!state.enabled) {
@@ -325,19 +338,20 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     if (dueDate.isBefore(DateTime.now())) {
       log.v('Task is already overdue. Showing notification immediately.');
       await showNotification(
-        id: task.notificationId,
-        title: task.title,
-        body: 'This task is overdue.',
-        payload: jsonEncode(task.toJson()),
+        id: notification.id,
+        title: notification.title,
+        body: notification.body,
+        payload: notification.payload,
       );
       return;
     }
 
     await _scheduleNotificationWithSystem(
-      title: task.title,
-      body: '',
+      id: notification.id,
+      title: notification.title,
+      body: notification.body,
       scheduledDate: dueDate,
-      payload: jsonEncode(task.toJson()),
+      payload: notification.payload,
     );
   }
 
@@ -351,6 +365,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   /// [payload] is an optional string that will be passed to the app when the
   /// notification is tapped.
   Future<void> _scheduleNotificationWithSystem({
+    required int id,
     required String title,
     required String body,
     required DateTime scheduledDate,
@@ -366,7 +381,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     );
 
     await _notificationsPlugin.zonedSchedule(
-      0,
+      id,
       title,
       body,
       tz.TZDateTime.from(scheduledDate, tz.local),
