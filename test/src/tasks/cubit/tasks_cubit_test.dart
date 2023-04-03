@@ -402,7 +402,10 @@ void main() {
         // The completed task in the other list should remain.
         final updatedTaskList1 = testCubit.state.taskLists.first;
         expect(updatedTaskList1.items.length, 1);
-        expect(updatedTaskList1.items[0], task2.copyWith(index: 0));
+        expect(
+          updatedTaskList1.items[0],
+          taskList1.items[1].copyWith(index: 0),
+        );
         expect(testCubit.state.taskLists[1], taskList2);
       });
 
