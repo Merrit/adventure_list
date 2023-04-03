@@ -34,14 +34,20 @@ class HomeWidgetConfigPage extends StatelessWidget {
                                 value,
                               );
 
-                              final selectedList = tasksState //
+                              TaskList selectedList = tasksState //
                                   .taskLists
                                   .singleWhere(
                                 (taskList) => taskList.id == value,
                               );
 
-                              selectedList.items.removeWhere(
-                                  (e) => e.completed || e.parent != null);
+                              final selectedListItems = selectedList.items
+                                  .where(
+                                      (e) => !e.completed && e.parent == null)
+                                  .toList();
+
+                              selectedList = selectedList.copyWith(
+                                items: selectedListItems,
+                              );
 
                               await updateHomeWidget(
                                 'selectedList',
