@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:googleapis/calendar/v3.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
@@ -173,6 +174,8 @@ class TasksCubit extends Cubit<TasksState> {
         }
       }
     }
+
+    _listenForNotificationResponse();
   }
 
   /// Creates a new Todo list.
@@ -628,6 +631,34 @@ class TasksCubit extends Cubit<TasksState> {
     });
   }
 
+  /// Stream subscription for listening for when the user taps on a notification.
+  StreamSubscription<NotificationResponse>? _notificationResponseSubscription;
+
+  /// Listens for when the user taps on a notification.
+  void _listenForNotificationResponse() {
+    _notificationResponseSubscription = notificationResponseStream.stream
+        .listen((NotificationResponse response) {
+      if (response.payload == null) return;
+
+      // NotificationResponseType.selectedNotification: The user tapped on the
+      // notification.
+
+      // NotificationResponseType.selectedNotificationAction: The user tapped on
+      // an action button on the notification.
+
+      final task = Task.fromJson(
+        jsonDecode(response.payload!) as Map<String, dynamic>,
+      );
+
+      final taskList = state.taskLists.getTaskListById(task.taskListId);
+
+      emit(state.copyWith(
+        activeList: taskList,
+        activeTask: task,
+      ));
+    });
+  }
+
   /// Updates the Android home screen widget.
   void _updateAndroidWidget(TasksState data) {
     final selectedListId = settingsCubit.state.homeWidgetSelectedListId;
@@ -647,5 +678,13 @@ class TasksCubit extends Cubit<TasksState> {
           .toList(),
     );
     updateHomeWidget('selectedList', jsonEncode(listCopy.toJson()));
+  }
+
+  @override
+  Future<void> close() {
+    _notificationResponseSubscription?.cancel();
+    _cacheTimer?.cancel();
+    _clearTimer?.cancel();
+    return super.close();
   }
 }

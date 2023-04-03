@@ -70,6 +70,8 @@ class TaskDetailsView extends StatelessWidget {
 
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
+        final activeList = state.activeList;
+        if (activeList == null) return const SizedBox();
         final Task? task = state.activeTask;
         if (task == null) return const SizedBox();
 
@@ -91,7 +93,7 @@ class TaskDetailsView extends StatelessWidget {
               const _ParentSelectionWidget(),
               const SizedBox(height: 20),
               const Text('Sub-tasks'),
-              ...state.activeList!.items
+              ...activeList.items
                   .subtasksOf(task.id)
                   .map((e) => TaskTile(key: ValueKey(e), index: 0, task: e))
                   .toList(),

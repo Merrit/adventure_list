@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -281,7 +282,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       await showNotification(
         title: task.title,
         body: 'This task is overdue.',
-        payload: task.id,
+        payload: jsonEncode(task.toJson()),
       );
       return;
     }
@@ -294,7 +295,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
           id: task.notificationId,
           title: task.title,
           body: '',
-          payload: task.id,
+          payload: jsonEncode(task.toJson()),
         );
       },
     );
@@ -327,7 +328,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
         id: task.notificationId,
         title: task.title,
         body: 'This task is overdue.',
-        payload: task.id,
+        payload: jsonEncode(task.toJson()),
       );
       return;
     }
@@ -336,7 +337,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       title: task.title,
       body: '',
       scheduledDate: dueDate,
-      payload: task.id,
+      payload: jsonEncode(task.toJson()),
     );
   }
 
@@ -378,6 +379,11 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   }
 }
 
+/// A stream that emits a notification response when the user taps on a
+/// notification.
+final StreamController<NotificationResponse> notificationResponseStream =
+    StreamController.broadcast();
+
 /// Handle background notification actions.
 ///
 /// This is called when the user taps on a notification action button.
@@ -399,9 +405,11 @@ Future<void> _notificationCallback(NotificationResponse response) async {
   // response.payload is the id of the task.
   switch (response.notificationResponseType) {
     case NotificationResponseType.selectedNotification:
+      notificationResponseStream.add(response);
       break;
     case NotificationResponseType.selectedNotificationAction:
       // response.actionId will be either `complete` or `snooze`.
+      notificationResponseStream.add(response);
       break;
   }
 }
