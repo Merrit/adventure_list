@@ -641,21 +641,31 @@ class TasksCubit extends Cubit<TasksState> {
   /// Listens for when the user taps on a notification.
   void _listenForNotificationResponse() {
     _notificationResponseSubscription = notificationResponseStream.stream
-        .listen((NotificationResponse response) {
+        .listen((NotificationResponse response) async {
       if (response.payload == null) return;
-
-      // NotificationResponseType.selectedNotification: The user tapped on the
-      // notification.
-
-      // NotificationResponseType.selectedNotificationAction: The user tapped on
-      // an action button on the notification.
 
       final task = Task.fromJson(
         jsonDecode(response.payload!) as Map<String, dynamic>,
       );
 
-      setActiveList(task.taskListId);
-      setActiveTask(task.id);
+      switch (response.notificationResponseType) {
+        case NotificationResponseType.selectedNotification:
+          // The user tapped on the notification.
+          setActiveList(task.taskListId);
+          setActiveTask(task.id);
+          break;
+        case NotificationResponseType.selectedNotificationAction:
+          // The user tapped on an action button on the notification.
+          switch (response.actionId) {
+            case 'complete':
+              await updateTask(task.copyWith(completed: true));
+              break;
+            case 'snooze':
+              await NotificationsCubit.instance.snoozeTask(task);
+              break;
+          }
+          break;
+      }
     });
   }
 
