@@ -455,10 +455,33 @@ class TasksCubit extends Cubit<TasksState> {
   }
 
   /// Sets the [Task] with the provided [id] as the active task.
+  ///
+  /// If the [id] is null or no task with that [id] exists, the active task is
+  /// set to null.
+  ///
+  /// If the task belongs to a different list than the active list, the active
+  /// list is set to the list that contains the task.
   void setActiveTask(String? id) {
-    emit(state.copyWith(
-      activeTask: state.activeList?.items.singleWhereOrNull((e) => e.id == id),
-    ));
+    final Task? task = state.taskLists
+        .expand((element) => element.items)
+        .firstWhereOrNull((element) => element.id == id);
+    if (task == null) {
+      emit(state.copyWith(activeTask: null));
+      return;
+    }
+
+    final TaskList? taskList = state.taskLists
+        .firstWhereOrNull((element) => element.items.contains(task));
+    if (taskList == null) {
+      emit(state.copyWith(activeTask: null));
+      return;
+    }
+
+    if (taskList.id != state.activeList?.id) {
+      setActiveList(taskList.id);
+    }
+
+    emit(state.copyWith(activeTask: task));
   }
 
   /// Holds the `activeList` as it was before the tasks were cleared until the
