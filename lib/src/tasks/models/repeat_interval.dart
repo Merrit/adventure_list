@@ -15,23 +15,11 @@ part 'repeat_interval.g.dart';
 /// If the interval is set to 1 week, the task will be repeated every week at
 /// the same time and day of the week.
 ///
-/// If the interval is set to 1 month, the task will be repeated every month at
-/// the same time and day of the month.
-///
-/// If the interval is set to 1 year, the task will be repeated every year at
-/// the same time and day of the year.
-///
 /// If the interval is set to every 2 days, the task will be repeated every 2
 /// days at the same time.
 ///
 /// If the interval is set to every 2 weeks, the task will be repeated every 2
 /// weeks at the same time and day of the week.
-///
-/// If the interval is set to every 2 months, the task will be repeated every 2
-/// months at the same time and day of the month.
-///
-/// If the interval is set to every 2 years, the task will be repeated every 2
-/// years at the same time and day of the year.
 @freezed
 class RepeatInterval with _$RepeatInterval {
   const factory RepeatInterval({
