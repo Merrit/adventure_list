@@ -289,6 +289,15 @@ class _DueDateWidgetState extends State<_DueDateWidget> {
             ),
         ];
 
+        final bool isOverdue = task.dueDate?.isBefore(DateTime.now()) ?? false;
+
+        TextStyle? textStyle;
+        if (isOverdue) {
+          textStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Theme.of(context).colorScheme.error,
+              );
+        }
+
         return ListTile(
           leading: const Icon(Icons.calendar_today),
           title: const Text('Due date'),
@@ -324,6 +333,7 @@ class _DueDateWidgetState extends State<_DueDateWidget> {
                 }
               },
               items: dropdownItems,
+              style: textStyle,
             ),
           ),
         );
