@@ -166,16 +166,20 @@ class TasksCubit extends Cubit<TasksState> {
       taskLists: taskLists!.sorted(),
     ));
 
-    // Schedule notifications.
+    await _scheduleNotifications(taskLists);
+    _listenForNotificationResponse();
+  }
+
+  /// Schedules notifications for all tasks that have a due date and are not
+  /// completed.
+  Future<void> _scheduleNotifications(List<TaskList> taskLists) async {
     for (final taskList in taskLists) {
       for (final task in taskList.items) {
-        if (task.dueDate != null) {
+        if (task.dueDate != null && !task.completed) {
           await NotificationsCubit.instance.scheduleNotification(task);
         }
       }
     }
-
-    _listenForNotificationResponse();
   }
 
   /// Creates a new Todo list.
