@@ -397,55 +397,56 @@ class TasksCubit extends Cubit<TasksState> {
 
   /// Updates the provided [Task].
   Future<Task> updateTask(Task task) async {
-    final activeList = state.activeList;
-    if (activeList == null) throw Exception('No active list');
+    final taskList = state.taskLists.getTaskListById(task.taskListId);
+    if (taskList == null) throw Exception('Task list not found');
 
     // If the task is unchanged, don't do anything.
-    if (activeList.items.contains(task)) return task;
+    if (taskList.items.contains(task)) return task;
 
+    final bool isActiveTaskList = (state.activeList?.id == taskList.id);
     final bool isActiveTask = (state.activeTask?.id == task.id);
-    final int index = activeList.items.indexWhere((t) => t.id == task.id);
+    final int taskIndex = taskList.items.indexWhere((t) => t.id == task.id);
 
     // Update local state immediately.
-    final items = List<Task>.from(activeList.items)
-      ..removeAt(index)
-      ..insert(index, task);
+    final items = List<Task>.from(taskList.items)
+      ..removeAt(taskIndex)
+      ..insert(taskIndex, task);
     final taskLists = state.taskLists;
     final int taskListIndex = taskLists.indexWhere(
-      (element) => element.id == state.activeList!.id,
+      (element) => element.id == taskList.id,
     );
-    final TaskList updatedTaskList = activeList.copyWith(items: items);
+    final TaskList updatedTaskList = taskList.copyWith(items: items);
     final List<TaskList> updatedAllTaskLists = taskLists.copy()
       ..[taskListIndex] = updatedTaskList;
 
     emit(state.copyWith(
-      activeList: updatedTaskList,
-      activeTask: isActiveTask ? task : null,
+      activeList: isActiveTaskList ? updatedTaskList : state.activeList,
+      activeTask: isActiveTask ? task : state.activeTask,
       taskLists: updatedAllTaskLists,
     ));
 
     // Update with repository.
     final updatedTask = await _tasksRepository.updateTask(
-      taskListId: state.activeList!.id,
+      taskListId: task.taskListId,
       updatedTask: task,
     );
 
     // If the update failed, revert the changes.
     if (updatedTask == null) {
       emit(state.copyWith(
-        activeList: activeList,
-        activeTask: isActiveTask ? task : null,
+        activeList: isActiveTaskList ? taskList : state.activeList,
+        activeTask: isActiveTask ? task : state.activeTask,
         taskLists: taskLists,
       ));
       return task;
     }
 
     // Update local state with updated task.
-    final updatedItems = List<Task>.from(activeList.items)
-      ..removeAt(index)
-      ..insert(index, updatedTask);
+    final updatedItems = List<Task>.from(taskList.items)
+      ..removeAt(taskIndex)
+      ..insert(taskIndex, updatedTask);
 
-    final updatedTaskListWithUpdatedTask = activeList.copyWith(
+    final updatedTaskListWithUpdatedTask = taskList.copyWith(
       items: updatedItems,
     );
 
@@ -453,8 +454,9 @@ class TasksCubit extends Cubit<TasksState> {
       ..[taskListIndex] = updatedTaskListWithUpdatedTask;
 
     emit(state.copyWith(
-      activeList: updatedTaskListWithUpdatedTask,
-      activeTask: isActiveTask ? updatedTask : null,
+      activeList:
+          isActiveTaskList ? updatedTaskListWithUpdatedTask : state.activeList,
+      activeTask: isActiveTask ? updatedTask : state.activeTask,
       taskLists: updatedAllTaskListsWithUpdatedTask,
     ));
 
