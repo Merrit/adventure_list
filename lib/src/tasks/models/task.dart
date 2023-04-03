@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -36,6 +38,12 @@ class Task with _$Task {
     @JsonKey(defaultValue: -1)
         required int index,
 
+    /// ID for notifications associated with the task.
+    ///
+    /// A 32-bit integer as required by the notifications plugin.
+    @JsonKey(defaultValue: _generateNotificationId)
+        required int notificationId,
+
     /// The ID of the task considered the parent, only if this task is nested.
     required String? parent,
 
@@ -71,6 +79,7 @@ class Task with _$Task {
         dueDate: null,
         id: '',
         index: -1,
+        notificationId: _generateNotificationId(),
         parent: null,
         repeatInterval: null,
         synced: false,
@@ -85,6 +94,7 @@ class Task with _$Task {
     DateTime? dueDate,
     String id = '',
     int index = -1,
+    int? notificationId,
     String? parent,
     RepeatInterval? repeatInterval,
     bool synced = false,
@@ -113,6 +123,7 @@ class Task with _$Task {
       dueDate: dueDate,
       id: id,
       index: index,
+      notificationId: notificationId ?? _generateNotificationId(),
       parent: parent,
       repeatInterval: repeatInterval,
       synced: synced,
@@ -175,6 +186,13 @@ DateTime? _dueDateFromJson(int? date) {
 int? _dueDateToJson(DateTime? date) {
   if (date == null) return null;
   return date.millisecondsSinceEpoch;
+}
+
+/// Generate a random id for a notification.
+///
+/// The id will fit within a 32-bit integer as required by the plugin.
+int _generateNotificationId() {
+  return Random().nextInt(1 << 30);
 }
 
 /// Handles the fromJson for [Task.updated].

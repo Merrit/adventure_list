@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -227,7 +228,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   ///
   /// The id will fit within a 32-bit integer as required by the plugin.
   int _generateNotificationId() {
-    return DateTime.now().millisecondsSinceEpoch & 0xFFFFFFFF;
+    return Random().nextInt(1 << 30);
   }
 
   /// Request permission to show notifications.
@@ -290,6 +291,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       () async {
         log.v('Showing scheduled notification for task: ${task.id}');
         await showNotification(
+          id: task.notificationId,
           title: task.title,
           body: '',
           payload: task.id,
@@ -322,6 +324,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     if (dueDate.isBefore(DateTime.now())) {
       log.v('Task is already overdue. Showing notification immediately.');
       await showNotification(
+        id: task.notificationId,
         title: task.title,
         body: 'This task is overdue.',
         payload: task.id,
@@ -387,16 +390,18 @@ void _notificationBackgroundCallback(NotificationResponse response) {
 
 /// Called when the user taps on a notification.
 Future<void> _notificationCallback(NotificationResponse response) async {
+  if (defaultTargetPlatform.isDesktop) {
+    // On desktop, the app is already running so we can just show the window.
+    await AppWindow.instance.show();
+    await AppWindow.instance.focus();
+  }
+
   // response.payload is the id of the task.
   switch (response.notificationResponseType) {
     case NotificationResponseType.selectedNotification:
-      await AppWindow.instance.show();
-      await AppWindow.instance.focus();
       break;
     case NotificationResponseType.selectedNotificationAction:
       // response.actionId will be either `complete` or `snooze`.
-      await AppWindow.instance.show();
-      await AppWindow.instance.focus();
       break;
   }
 }
