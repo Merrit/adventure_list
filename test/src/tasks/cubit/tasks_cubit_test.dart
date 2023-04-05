@@ -945,34 +945,43 @@ void main() {
     });
 
     test('updating sub-task works', () async {
-      await testCubit.createList('Tasks');
-      final Task? task = await testCubit.createTask(
-        Task(
-          taskListId: 'test-list-id',
-          title: 'Parent task',
-        ),
-      );
-      expect(task, isNotNull);
-      final Task? subTask = await testCubit.createTask(
-        Task(
-          taskListId: 'test-list-id',
-          title: 'sub-task',
-          parent: task!.id,
-        ),
-      );
-      expect(subTask, isNotNull);
-
-      expect(
-        testCubit.state.activeList!.items.getTaskById(task.id)!.completed,
-        isFalse,
+      // Seed the state.
+      final taskList = testTaskList.copyWith(
+        items: [
+          task1,
+          task2,
+          task3,
+          task4,
+          subTask1,
+          subTask2,
+          subTask3,
+          subTask4,
+        ],
       );
 
-      await testCubit.updateTask(subTask!.copyWith(completed: true));
+      testCubit.emit(TasksState(
+        activeList: taskList,
+        activeTask: task1,
+        loading: false,
+        taskLists: [taskList],
+      ));
 
-      expect(
-        testCubit.state.activeList!.items.getTaskById(subTask.id)!.completed,
-        isTrue,
-      );
+      // Update sub-task.
+      await testCubit.updateTask(subTask1.copyWith(completed: true));
+
+      expect(testCubit.state.taskLists.length, 1);
+
+      final updatedTaskList = testCubit.state.taskLists.first;
+      expect(updatedTaskList.items, [
+        task1,
+        task2,
+        task3,
+        task4,
+        subTask1.copyWith(completed: true),
+        subTask2,
+        subTask3,
+        subTask4,
+      ]);
     });
   });
 }
