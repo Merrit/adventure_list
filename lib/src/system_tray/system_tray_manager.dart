@@ -13,7 +13,7 @@ class SystemTrayManager {
   Future<void> initialize() async {
     final String iconPath = Platform.isWindows
         ? 'assets/icons/$kPackageId.ico'
-        : 'assets/icons/$kPackageId.png';
+        : 'assets/icons/$kPackageId-symbolic.svg';
 
     await trayManager.setIcon(iconPath);
 
