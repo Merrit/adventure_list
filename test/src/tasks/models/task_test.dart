@@ -171,6 +171,22 @@ void main() {
       expect(updatedTasks.last, task3);
     });
 
+    test('overdueTasks() works', () {
+      final tasks = <Task>[task1, task2, task3];
+      final overdueTasks = tasks.overdueTasks();
+      expect(overdueTasks, isA<List<Task>>());
+      expect(overdueTasks.length, 0);
+      final updatedTasks = tasks
+          .map((t) => t.copyWith(
+              dueDate: DateTime.now().subtract(const Duration(days: 1))))
+          .toList();
+      final updatedOverdueTasks = updatedTasks.overdueTasks();
+      expect(updatedOverdueTasks.length, 3);
+      expect(updatedOverdueTasks.first.title, 'Test Task 1');
+      expect(updatedOverdueTasks[1].title, 'Test Task 2');
+      expect(updatedOverdueTasks.last.title, 'Test Task 3');
+    });
+
     test('reorderTasks() works', () {
       final tasks = <Task>[task1, task2, task3];
       final updatedTasks = tasks.reorderTasks(task1, 2);
