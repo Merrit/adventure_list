@@ -41,12 +41,13 @@ dependencies:
   helpers:
     git:
       url: https://github.com/Merrit/helpers.git
-      ref: 161edd8120b628d61e90db44810b4cd920259c1b
+      ref: be754e0b6b23625bd83e60a2fb4f1e0939218632
   hive_flutter: ^1.1.0
   home_widget: ^0.2.0+1
   http: ^0.13.4
   intl: ^0.17.0
   json_annotation: ^4.8.0
+  launcher_entry: ^0.1.1
   logger: ^1.1.0
   # move_to_background sends the Android app to background when user exits
   # instead of the app closing entirely.

@@ -8,11 +8,13 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     hide RepeatInterval;
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
+import 'package:launcher_entry/launcher_entry.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../../core/core.dart';
 import '../../logs/logging_manager.dart';
+import '../../system_tray/system_tray_manager.dart';
 import '../../tasks/tasks.dart';
 import '../../window/app_window.dart';
 import '../notifications.dart';
@@ -47,9 +49,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     const initSettingsDarwin = DarwinInitializationSettings();
     final initSettingsLinux = LinuxInitializationSettings(
       defaultActionName: 'Open notification',
-      defaultIcon: AssetsLinuxIcon(
-        'assets/icons/codes.merritt.adventurelist.svg',
-      ),
+      defaultIcon: AssetsLinuxIcon(AppIcons.linux),
     );
 
     final initSettings = InitializationSettings(
@@ -128,6 +128,23 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   /// Enable notifications.
   Future<void> enable() async {
     emit(state.copyWith(enabled: true));
+  }
+
+  /// Set the taskbar and system tray icon notification badge.
+  ///
+  /// Only works on Linux and Windows.
+  Future<void> setNotificationBadge(int count) async {
+    if (state.overdueTasksCount == count) return;
+
+    log.v('Setting notification badge count to $count');
+
+    if (defaultTargetPlatform.isLinux) {
+      await _setNotificationBadgeLinux(count);
+    } else if (defaultTargetPlatform.isWindows) {
+      await _setNotificationBadgeWindows(count);
+    }
+
+    emit(state.copyWith(overdueTasksCount: count));
   }
 
   /// Schedule a notification for a task.
@@ -414,6 +431,34 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       payload: payload,
     );
   }
+
+  /// Set the notification badges on Linux.
+  Future<void> _setNotificationBadgeLinux(int count) async {
+    await _setNotificationBadgeLinuxTaskbar(count);
+    await _setNotificationBadgeLinuxSystemTray(count);
+  }
+
+  /// Set the notification badge on the Linux taskbar.
+  Future<void> _setNotificationBadgeLinuxTaskbar(int count) async {
+    /// Linux uses the Unity API to set the badge count.
+    /// See: https://wiki.ubuntu.com/Unity/LauncherAPI
+    final service = LauncherEntryService(
+      appUri: 'application://$kPackageId.desktop',
+    );
+    await service.update(count: count, countVisible: true);
+  }
+
+  /// Set the notification badge on the Linux system tray.
+  Future<void> _setNotificationBadgeLinuxSystemTray(int count) async {
+    final icon = (count > 0)
+        ? AppIcons.linuxSymbolicWithNotificationBadge
+        : AppIcons.linuxSymbolic;
+
+    await SystemTrayManager.instance.setIcon(icon);
+  }
+
+  /// Set the notification badge on Windows.
+  Future<void> _setNotificationBadgeWindows(int count) async {}
 }
 
 /// A stream that emits a notification response when the user taps on a
