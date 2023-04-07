@@ -13,6 +13,7 @@ import 'package:http/http.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../authentication/authentication.dart';
+import '../../core/core.dart';
 import '../../home_widget/home_widget_manager.dart';
 import '../../logs/logs.dart';
 import '../../notifications/notifications.dart';
@@ -611,6 +612,24 @@ class TasksCubit extends Cubit<TasksState> {
     }
 
     if (Platform.isAndroid) _updateAndroidWidget(change.nextState);
+
+    _updateNotificationBadge(change.nextState);
+  }
+
+  /// Update the taskbar and system tray icons to indicate notifications.
+  Future<void> _updateNotificationBadge(TasksState state) async {
+    if (!defaultTargetPlatform.isLinux && !defaultTargetPlatform.isWindows) {
+      return;
+    }
+
+    log.v('Updating notification badge...');
+
+    int overdueTaskCount = 0;
+    for (final taskList in state.taskLists) {
+      overdueTaskCount += taskList.items.overdueTasks().length;
+    }
+
+    await NotificationsCubit.instance.setNotificationBadge(overdueTaskCount);
   }
 
   /// Timer ensures we aren't caching constantly.

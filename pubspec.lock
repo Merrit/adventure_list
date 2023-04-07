@@ -627,8 +627,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "161edd8120b628d61e90db44810b4cd920259c1b"
-      resolved-ref: "161edd8120b628d61e90db44810b4cd920259c1b"
+      ref: be754e0b6b23625bd83e60a2fb4f1e0939218632
+      resolved-ref: be754e0b6b23625bd83e60a2fb4f1e0939218632
       url: "https://github.com/Merrit/helpers.git"
     source: git
     version: "0.0.1"
@@ -728,6 +728,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.6.1"
+  launcher_entry:
+    dependency: "direct main"
+    description:
+      name: launcher_entry
+      sha256: "87c403fce3f9beea51514a7c5859aac57c9af6b795433a29ee9caa7b5bba9ac1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.1"
   lints:
     dependency: transitive
     description:

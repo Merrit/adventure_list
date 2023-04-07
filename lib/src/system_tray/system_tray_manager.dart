@@ -1,19 +1,24 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:tray_manager/tray_manager.dart';
 
 import '../core/core.dart';
 import '../window/app_window.dart';
 
+/// Manages the system tray icon.
 class SystemTrayManager {
   final AppWindow _window;
 
-  SystemTrayManager(this._window);
+  /// The singleton instance of this class.
+  static late SystemTrayManager instance;
+
+  SystemTrayManager(this._window) {
+    instance = this;
+  }
 
   Future<void> initialize() async {
-    final String iconPath = Platform.isWindows
-        ? 'assets/icons/$kPackageId.ico'
-        : 'assets/icons/$kPackageId-symbolic.svg';
+    final String iconPath = (defaultTargetPlatform.isWindows) //
+        ? AppIcons.windows
+        : AppIcons.linux;
 
     await trayManager.setIcon(iconPath);
 
@@ -26,5 +31,10 @@ class SystemTrayManager {
     );
 
     await trayManager.setContextMenu(menu);
+  }
+
+  /// Sets the system tray icon.
+  Future<void> setIcon(String iconPath) async {
+    await trayManager.setIcon(iconPath);
   }
 }
