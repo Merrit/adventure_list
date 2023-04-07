@@ -244,6 +244,14 @@ extension ListOfTasksExtensions on List<Task> {
         .toList();
   }
 
+  /// Returns all [Task]s that have a due date in the past and are not completed.
+  List<Task> overdueTasks() {
+    return where((t) =>
+        !t.completed &&
+        t.dueDate != null &&
+        t.dueDate!.isBefore(DateTime.now())).toList();
+  }
+
   /// Returns a copy of the list with the task updated to the new index.
   ///
   /// The index of all the tasks is updated.
