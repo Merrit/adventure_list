@@ -265,15 +265,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.8"
-  desktop_integration:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: "78b3fc0d221bb117457f92786461b21b0f3c0777"
-      resolved-ref: "78b3fc0d221bb117457f92786461b21b0f3c0777"
-      url: "https://github.com/Merrit/desktop_integration.git"
-    source: git
-    version: "0.0.1"
   diff_match_patch:
     dependency: transitive
     description:

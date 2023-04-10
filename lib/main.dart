@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:desktop_integration/desktop_integration.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +15,6 @@ import 'firebase_options.dart';
 import 'src/app.dart';
 import 'src/app/cubit/app_cubit.dart';
 import 'src/authentication/authentication.dart';
-import 'src/core/constants.dart';
 import 'src/logs/logs.dart';
 import 'src/notifications/notifications.dart';
 import 'src/settings/cubit/settings_cubit.dart';
@@ -96,36 +94,6 @@ Future<void> main(List<String> args) async {
       ),
     ),
   );
-
-  integrateWithDesktop();
-}
-
-/// Add the app to the user's applications menu with icon.
-Future<void> integrateWithDesktop() async {
-  if (!Platform.isLinux && !Platform.isWindows) return;
-  if (kDebugMode) return;
-
-  File? desktopFile;
-  if (Platform.isLinux) {
-    desktopFile = await assetToTempDir(
-      'packaging/linux/codes.merritt.adventurelist.desktop',
-    );
-  }
-
-  final iconFileSuffix = Platform.isWindows ? 'ico' : 'svg';
-
-  final iconFile = await assetToTempDir(
-    'assets/icons/codes.merritt.adventurelist.$iconFileSuffix',
-  );
-
-  final desktopIntegration = DesktopIntegration(
-    desktopFilePath: desktopFile?.path ?? '',
-    iconPath: iconFile.path,
-    packageName: kPackageId,
-    linkFileName: 'Adventure List',
-  );
-
-  await desktopIntegration.addToApplicationsMenu();
 }
 
 /// Used for Background Updates using Workmanager Plugin
