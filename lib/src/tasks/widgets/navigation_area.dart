@@ -145,9 +145,18 @@ class __TaskListTileState extends State<_TaskListTile> {
             (element) => element.id == widget.taskList.id,
           );
 
+          final overdueTasks = taskList.items.overdueTasks();
+
           return ListTile(
             key: ValueKey(taskList.id),
-            title: Text(taskList.title),
+            title: badges.Badge(
+              showBadge: overdueTasks.isNotEmpty,
+              badgeContent: Text(
+                overdueTasks.length.toString(),
+                style: const TextStyle(color: Colors.white),
+              ),
+              child: Text(taskList.title),
+            ),
             selected: (state.activeList == taskList),
             trailing: isHovered
                 ? ReorderableDragStartListener(
