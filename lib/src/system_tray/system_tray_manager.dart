@@ -26,6 +26,7 @@ class SystemTrayManager {
       items: [
         MenuItem(label: 'Show', onClick: (menuItem) => _window.show()),
         MenuItem(label: 'Hide', onClick: (menuItem) => _window.hide()),
+        MenuItem(label: 'Reset Window', onClick: (menuItem) => _window.reset()),
         MenuItem(label: 'Exit', onClick: (menuItem) => _window.close()),
       ],
     );

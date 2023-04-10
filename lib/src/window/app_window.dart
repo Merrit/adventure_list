@@ -64,6 +64,15 @@ class AppWindow {
 
   Future<void> hide() async => await windowManager.hide();
 
+  /// Reset window size and position to default.
+  ///
+  /// This will also center the window on the primary screen.
+  /// Useful if the window is somehow moved off screen.
+  Future<void> reset() async {
+    await StorageRepository.instance.delete('windowSizeAndPosition');
+    await setWindowSizeAndPosition();
+  }
+
   Future<void> show() async => await windowManager.show();
 
   Future<void> saveWindowSizeAndPosition() async {
