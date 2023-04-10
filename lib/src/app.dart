@@ -48,6 +48,18 @@ class _AppState extends State<App> with TrayListener, WindowListener {
   }
 
   @override
+  void onTrayIconMouseDown() {
+    trayManager.popUpContextMenu();
+    super.onTrayIconMouseUp();
+  }
+
+  @override
+  void onTrayIconRightMouseDown() {
+    trayManager.popUpContextMenu();
+    super.onTrayIconRightMouseUp();
+  }
+
+  @override
   Future<void> onWindowClose() async {
     /// This method from the `window_manager` package is only working on Windows
     /// for some reason. Linux will use `flutter_window_close` instead until it
