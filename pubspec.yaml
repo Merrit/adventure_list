@@ -48,6 +48,7 @@ dependencies:
   intl: ^0.17.0
   json_annotation: ^4.8.0
   launcher_entry: ^0.1.1
+  local_notifier: ^0.1.5
   logger: ^1.1.0
   # move_to_background sends the Android app to background when user exits
   # instead of the app closing entirely.
