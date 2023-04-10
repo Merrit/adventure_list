@@ -29,6 +29,10 @@ jobs:
           sudo apt-get update
           # libappindicator required for tray_manager
           sudo apt-get install appindicator3-0.1 libappindicator3-dev
+          # libnotify-dev required for notifications, only until the
+          # following issue is resolved:
+          # https://github.com/MaikuB/flutter_local_notifications/issues/746
+          sudo apt-get install libnotify-dev
           # keybinder required for global hotkeys
           sudo apt-get install keybinder-3.0
 
