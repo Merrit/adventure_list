@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:launcher_entry/launcher_entry.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:window_manager/window_manager.dart';
 
 import '../../core/core.dart';
 import '../../logs/logging_manager.dart';
@@ -458,7 +459,28 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   }
 
   /// Set the notification badge on Windows.
-  Future<void> _setNotificationBadgeWindows(int count) async {}
+  Future<void> _setNotificationBadgeWindows(int count) async {
+    await _setNotificationBadgeWindowsTaskbar(count);
+    await _setNotificationBadgeWindowsSystemTray(count);
+  }
+
+  /// Set the notification badge on the Windows taskbar.
+  Future<void> _setNotificationBadgeWindowsTaskbar(int count) async {
+    final icon =
+        (count > 0) ? AppIcons.windowsWithNotificationBadge : AppIcons.windows;
+
+    // await TaskbarManager.instance.setIcon(icon);
+    await windowManager.setIcon(icon);
+  }
+
+  /// Set the notification badge on the Windows system tray.
+  Future<void> _setNotificationBadgeWindowsSystemTray(int count) async {
+    final icon = (count > 0)
+        ? AppIcons.windowsSymbolicWithNotificationBadge
+        : AppIcons.windowsSymbolic;
+
+    await SystemTrayManager.instance.setIcon(icon);
+  }
 }
 
 /// A stream that emits a notification response when the user taps on a
