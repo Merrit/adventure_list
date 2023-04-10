@@ -17,8 +17,8 @@ class SystemTrayManager {
 
   Future<void> initialize() async {
     final String iconPath = (defaultTargetPlatform.isWindows) //
-        ? AppIcons.windows
-        : AppIcons.linux;
+        ? AppIcons.windowsSymbolic
+        : AppIcons.linuxSymbolic;
 
     await trayManager.setIcon(iconPath);
 
