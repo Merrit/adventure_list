@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -156,47 +154,44 @@ class _TaskListTile extends StatefulWidget {
 }
 
 class __TaskListTileState extends State<_TaskListTile> {
-  bool isHovered = false;
-
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => isHovered = true),
-      onExit: (_) => setState(() => isHovered = false),
-      child: BlocBuilder<TasksCubit, TasksState>(
-        builder: (context, state) {
-          final taskList = state.taskLists.singleWhere(
-            (element) => element.id == widget.taskList.id,
-          );
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        final taskList = state.taskLists.singleWhere(
+          (element) => element.id == widget.taskList.id,
+        );
 
-          final overdueTasks = taskList.items.overdueTasks();
+        final overdueTasks = taskList.items.overdueTasks();
 
-          return ListTile(
-            key: ValueKey(taskList.id),
-            title: badges.Badge(
-              showBadge: overdueTasks.isNotEmpty,
-              badgeContent: Text(
-                overdueTasks.length.toString(),
-                style: const TextStyle(color: Colors.white),
-              ),
-              child: Text(taskList.title),
+        final listTile = ListTile(
+          key: ValueKey(taskList.id),
+          title: badges.Badge(
+            showBadge: overdueTasks.isNotEmpty,
+            badgeContent: Text(
+              overdueTasks.length.toString(),
+              style: const TextStyle(color: Colors.white),
             ),
-            selected: (state.activeList == taskList),
-            trailing: isHovered
-                ? ReorderableDragStartListener(
-                    index: taskList.index,
-                    child: const Icon(Icons.drag_handle),
-                  )
-                : null,
-            onTap: () {
-              tasksCubit.setActiveList(taskList.id);
-              if (mediaQuery.isSmallScreen) Navigator.pop(context);
-            },
+            child: Text(taskList.title),
+          ),
+          selected: (state.activeList == taskList),
+          onTap: () {
+            tasksCubit.setActiveList(taskList.id);
+            if (mediaQuery.isSmallScreen) Navigator.pop(context);
+          },
+        );
+
+        if (defaultTargetPlatform.isMobile) {
+          return listTile;
+        } else {
+          return ReorderableDragStartListener(
+            index: taskList.index,
+            child: listTile,
           );
-        },
-      ),
+        }
+      },
     );
   }
 }
