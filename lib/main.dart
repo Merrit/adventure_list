@@ -31,7 +31,7 @@ Future<void> main(List<String> args) async {
 
   // Handle platform errors not caught by Flutter.
   PlatformDispatcher.instance.onError = (error, stack) {
-    log.e('Uncaught platform error:', error, stack);
+    log.e('Uncaught platform error', error, stack);
     return true;
   };
 
