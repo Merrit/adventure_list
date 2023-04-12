@@ -129,7 +129,7 @@ class _ScrollingListTiles extends StatelessWidget {
               oldIndex,
               newIndex,
             ),
-            buildDefaultDragHandles: Platform.isAndroid || Platform.isIOS,
+            buildDefaultDragHandles: defaultTargetPlatform.isMobile,
             children: state.taskLists
                 .map((TaskList e) => _TaskListTile(
                       key: ValueKey(e.id),

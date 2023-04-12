@@ -91,7 +91,7 @@ class TasksCubit extends Cubit<TasksState> {
     emit(state.copyWith(
       activeList: taskLists.singleWhereOrNull((e) => e.id == activeListId),
       loading: false,
-      taskLists: taskLists.sorted(),
+      taskLists: taskLists.sortedByIndex(),
     ));
   }
 
@@ -164,7 +164,7 @@ class TasksCubit extends Cubit<TasksState> {
     emit(state.copyWith(
       activeList: taskLists?.singleWhereOrNull((e) => e.id == activeListId),
       loading: false,
-      taskLists: taskLists!.sorted(),
+      taskLists: taskLists!.sortedByIndex(),
     ));
 
     await _scheduleNotifications(taskLists);
@@ -383,7 +383,7 @@ class TasksCubit extends Cubit<TasksState> {
       ..add(updatedList);
     emit(state.copyWith(
       activeList: updatedList,
-      taskLists: updatedLists.sorted(),
+      taskLists: updatedLists.sortedByIndex(),
     ));
     // sync tasks that have changed
     for (var i = 0; i < items.length; i++) {
