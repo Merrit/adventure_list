@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:helpers/helpers.dart';
 
 import '../../core/helpers/helpers.dart';
 import '../../notifications/notifications.dart';
@@ -55,14 +56,24 @@ class _TasksPageState extends State<TasksPage> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final bool pinned = context.select<WindowCubit, bool>(
-            (cubit) => cubit.state.pinned,
-          );
+          final bool pinned;
+          if (defaultTargetPlatform.isDesktop) {
+            pinned = context.select<WindowCubit, bool>(
+              (cubit) => cubit.state.pinned,
+            );
+          } else {
+            pinned = false;
+          }
 
-          final bool transparentBackgroundEnabled =
-              context.select<SettingsCubit, bool>(
-            (cubit) => cubit.state.desktopWidgetSettings.transparentBackground,
-          );
+          final bool transparentBackgroundEnabled;
+          if (defaultTargetPlatform.isDesktop) {
+            transparentBackgroundEnabled = context.select<SettingsCubit, bool>(
+              (cubit) =>
+                  cubit.state.desktopWidgetSettings.transparentBackground,
+            );
+          } else {
+            transparentBackgroundEnabled = false;
+          }
 
           final Color backgroundColor = (pinned && transparentBackgroundEnabled)
               ? Colors.transparent
