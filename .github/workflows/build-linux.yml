@@ -41,7 +41,7 @@ jobs:
         run: echo "prerelease=true" >> $GITHUB_ENV
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2.3.0
+        uses: subosito/flutter-action@v2.10.0
 
       - name: Checkout code
         uses: actions/checkout@v3
