@@ -112,9 +112,26 @@ extension ListOfTaskListExtensions on List<TaskList> {
   }
 
   /// Sorts [TaskList]s by their index.
-  List<TaskList> sorted() {
-    sort((a, b) => a.index.compareTo(b.index));
-    return this;
+  ///
+  /// If the list of indexes is not contiguous, contains duplicates, or any have
+  /// a negative index, the list is sorted by index as is though with the
+  /// negative indexes at the end; then the indexes are reassigned to be
+  /// contiguous and match the order of the list.
+  List<TaskList> sortedByIndex() {
+    final sortedTaskLists = List<TaskList>.from(this)
+      ..sort((a, b) => a.index.compareTo(b.index));
+
+    final negativeIndexes = sortedTaskLists.where((e) => e.index < 0).toList();
+    final positiveIndexes = sortedTaskLists.where((e) => e.index >= 0).toList();
+
+    final updatedTaskLists = List<TaskList>.from(positiveIndexes)
+      ..addAll(negativeIndexes);
+
+    for (var i = 0; i < updatedTaskLists.length; i++) {
+      updatedTaskLists[i] = updatedTaskLists[i].copyWith(index: i);
+    }
+
+    return updatedTaskLists;
   }
 
   /// Returns a copy of the list with the given [taskList] added.

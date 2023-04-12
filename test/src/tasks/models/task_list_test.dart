@@ -150,13 +150,37 @@ void main() {
       expect(taskLists.getTaskById('task-20'), null);
     });
 
-    test('sorted() works', () {
+    test('sortedByIndex() works', () {
       final taskLists = [taskList4, taskList2, taskList3, taskList1];
-      final sortedTaskLists = taskLists.sorted();
+      final sortedTaskLists = taskLists.sortedByIndex();
       expect(sortedTaskLists[0].id, taskList1.id);
       expect(sortedTaskLists[1].id, taskList2.id);
       expect(sortedTaskLists[2].id, taskList3.id);
       expect(sortedTaskLists[3].id, taskList4.id);
+    });
+
+    test('sortedByIndex() validates indexes if needed', () {
+      final incorrectTaskList1 = taskList1.copyWith(index: 2);
+      final incorrectTaskList2 = taskList2.copyWith(index: 0);
+      final incorrectTaskList3 = taskList3.copyWith(index: -1);
+      final incorrectTaskList4 = taskList4.copyWith(index: 4);
+
+      final taskLists = [
+        incorrectTaskList1,
+        incorrectTaskList2,
+        incorrectTaskList3,
+        incorrectTaskList4,
+      ];
+
+      final sortedTaskLists = taskLists.sortedByIndex();
+      expect(sortedTaskLists[0].id, taskList2.id);
+      expect(sortedTaskLists[0].index, 0);
+      expect(sortedTaskLists[1].id, taskList1.id);
+      expect(sortedTaskLists[1].index, 1);
+      expect(sortedTaskLists[2].id, taskList4.id);
+      expect(sortedTaskLists[2].index, 2);
+      expect(sortedTaskLists[3].id, taskList3.id);
+      expect(sortedTaskLists[3].index, 3);
     });
 
     test('addTaskList() works', () {
