@@ -62,7 +62,14 @@ class _SettingsView extends StatelessWidget {
           title: 'Integration',
           children: [
             _CloseToTrayTile(),
+          ],
+        );
+
+        const widgetSection = _SectionCard(
+          title: 'Widget',
+          children: [
             _CustomizeAndroidWidgetTile(),
+            _CustomizeDesktopWidgetTile(),
           ],
         );
 
@@ -82,6 +89,7 @@ class _SettingsView extends StatelessWidget {
             versionSection,
             appearanceSection,
             integrationSection,
+            widgetSection,
             syncSection,
           ],
         );
@@ -232,12 +240,36 @@ class _CustomizeAndroidWidgetTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!Platform.isAndroid) return const SizedBox();
+    if (!defaultTargetPlatform.isAndroid) return const SizedBox();
 
     return ListTile(
-      title: const Text('Android widget'),
+      title: const Text('Settings'),
       trailing: const Icon(Icons.keyboard_arrow_right),
       onTap: () => Navigator.pushNamed(context, HomeWidgetConfigPage.routeName),
+    );
+  }
+}
+
+class _CustomizeDesktopWidgetTile extends StatelessWidget {
+  const _CustomizeDesktopWidgetTile();
+
+  @override
+  Widget build(BuildContext context) {
+    if (!defaultTargetPlatform.isDesktop) return const SizedBox();
+
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, state) {
+        return SwitchListTile(
+          title: const Text('Transparent background'),
+          secondary: const Icon(Icons.desktop_windows),
+          value: state.desktopWidgetSettings.transparentBackground,
+          onChanged: (value) => settingsCubit.updateDesktopWidgetSettings(
+            state.desktopWidgetSettings.copyWith(
+              transparentBackground: value,
+            ),
+          ),
+        );
+      },
     );
   }
 }

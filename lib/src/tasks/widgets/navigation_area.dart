@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:badges/badges.dart' as badges;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +10,7 @@ import 'package:helpers/helpers.dart';
 import '../../app/cubit/app_cubit.dart';
 import '../../core/helpers/helpers.dart';
 import '../../settings/widgets/settings_page.dart';
+import '../../window/window.dart';
 import '../tasks.dart';
 
 class CustomNavigationRail extends StatelessWidget {
@@ -70,6 +72,7 @@ class _SettingsTile extends StatelessWidget {
             ),
             child: const Text('Settings'),
           ),
+          trailing: const _PinWindowButton(),
           onTap: () => Navigator.pushNamed(context, SettingsPage.routeName),
         );
       },
@@ -86,6 +89,29 @@ class _CreateListButton extends StatelessWidget {
       leading: const Icon(Icons.add),
       placeholderText: 'New List',
       callback: (String value) => tasksCubit.createList(value),
+    );
+  }
+}
+
+/// Button to pin the window to the desktop as a widget.
+class _PinWindowButton extends StatelessWidget {
+  const _PinWindowButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if (!defaultTargetPlatform.isDesktop) return const SizedBox();
+
+    return BlocBuilder<WindowCubit, WindowState>(
+      builder: (context, state) {
+        final icon = (state.pinned) //
+            ? Icons.push_pin
+            : Icons.push_pin_outlined;
+
+        return IconButton(
+          icon: Icon(icon),
+          onPressed: () => WindowCubit.instance.togglePinned(),
+        );
+      },
     );
   }
 }

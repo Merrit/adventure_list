@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/helpers/helpers.dart';
 import '../../notifications/notifications.dart';
+import '../../settings/settings.dart';
+import '../../window/window.dart';
 import '../tasks.dart';
 
 class TasksPage extends StatefulWidget {
@@ -53,6 +55,19 @@ class _TasksPageState extends State<TasksPage> {
             return const Center(child: CircularProgressIndicator());
           }
 
+          final bool pinned = context.select<WindowCubit, bool>(
+            (cubit) => cubit.state.pinned,
+          );
+
+          final bool transparentBackgroundEnabled =
+              context.select<SettingsCubit, bool>(
+            (cubit) => cubit.state.desktopWidgetSettings.transparentBackground,
+          );
+
+          final Color backgroundColor = (pinned && transparentBackgroundEnabled)
+              ? Colors.transparent
+              : Theme.of(context).scaffoldBackgroundColor;
+
           final Widget bodyContainer = Row(
             children: [
               if (!mediaQuery.isSmallScreen) const VerticalDivider(),
@@ -71,6 +86,7 @@ class _TasksPageState extends State<TasksPage> {
             appBar = AppBar(
               title: const Text('Debug'),
               actions: const [_DebugMenuButton()],
+              backgroundColor: backgroundColor,
             );
           } else {
             appBar = null;
@@ -81,6 +97,7 @@ class _TasksPageState extends State<TasksPage> {
             drawer: (mediaQuery.isSmallScreen)
                 ? const CustomNavigationRail(breakpoint: Breakpoints.small)
                 : null,
+            backgroundColor: backgroundColor,
             body: AdaptiveLayout(
               primaryNavigation: SlotLayout(
                 config: <Breakpoint, SlotLayoutConfig>{

@@ -22,7 +22,7 @@ import 'src/storage/storage_repository.dart';
 import 'src/system_tray/system_tray_manager.dart';
 import 'src/tasks/tasks.dart';
 import 'src/updates/updates.dart';
-import 'src/window/app_window.dart';
+import 'src/window/window.dart';
 
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -89,6 +89,10 @@ Future<void> main(List<String> args) async {
           BlocProvider.value(value: notificationsCubit),
           BlocProvider.value(value: settingsCubitInstance),
           BlocProvider.value(value: tasksCubit),
+          if (defaultTargetPlatform.isDesktop)
+            BlocProvider(
+              create: (context) => WindowCubit(),
+            ),
         ],
         child: const App(),
       ),
