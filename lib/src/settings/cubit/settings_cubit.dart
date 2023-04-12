@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -5,6 +7,7 @@ import 'package:system_theme/system_theme.dart';
 
 import '../../storage/storage_repository.dart';
 import '../../theme/theme.dart';
+import '../settings.dart';
 
 part 'settings_state.dart';
 part 'settings_cubit.freezed.dart';
@@ -17,6 +20,16 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   static Future<SettingsCubit> initialize() async {
+    final String? desktopWidgetSettingsJson = await StorageRepository //
+        .instance
+        .get('desktopWidgetSettings');
+
+    final desktopWidgetSettings = (desktopWidgetSettingsJson != null)
+        ? DesktopWidgetSettings.fromJson(
+            Map<String, dynamic>.from(jsonDecode(desktopWidgetSettingsJson)),
+          )
+        : DesktopWidgetSettings.initial();
+
     final String? homeWidgetSelectedListId = await StorageRepository //
         .instance
         .get('homeWidgetSelectedListId');
@@ -25,6 +38,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       initialState: SettingsState(
         closeToTray:
             await StorageRepository.instance.get('closeToTray') ?? true,
+        desktopWidgetSettings: desktopWidgetSettings,
         homeWidgetSelectedListId: homeWidgetSelectedListId ?? '',
         theme: await _getTheme(),
       ),
@@ -91,6 +105,18 @@ class SettingsCubit extends Cubit<SettingsState> {
     await StorageRepository.instance.save(
       key: 'ThemeMode',
       value: newThemeMode.toString(),
+    );
+  }
+
+  /// Update and persist the [DesktopWidgetSettings].
+  Future<void> updateDesktopWidgetSettings(
+    DesktopWidgetSettings newSettings,
+  ) async {
+    emit(state.copyWith(desktopWidgetSettings: newSettings));
+
+    await StorageRepository.instance.save(
+      key: 'desktopWidgetSettings',
+      value: jsonEncode(newSettings.toJson()),
     );
   }
 }

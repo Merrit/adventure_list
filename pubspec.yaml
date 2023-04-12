@@ -68,6 +68,15 @@ dependencies:
   window_to_front: ^0.0.3
   workmanager: ^0.5.0
 
+dependency_overrides:
+  # Override window_manager to use the fork with the fix for Linux that
+  # restores the window frame until the fix is merged.
+  # See: https://github.com/leanflutter/window_manager/pull/323
+  window_manager:
+    git:
+      url: https://github.com/Merrit/window_manager
+      ref: 5f8143d6b0f181f397b31ed313bc17f08608ed11
+
 dev_dependencies:
   flutter_app_builder:
     git:

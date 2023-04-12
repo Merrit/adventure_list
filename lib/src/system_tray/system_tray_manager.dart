@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:tray_manager/tray_manager.dart';
 
 import '../core/core.dart';
-import '../window/app_window.dart';
+import '../window/window.dart';
 
 /// Manages the system tray icon.
 class SystemTrayManager {
@@ -26,7 +26,7 @@ class SystemTrayManager {
       items: [
         MenuItem(label: 'Show', onClick: (menuItem) => _window.show()),
         MenuItem(label: 'Hide', onClick: (menuItem) => _window.hide()),
-        MenuItem(label: 'Reset Window', onClick: (menuItem) => _window.reset()),
+        MenuItem(label: 'Reset Window', onClick: (_) => _resetWindow()),
         MenuItem(label: 'Exit', onClick: (menuItem) => _window.close()),
       ],
     );
@@ -37,5 +37,16 @@ class SystemTrayManager {
   /// Sets the system tray icon.
   Future<void> setIcon(String iconPath) async {
     await trayManager.setIcon(iconPath);
+  }
+
+  /// Reset the window size and position.
+  ///
+  /// In addition if the window is pinned, it will be unpinned.
+  Future<void> _resetWindow() async {
+    if (WindowCubit.instance.state.pinned) {
+      await WindowCubit.instance.togglePinned();
+    }
+
+    await _window.reset();
   }
 }

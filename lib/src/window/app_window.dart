@@ -73,6 +73,33 @@ class AppWindow {
     await setWindowSizeAndPosition();
   }
 
+  /// Sets whether the window should be always on bottom.
+  Future<void> setAlwaysOnBottom(bool alwaysOnBottom) async {
+    await windowManager.setAlwaysOnBottom(alwaysOnBottom);
+  }
+
+  Future<void> setAsFrameless() async {
+    await windowManager.setAsFrameless();
+  }
+
+  /// Sets the background color of the window.
+  Future<void> setBackgroundColor(Color color) async {
+    await windowManager.setBackgroundColor(color);
+  }
+
+  /// Sets whether the window should be shown in the taskbar.
+  Future<void> setSkipTaskbar(bool skip) async {
+    await windowManager.setSkipTaskbar(skip);
+  }
+
+  /// Sets the title bar visibility.
+  Future<void> setTitleBarVisible(bool visible) async {
+    final titleBarStyle = (visible) //
+        ? TitleBarStyle.normal
+        : TitleBarStyle.hidden;
+    await windowManager.setTitleBarStyle(titleBarStyle);
+  }
+
   Future<void> show() async => await windowManager.show();
 
   Future<void> saveWindowSizeAndPosition() async {
