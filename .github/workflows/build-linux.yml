@@ -2,7 +2,7 @@ name: Build Linux
 on:
   # Enable manual run
   workflow_dispatch:
-  # Verify builds succeed on pull requests
+  # Allow being called by other workflows
   workflow_call:
     inputs:
       pre-release:
@@ -57,7 +57,7 @@ jobs:
       - name: Run build script
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASES_TOKEN }}
-        run: flutter pub run flutter_app_builder --platforms=linux
+        run: flutter pub run flutter_app_builder -v --platforms=linux
 
       # ---------------------------------- Upload ---------------------------- #
 

@@ -2,7 +2,7 @@ name: Build Windows
 on:
   # Enable manual run
   workflow_dispatch:
-  # Verify builds succeed on pull requests
+  # Allow being called by other workflows
   workflow_call:
     inputs:
       pre-release:

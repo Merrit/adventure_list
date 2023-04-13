@@ -1,0 +1,44 @@
+# name: Publish Android build to Google Play
+
+# on:
+#   # Enable manual run
+#   workflow_dispatch:
+#   # Build & deploy for published releases
+#   release:
+#     types:
+#       - published
+
+# env:
+#   appname-without-spaces: "AdventureList"
+#   packageName: "codes.merritt.adventurelist"
+#   repository: "merrit/adventure_list"
+#   repositoryUrl: https://github.com/Merrit/adventure_list
+
+# jobs:
+#   release:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Download .aab artifact
+#         run: wget ${{env.repositoryUrl}}/releases/latest/download/${{env.appname-without-spaces}}-Android.aab
+
+#         # Works with the r0adkll/upload-google-play action.
+#       - name: Download changelog
+#         run: |
+#           mkdir whatsNewDirectory
+#           gh release view --json body --jq .body --repo ${{env.repository}} >> whatsNewDirectory/whatsnew-en-US
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+#       - name: Access Google Play API key
+#         env:
+#           GOOGLE_PLAY_API_JSON: ${{ secrets.GOOGLE_PLAY_API_JSON }}
+#         run: echo "$GOOGLE_PLAY_API_JSON" | base64 --decode > google_play_api.json
+
+#       - name: Release Android build on Google Play
+#         uses: r0adkll/upload-google-play@v1.0.15
+#         with:
+#           serviceAccountJson: google_play_api.json
+#           packageName: ${{env.packageName}}
+#           releaseFiles: ${{env.appname-without-spaces}}-Android.aab
+#           track: production
