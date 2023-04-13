@@ -4,6 +4,12 @@ on:
   workflow_dispatch:
   # Allow being called by other workflows
   workflow_call:
+    inputs:
+      pre-release:
+        description: "Whether the build is for a pre-release"
+        required: false
+        default: false
+        type: boolean
 
 env:
   app-display-name: "Adventure List"
@@ -54,7 +60,7 @@ jobs:
       - name: Run build script
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASES_TOKEN }}
-        run: flutter pub run flutter_app_builder --platforms=android
+        run: flutter pub run flutter_app_builder -v --platforms=android
 
       # ---------------------------------- Upload ---------------------------- #
 
