@@ -409,18 +409,18 @@ void main() {
         expect(testCubit.state.taskLists[1], taskList2);
       });
 
-      test('if provided a parentId, only clears that task and subtasks',
+      test("if provided a parentId, only clears that task's subtasks",
           () async {
         final taskList = testTaskList.copyWith(
           items: [
             task1.copyWith(completed: true),
-            task2.copyWith(completed: false),
-            task3.copyWith(completed: false),
-            task4.copyWith(completed: false),
-            subTask1.copyWith(completed: false),
+            task2,
+            task3,
+            task4,
+            subTask1.copyWith(completed: true),
             subTask2.copyWith(completed: true),
-            subTask3.copyWith(completed: false),
-            subTask4.copyWith(completed: false),
+            subTask3,
+            subTask4,
           ],
         );
 
@@ -433,20 +433,14 @@ void main() {
 
         // Clear the completed tasks
         await testCubit.clearCompletedTasks(parentId: task1.id);
-
-        // Verify that only the task with the provided parentId and its
-        // subtasks were cleared.
-        final updatedTaskList = testCubit.state.activeList;
-        if (updatedTaskList == null) fail('Task list is null');
-        expect(updatedTaskList.items.length, 4);
-        expect(updatedTaskList.items[0].id, task2.id);
-        expect(updatedTaskList.items[0].index, 0);
-        expect(updatedTaskList.items[1].id, task3.id);
-        expect(updatedTaskList.items[1].index, 1);
-        expect(updatedTaskList.items[2].id, task4.id);
-        expect(updatedTaskList.items[2].index, 2);
-        expect(updatedTaskList.items[3].id, subTask4.id);
-        expect(updatedTaskList.items[3].index, 0);
+        expect(testCubit.state.activeList?.items, [
+          task1.copyWith(completed: true),
+          task2,
+          task3,
+          task4,
+          subTask3.copyWith(index: 0),
+          subTask4,
+        ]);
       });
     });
 
