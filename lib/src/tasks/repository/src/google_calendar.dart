@@ -214,10 +214,7 @@ extension CalendarHelper on Calendar {
   Future<TaskList?> toModel(CalendarApi api) async {
     final Events apiTasks;
     try {
-      apiTasks = await api.events.list(
-        id!,
-        showDeleted: true,
-      );
+      apiTasks = await api.events.list(id!);
     } on Exception catch (e) {
       log.e('Failed to get tasks for list', e);
       return null;
