@@ -3,10 +3,11 @@ Version=1.0
 Type=Application
 
 Name=Adventure List
-Comment=Multi-platform Todo list App
+Comment=Todo list that syncs to all your devices
 Categories=Utility;
+Keywords=todo;task;list;sync;desktop;mobile;reminder;reminders;widget;
 
 Icon=codes.merritt.adventurelist
 Exec=adventure_list
 Terminal=false
-StartupWMClass=Adventure_list
+StartupWMClass=adventure_list
