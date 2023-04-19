@@ -452,25 +452,6 @@ class TasksCubit extends Cubit<TasksState> {
       return task;
     }
 
-    // Update local state with updated task.
-    final updatedItems = List<Task>.from(taskList.items)
-      ..removeAt(taskIndex)
-      ..insert(taskIndex, updatedTask);
-
-    final updatedTaskListWithUpdatedTask = taskList.copyWith(
-      items: updatedItems,
-    );
-
-    final updatedAllTaskListsWithUpdatedTask = taskLists.copy()
-      ..[taskListIndex] = updatedTaskListWithUpdatedTask;
-
-    emit(state.copyWith(
-      activeList:
-          isActiveTaskList ? updatedTaskListWithUpdatedTask : state.activeList,
-      activeTask: isActiveTask ? updatedTask : state.activeTask,
-      taskLists: updatedAllTaskListsWithUpdatedTask,
-    ));
-
     return updatedTask;
   }
 
@@ -502,6 +483,27 @@ class TasksCubit extends Cubit<TasksState> {
     }
 
     emit(state.copyWith(activeTask: task));
+  }
+
+  /// Marks the task with the provided [id] as completed or not completed.
+  ///
+  /// If the task has sub-tasks, their completion status is also updated.
+  Future<void> setTaskCompleted(String id, bool completed) async {
+    final Task? task = state.taskLists.getTaskById(id);
+    assert(task != null);
+    if (task == null) return;
+
+    final Task updatedTask = task.copyWith(completed: completed);
+    updateTask(updatedTask);
+
+    final taskList = state.taskLists.getTaskListById(task.taskListId);
+    if (taskList == null) return;
+
+    // If the task has sub-tasks, update their completion status as well.
+    final List<Task> subTasks = taskList.items.subtasksOf(id);
+    for (final subTask in subTasks) {
+      setTaskCompleted(subTask.id, completed);
+    }
   }
 
   /// Holds the `activeList` as it was before the tasks were cleared until the

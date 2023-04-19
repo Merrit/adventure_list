@@ -174,8 +174,9 @@ class _TitleRow extends StatelessWidget {
                 dragHandle,
                 Checkbox(
                   value: tileState.task.completed,
-                  onChanged: (bool? value) => tasksCubit.updateTask(
-                    tileState.task.copyWith(completed: value!),
+                  onChanged: (bool? value) => tasksCubit.setTaskCompleted(
+                    tileState.task.id,
+                    value!,
                   ),
                   shape: roundedSquareBorder,
                 ),
