@@ -267,7 +267,12 @@ extension TaskHelper on Task {
       description: jsonEncode(toJson()),
       end: EventDateTime(date: DateTime(2022, 06, 27)),
       start: EventDateTime(date: DateTime(2022, 06, 27)),
-      status: completed ? 'cancelled' : 'confirmed',
+      // Google Calendar seems to consider events with a 'cancelled' status the
+      // same as deleted, so we use 'confirmed' instead.
+      //
+      // Whether a task is completed or not is determined by the 'completed'
+      // field on the task.
+      status: 'confirmed',
       summary: title,
     );
   }
