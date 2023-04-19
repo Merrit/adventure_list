@@ -517,8 +517,7 @@ class TasksCubit extends Cubit<TasksState> {
 
   /// Clears all completed tasks from the active list.
   ///
-  /// If [parentId] is provided, only that parent task and its sub-tasks will be
-  /// cleared.
+  /// If [parentId] is provided, only sub-tasks of the parent will be cleared.
   ///
   /// A task is marked "completed" when it is checked, but this does not remove
   /// it from the list, rather it is displayed differently; for example crossed
@@ -534,9 +533,9 @@ class TasksCubit extends Cubit<TasksState> {
     final List<Task> tasksToBeCleared = [];
 
     if (parentId != null) {
-      final parentTask = activeList.items.getTaskById(parentId);
-      tasksToBeCleared.addAll(activeList.items.subtasksOf(parentId));
-      tasksToBeCleared.add(parentTask!);
+      final subtasks = activeList.items.subtasksOf(parentId);
+      final completedSubtasks = subtasks.completedTasks();
+      tasksToBeCleared.addAll(completedSubtasks);
     } else {
       tasksToBeCleared.addAll(activeList.items.completedTasks());
     }
