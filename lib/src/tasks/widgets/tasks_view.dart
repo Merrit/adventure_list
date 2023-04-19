@@ -14,6 +14,8 @@ class TasksView extends StatelessWidget {
     final mediaQuery = MediaQuery.of(context);
 
     return BlocConsumer<TasksCubit, TasksState>(
+      listenWhen: (previous, current) =>
+          previous.awaitingClearTasksUndo != current.awaitingClearTasksUndo,
       listener: (context, state) {
         if (state.awaitingClearTasksUndo) {
           ScaffoldMessenger.of(context).showSnackBar(

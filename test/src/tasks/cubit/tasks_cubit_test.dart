@@ -903,6 +903,54 @@ void main() {
       expect(testCubit.state.activeList, taskList1);
     });
 
+    test('setTaskCompleted() works', () async {
+      // Seed state with tasks.
+      final taskList = testTaskList.copyWith(
+        items: [
+          task1,
+          task2,
+          task3,
+          task4,
+          subTask1,
+          subTask2,
+          subTask3,
+          subTask4,
+        ],
+      );
+
+      testCubit.emit(TasksState(
+        activeList: taskList,
+        loading: false,
+        taskLists: [taskList],
+      ));
+
+      // Set task completed.
+      await testCubit.setTaskCompleted(task1.id, true);
+      expect(testCubit.state.activeList?.items, [
+        task1.copyWith(completed: true),
+        task2,
+        task3,
+        task4,
+        subTask1.copyWith(completed: true),
+        subTask2.copyWith(completed: true),
+        subTask3.copyWith(completed: true),
+        subTask4,
+      ]);
+
+      // Set task uncompleted.
+      await testCubit.setTaskCompleted(task1.id, false);
+      expect(testCubit.state.activeList?.items, [
+        task1,
+        task2,
+        task3,
+        task4,
+        subTask1,
+        subTask2,
+        subTask3,
+        subTask4,
+      ]);
+    });
+
     test('undoClearCompletedTasks works', () async {
       // Seed state with tasks.
       final taskList = testTaskList.copyWith(
