@@ -607,15 +607,18 @@ class TasksCubit extends Cubit<TasksState> {
 
   @override
   void onChange(Change<TasksState> change) {
-    super.onChange(change);
-
     // If the user has taken an action while the clear timer is active, consider
     // the clear operation committed.
     if (change.currentState.awaitingClearTasksUndo &&
         change.nextState.awaitingClearTasksUndo) {
       _activeListBeforeClear = null;
-      emit(state.copyWith(awaitingClearTasksUndo: false));
+      change = Change(
+        currentState: change.currentState,
+        nextState: change.nextState.copyWith(awaitingClearTasksUndo: false),
+      );
     }
+
+    super.onChange(change);
 
     if (change.currentState != change.nextState) {
       _cacheData(change.nextState);
