@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    Generator for metainfo & .desktop files: 
+    https://www.freedesktop.org/software/appstream/metainfocreator/#/
+-->
+<component type="desktop-application">
+  <id>codes.merritt.adventurelist</id>
+  <name>Adventure List</name>
+  <summary>Todo list that syncs to all your devices</summary>
+  <developer_name>Merritt Codes</developer_name>
+  <url type="homepage">https://merritt.codes/adventurelist/</url>
+  <url type="donation">https://merritt.codes/support/</url>
+  <metadata_license>MIT</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+  <keywords>
+    <keyword>todo</keyword>
+    <keyword>task</keyword>
+    <keyword>list</keyword>
+    <keyword>sync</keyword>
+    <keyword>desktop</keyword>
+    <keyword>mobile</keyword>
+    <keyword>reminder</keyword>
+    <keyword>reminders</keyword>
+    <keyword>widget</keyword>
+  </keywords>
+  <description>
+    <p>Are you ready for an adventure? Adventure List is a Todo list app that helps you organize your tasks and goals in a fun and easy way. Whether you want to plan a trip, learn a new skill, or just get things done, Adventure List is the app for you.</p>
+    <p>Here are some of the features that make Adventure List great:</p>
+    <ul>
+      <li>Due dates: Set due dates for your tasks and get reminders when they're due.</li>
+      <li>Recurring due dates: Set tasks to recur on a regular basis, so you never forget to do them.</li>
+      <li>Notifications: Get notifications when tasks are due, so you can stay on top of your to-do list.</li>
+      <li>Android widget: Add a widget to your Android home screen to quickly view your to-do list.</li>
+      <li>Desktop widget mode: Pin your to-do list to your computer desktop as a widget, so you can always see what you need to do.</li>
+      <li>Cross-platform: Available on Linux, Windows, and Android, so you can access your lists from anywhere.</li>
+      <li>Open source: Adventure List is open source, so you can contribute to its development or customize it to your liking.</li>
+    </ul>
+    <p>Adventure List is ready to help you get things done. Download it today and start your adventure!</p>
+  </description>
+  <launchable type="desktop-id">codes.merritt.adventurelist.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://i.imgur.com/wdqxDFP.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://i.imgur.com/oDECfhj.png</image>
+    </screenshot>
+  </screenshots>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.4.0" date="2023-04-20">
+      <description/>
+    </release>
+  </releases>
+</component>
