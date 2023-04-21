@@ -27,7 +27,10 @@ import 'src/window/window.dart';
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await LoggingManager.initialize(verbose: args.contains('--log'));
+  final bool verbose =
+      args.contains('--verbose') || const bool.fromEnvironment('VERBOSE');
+
+  await LoggingManager.initialize(verbose: verbose);
 
   // Handle platform errors not caught by Flutter.
   PlatformDispatcher.instance.onError = (error, stack) {
