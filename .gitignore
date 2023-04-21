@@ -10,6 +10,9 @@
 generated*
 Generated*
 
+# Packaging
+*.tar.gz
+
 # Test coverage
 lcov.info
 
