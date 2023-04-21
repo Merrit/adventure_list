@@ -15,7 +15,20 @@
         },
         // Debug with verbose logging
         {
-            "name": "Debug with verbose logging",
+            "name": "Debug verbose",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "program": "lib/main.dart",
+            "preLaunchTask": "${defaultBuildTask}",
+            "toolArgs": [
+                "--dart-define",
+                "VERBOSE=true"
+            ]
+        },
+        // Debug with verbose logging and verbose Flutter logging
+        {
+            "name": "Debug verbose: App + Flutter",
             "request": "launch",
             "type": "dart",
             "flutterMode": "debug",
