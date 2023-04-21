@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 
+import '../../logs/logging_manager.dart';
 import '../../settings/settings.dart';
 import '../../tasks/tasks.dart';
 import 'home_widget_config_page.dart';
@@ -39,7 +40,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
   void _handleAppLaunchedFromHomeWidget(Uri? uri) {
     if (uri == null) return;
 
-    debugPrint('_HomeScreenWidgetState: uri: ${uri.path}');
+    log.i('_HomeScreenWidgetState: uri: ${uri.path}');
 
     final navigator = Navigator.of(context);
 

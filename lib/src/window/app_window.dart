@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'dart:convert';
 import 'dart:io';
 
@@ -103,7 +101,7 @@ class AppWindow {
   Future<void> show() async => await windowManager.show();
 
   Future<void> saveWindowSizeAndPosition() async {
-    print('Saving window size and position');
+    log.v('Saving window size and position');
     final Rect bounds = await windowManager.getBounds();
 
     await StorageRepository.instance.save(
@@ -113,7 +111,7 @@ class AppWindow {
   }
 
   Future<void> setWindowSizeAndPosition() async {
-    print('Setting window size and position.');
+    log.v('Setting window size and position.');
     final Rect currentWindowFrame = await windowManager.getBounds();
 
     final String? targetWindowFrameJson = await StorageRepository.instance.get(
@@ -128,7 +126,7 @@ class AppWindow {
     targetWindowFrame ??= const Rect.fromLTWH(0, 0, 1100, 660);
 
     if (targetWindowFrame == currentWindowFrame) {
-      print('Target matches current window frame, nothing to do.');
+      log.v('Target matches current window frame, nothing to do.');
       return;
     }
 
