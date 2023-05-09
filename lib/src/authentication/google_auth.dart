@@ -131,34 +131,6 @@ class GoogleAuth {
     return client;
   }
 
-  // Commented code left until we are sure current implementation works.
-  // static Future<String?> refreshAccessToken() async {
-  //   final GoogleSignIn googleSignIn = GoogleSignIn(scopes: scopes);
-
-  //   assert(googleSignIn.currentUser != null);
-
-  //   // final authHeaders = await googleSignIn.currentUser!.authHeaders;
-  //   // custom IOClient from below
-  //   // final GoogleHttpClient client = GoogleHttpClient(authHeaders);
-
-  //   logger.i('Refreshing auth token.');
-  //   final GoogleSignInAccount? googleSignInAccount =
-  //       await googleSignIn.signInSilently();
-  //   if (googleSignInAccount == null) return null;
-
-  //   final GoogleSignInAuthentication googleSignInAuthentication =
-  //       await googleSignInAccount.authentication;
-
-  //   final credential = GoogleAuthProvider.credential(
-  //     accessToken: googleSignInAuthentication.accessToken,
-  //     idToken: googleSignInAuthentication.idToken,
-  //   );
-  //   // final authResult = await signInWithCredential(credential);
-
-  //   return credential.accessToken;
-  //   // return googleSignInAuthentication.accessToken; // New refreshed token
-  // }
-
   Future<void> launchAuthUrl(String url) async {
     final authUrl = Uri.parse(url);
     try {
