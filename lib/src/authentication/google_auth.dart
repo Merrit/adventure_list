@@ -74,6 +74,7 @@ class GoogleAuth {
   /// Supports all platforms, but is not as stable or nice to use as the
   /// `google_sign_in` package.
   Future<AccessCredentials?> _googleApisAuth() async {
+    log.i('Signing in via googleapis_auth...');
     AutoRefreshingAuthClient? client;
     try {
       client = await clientViaUserConsent(
@@ -160,7 +161,12 @@ class GoogleAuth {
 
   Future<void> launchAuthUrl(String url) async {
     final authUrl = Uri.parse(url);
-    if (await canLaunchUrl(authUrl)) launchUrl(authUrl);
+    try {
+      log.i('Launching auth url: $authUrl');
+      await launchUrl(authUrl);
+    } catch (e) {
+      log.e('Could not launch auth url: $authUrl');
+    }
   }
 
   Future<void> signOut() async {
