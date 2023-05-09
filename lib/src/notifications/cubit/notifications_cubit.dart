@@ -107,7 +107,6 @@ class NotificationsCubit extends Cubit<NotificationsState> {
         label: 'Snooze',
       ),
     ],
-    category: LinuxNotificationCategory('adventurelist'),
     defaultActionName: 'Open notification',
     urgency: LinuxNotificationUrgency.critical,
   );
@@ -436,7 +435,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       body,
       tz.TZDateTime.from(scheduledDate, tz.local),
       notificationDetails,
-      androidAllowWhileIdle: true,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
