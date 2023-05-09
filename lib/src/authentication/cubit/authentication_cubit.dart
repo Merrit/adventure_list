@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
 
+import '../../logs/logging_manager.dart';
 import '../../storage/storage_repository.dart';
 import '../google_auth.dart';
 
@@ -46,8 +47,15 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   Future<void> signIn() async {
     assert(!state.signedIn);
 
+    log.i('Signing in...');
+
     final accessCredentials = await _googleAuth.signin();
-    if (accessCredentials == null) return;
+    if (accessCredentials == null) {
+      log.w('Unable to sign in');
+      return;
+    } else {
+      log.i('Signed in successfully.');
+    }
 
     emit(state.copyWith(
       accessCredentials: accessCredentials,
