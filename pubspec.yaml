@@ -69,6 +69,14 @@ dependencies:
   workmanager: ^0.5.0
 
 dependency_overrides:
+  # Override flutter_local_notifications to use the fork with the fix for
+  # Flatpak until the fix is merged.
+  # See: https://github.com/MaikuB/flutter_local_notifications/issues/1757
+  flutter_local_notifications:
+    git:
+      url: https://github.com/Merrit/flutter_local_notifications.git
+      ref: d5d529cb2278deba2ca8244025256348483a1cdd
+      path: flutter_local_notifications
   # Override window_manager to use the fork with the fix for Linux that
   # restores the window frame until the fix is merged.
   # See: https://github.com/leanflutter/window_manager/pull/323
