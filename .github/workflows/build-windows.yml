@@ -37,6 +37,9 @@ jobs:
 
       - name: Prepare for build
         run: |
+          # Fix error for git packages with long names
+          git config --system core.longpaths true
+          # Setup Flutter
           flutter config --enable-windows-desktop
           flutter upgrade
           flutter pub get
