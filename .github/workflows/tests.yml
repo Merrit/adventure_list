@@ -16,7 +16,7 @@ jobs:
 
       - name: Setup
         run: |
-          flutter upgrade
+          flutter upgrade --force
           flutter pub get
 
       - name: Run code generation

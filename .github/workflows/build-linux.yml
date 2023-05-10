@@ -49,7 +49,7 @@ jobs:
       - name: Prepare for build
         run: |
           flutter config --enable-linux-desktop
-          flutter upgrade
+          flutter upgrade --force
           flutter pub get
 
       # ----------------------------------- Build ---------------------------- #

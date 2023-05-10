@@ -52,7 +52,7 @@ jobs:
 
       - name: Prepare for build
         run: |
-          flutter upgrade
+          flutter upgrade --force
           flutter pub get
 
       # ----------------------------------- Build ---------------------------- #
