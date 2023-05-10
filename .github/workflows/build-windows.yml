@@ -41,7 +41,7 @@ jobs:
           git config --system core.longpaths true
           # Setup Flutter
           flutter config --enable-windows-desktop
-          flutter upgrade
+          flutter upgrade --force
           flutter pub get
 
       # ----------------------------------- Build ---------------------------- #
