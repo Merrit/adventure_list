@@ -80,7 +80,7 @@ class _AppState extends State<App> with TrayListener, WindowListener {
       timer?.cancel();
       timer = null;
       timer = Timer(
-        const Duration(seconds: 30),
+        const Duration(seconds: 5),
         () {
           AppWindow.instance.saveWindowSizeAndPosition();
         },

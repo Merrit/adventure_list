@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:window_size/window_size.dart' as window_size;
 
 import '../logs/logs.dart';
 import '../settings/settings.dart';
@@ -100,22 +101,39 @@ class AppWindow {
 
   Future<void> show() async => await windowManager.show();
 
+  /// Saves the current window size and position to storage.
+  ///
+  /// Allows us to restore the window size and position on the next run.
   Future<void> saveWindowSizeAndPosition() async {
-    log.v('Saving window size and position');
     final Rect bounds = await windowManager.getBounds();
+    final screenConfigurationId = await _getScreenConfigurationId();
+
+    log.v(
+      'Saving window size and position. \n'
+      'Screen configuration ID: $screenConfigurationId \n'
+      'Window bounds: left: ${bounds.left}, top: ${bounds.top}, '
+      'width: ${bounds.width}, height: ${bounds.height}',
+    );
 
     await StorageRepository.instance.save(
-      key: 'windowSizeAndPosition',
+      storageArea: 'windowSizeAndPosition',
+      key: screenConfigurationId,
       value: bounds.toJson(),
     );
   }
 
+  /// Sets the window size and position.
+  ///
+  /// If the window size and position has been saved previously, it will be
+  /// restored. Otherwise, the window will be centered on the primary screen.
   Future<void> setWindowSizeAndPosition() async {
     log.v('Setting window size and position.');
+    final screenConfigurationId = await _getScreenConfigurationId();
     final Rect currentWindowFrame = await windowManager.getBounds();
 
     final String? targetWindowFrameJson = await StorageRepository.instance.get(
-      'windowSizeAndPosition',
+      screenConfigurationId,
+      storageArea: 'windowSizeAndPosition',
     );
 
     Rect? targetWindowFrame;
@@ -130,20 +148,51 @@ class AppWindow {
       return;
     }
 
+    log.v(
+      'Setting window size and position. \n'
+      'Screen configuration ID: $screenConfigurationId \n'
+      'Current window bounds: \n'
+      'left: ${currentWindowFrame.left}, top: ${currentWindowFrame.top}, '
+      'width: ${currentWindowFrame.width}, '
+      'height: ${currentWindowFrame.height} \n'
+      'Target window bounds: \n'
+      'left: ${targetWindowFrame.left}, top: ${targetWindowFrame.top}, '
+      'width: ${targetWindowFrame.width}, height: ${targetWindowFrame.height}',
+    );
+
     await windowManager.setBounds(targetWindowFrame);
 
     // If first run, center window.
     if (targetWindowFrameJson == null) await windowManager.center();
   }
+
+  /// Returns a unique identifier for the current configuration of screens.
+  ///
+  /// By using this, we can save the window position for each screen
+  /// configuration, and then restore the window position for the current
+  /// screen configuration.
+  Future<String> _getScreenConfigurationId() async {
+    final screens = await window_size.getScreenList();
+    final StringBuffer buffer = StringBuffer();
+    for (final screen in screens) {
+      buffer
+        ..write(screen.frame.left)
+        ..write(screen.frame.top)
+        ..write(screen.frame.width)
+        ..write(screen.frame.height)
+        ..write(screen.scaleFactor);
+    }
+    return buffer.toString();
+  }
 }
 
-extension on Rect {
+extension RectHelper on Rect {
   Map<String, dynamic> toMap() {
     return {
       'left': left,
       'top': top,
-      'right': right,
-      'bottom': bottom,
+      'width': width,
+      'height': height,
     };
   }
 
@@ -152,10 +201,10 @@ extension on Rect {
 
 Rect rectFromJson(String source) {
   final Map<String, dynamic> map = json.decode(source);
-  return Rect.fromLTRB(
+  return Rect.fromLTWH(
     map['left'],
     map['top'],
-    map['right'],
-    map['bottom'],
+    map['width'],
+    map['height'],
   );
 }
