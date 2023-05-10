@@ -65,6 +65,11 @@ dependencies:
   url_launcher: ^6.1.4
   uuid: ^3.0.6
   window_manager: ^0.3.0
+  window_size:
+    git:
+      url: https://github.com/google/flutter-desktop-embedding.git
+      path: plugins/window_size
+      ref: 6c66ad23ee79749f30a8eece542cf54eaf157ed8
   window_to_front: ^0.0.3
   workmanager: ^0.5.0
 
