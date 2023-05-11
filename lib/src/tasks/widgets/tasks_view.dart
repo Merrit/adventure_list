@@ -102,11 +102,11 @@ class _CreateSelectListPrompt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(50.0),
+    return const Padding(
+      padding: EdgeInsets.all(50.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           SizedBox(height: double.infinity),
           Icon(Icons.arrow_back),
           SizedBox(width: 10),

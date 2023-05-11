@@ -149,7 +149,6 @@ class AppWindow {
     }
 
     log.v(
-      'Setting window size and position. \n'
       'Screen configuration ID: $screenConfigurationId \n'
       'Current window bounds: \n'
       'left: ${currentWindowFrame.left}, top: ${currentWindowFrame.top}, '

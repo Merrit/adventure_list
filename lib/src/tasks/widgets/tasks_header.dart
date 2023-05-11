@@ -52,10 +52,10 @@ class TasksHeader extends StatelessWidget {
                                   final mediaQuery = MediaQuery.of(context);
 
                                   return AlertDialog(
-                                    title: Row(
+                                    title: const Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
-                                      children: const [
+                                      children: [
                                         SizedBox(),
                                         Text('List Settings'),
                                         CloseButton(),
