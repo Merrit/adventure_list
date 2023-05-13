@@ -13,8 +13,8 @@ dependencies:
   badges: ^3.0.2
   collection: ^1.16.0
   extension_google_sign_in_as_googleapis_auth: ^2.0.9
-  firebase_auth: ^4.6.0
-  firebase_core: ^2.12.0
+  firebase_auth: ^4.0.0
+  firebase_core: 2.10.0
   # Temporary lock of firebase_core_platform_interface.
   # To be removed when upgrading the firebase packages.
   firebase_core_platform_interface: ^4.8.0
