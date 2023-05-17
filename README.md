@@ -34,14 +34,14 @@ Adventure List is ready to help you get things done. Download it today and start
 
 ### Planned
 
-- Due dates / reminders
-  - Recurring tasks
+- ~~Due dates / reminders~~ ✅
+  - ~~Recurring tasks~~ ✅
 - Offline mode
   - Improve offline capabilities so the app can reliably be used offline
 - Collaboration on lists with other users
-- Desktop widget
-- Desktop notifications
-  - Notification center / popup / tray icon badge / etc
+- ~~Desktop widget~~ ✅
+- ~~Desktop notifications~~ ✅
+  - ~~Notification center / popup / tray icon badge / etc~~ ✅
 
 ### Considering
 
