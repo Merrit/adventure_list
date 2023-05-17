@@ -23,7 +23,23 @@ dependencies:
     sdk: flutter
   flutter_adaptive_scaffold: ^0.1.2
   flutter_bloc: ^8.0.1
-  flutter_local_notifications: ^13.0.0
+
+  # ---------------- Begin flutter_local_notifications override -------------- #
+  # Override flutter_local_notifications to use the fork with the fix for
+  # Flatpak until the fix is merged.
+  # See: https://github.com/MaikuB/flutter_local_notifications/issues/1757
+  flutter_local_notifications:
+    git:
+      url: https://github.com/Merrit/flutter_local_notifications.git
+      ref: 310ea54cf3fafeea087a60608d6f9f4c3b6080b7
+      path: flutter_local_notifications
+  flutter_local_notifications_linux:
+    git:
+      url: https://github.com/Merrit/flutter_local_notifications.git
+      ref: 03b9104dfa284eff2d43f04250ef8e3aa8c7161e
+      path: flutter_local_notifications_linux
+  # ----------------- End flutter_local_notifications override --------------- #
+
   flutter_localizations:
     sdk: flutter
   flutter_signin_button: ^2.0.0
@@ -74,14 +90,6 @@ dependencies:
   workmanager: ^0.5.0
 
 dependency_overrides:
-  # Override flutter_local_notifications to use the fork with the fix for
-  # Flatpak until the fix is merged.
-  # See: https://github.com/MaikuB/flutter_local_notifications/issues/1757
-  flutter_local_notifications:
-    git:
-      url: https://github.com/Merrit/flutter_local_notifications.git
-      ref: d5d529cb2278deba2ca8244025256348483a1cdd
-      path: flutter_local_notifications
   # Override window_manager to use the fork with the fix for Linux that
   # restores the window frame until the fix is merged.
   # See: https://github.com/leanflutter/window_manager/pull/323
