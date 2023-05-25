@@ -1,14 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:helpers/helpers.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/helpers/helpers.dart';
 import '../../tasks.dart';
 
 class TaskDetails extends StatelessWidget {
-  static const routeName = 'task_details';
+  static const routeName = '/task_details';
 
   const TaskDetails({Key? key}) : super(key: key);
 
@@ -49,11 +48,11 @@ class TaskDetails extends StatelessWidget {
                 _MoreActionsButton(),
               ],
             ),
-            body: const TaskDetailsView(),
+            body: TaskDetailsView(key: ValueKey(task)),
           ),
         );
 
-        const largeScreenView = TaskDetailsView();
+        final largeScreenView = TaskDetailsView(key: ValueKey(task));
 
         return (mediaQuery.isSmallScreen) ? smallScreenView : largeScreenView;
       },
@@ -541,26 +540,37 @@ class _ParentSelectionWidget extends StatelessWidget {
 class _AddSubTaskWidget extends StatelessWidget {
   final Task parentTask;
 
-  const _AddSubTaskWidget({
+  _AddSubTaskWidget({
     Key? key,
     required this.parentTask,
   }) : super(key: key);
 
+  final addSubTaskFocusNode = FocusNode(debugLabel: 'AddSubTaskFocusNode');
+  final controller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    return TextInputListTile(
-      placeholderText: 'Add sub-task',
+    return ListTile(
       leading: const Icon(Icons.add),
-      callback: (String value) {
-        tasksCubit.createTask(
-          Task(
-            parent: parentTask.id,
-            taskListId: parentTask.taskListId,
-            title: value,
-          ),
-        );
-      },
-      retainFocus: true,
+      title: TextField(
+        controller: controller,
+        decoration: const InputDecoration(
+          hintText: 'Add sub-task',
+          border: InputBorder.none,
+        ),
+        focusNode: addSubTaskFocusNode,
+        onSubmitted: (value) {
+          if (value.trim() == '') return;
+
+          tasksCubit.createTask(
+            Task(
+              parent: parentTask.id,
+              taskListId: parentTask.taskListId,
+              title: value,
+            ),
+          );
+        },
+      ),
     );
   }
 }

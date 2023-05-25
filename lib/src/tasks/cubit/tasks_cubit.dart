@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -457,8 +458,8 @@ class TasksCubit extends Cubit<TasksState> {
 
   /// Sets the [Task] with the provided [id] as the active task.
   ///
-  /// If the [id] is null or no task with that [id] exists, the active task is
-  /// set to null.
+  /// If the [id] is null, no task with that [id] exists, or is already the
+  /// active task, the active task is set to null.
   ///
   /// If the task belongs to a different list than the active list, the active
   /// list is set to the list that contains the task.
@@ -466,7 +467,8 @@ class TasksCubit extends Cubit<TasksState> {
     final Task? task = state.taskLists
         .expand((element) => element.items)
         .firstWhereOrNull((element) => element.id == id);
-    if (task == null) {
+
+    if (task == null || task.id == state.activeTask?.id) {
       emit(state.copyWith(activeTask: null));
       return;
     }
