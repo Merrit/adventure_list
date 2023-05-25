@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../core/core.dart';
-import '../../core/helpers/helpers.dart';
 import '../tasks.dart';
 
 part 'task_tile.freezed.dart';
@@ -52,8 +50,6 @@ class TaskTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
         final TaskList? activeList = state.activeList;
@@ -65,23 +61,6 @@ class TaskTile extends StatelessWidget {
         final completedTasks = childTasks //
             .where((element) => element.completed)
             .length;
-
-        Future<void> setActiveTaskCallback() async {
-          final String? taskId = (tasksCubit.state.activeTask == task) //
-              ? null
-              : task.id;
-          tasksCubit.setActiveTask(taskId);
-
-          if (mediaQuery.isSmallScreen) {
-            await Navigator.pushNamed(
-              context,
-              TaskDetails.routeName,
-            );
-
-            // User has returned from details page, unset active task.
-            tasksCubit.setActiveTask(null);
-          }
-        }
 
         return BlocProvider(
           create: (context) => TaskTileCubit(
@@ -95,7 +74,7 @@ class TaskTile extends StatelessWidget {
 
               return InkWell(
                 hoverColor: Colors.transparent,
-                onTap: () => setActiveTaskCallback(),
+                onTap: () => tasksCubit.setActiveTask(task.id),
                 child: MouseRegion(
                   onEnter: (_) => stateCubit.updateIsHovered(true),
                   onExit: (_) => stateCubit.updateIsHovered(false),

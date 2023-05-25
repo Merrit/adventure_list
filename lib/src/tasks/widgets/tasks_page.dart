@@ -22,24 +22,8 @@ class TasksPage extends StatefulWidget {
 class _TasksPageState extends State<TasksPage> {
   Widget body = const SizedBox();
 
-  /// Checks if there is an active task and what the current screen size is.
-  ///
-  /// If there is an active task and we are on a small screen, we want to
-  /// navigate to the task details page.
-  void checkForActiveTask(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final state = context.read<TasksCubit>().state;
-    if (state.activeTask != null && mediaQuery.isSmallScreen) {
-      Navigator.of(context).pushNamed(TaskDetails.routeName);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      checkForActiveTask(context);
-    });
-
     final mediaQuery = MediaQuery.of(context);
 
     return SafeArea(
@@ -48,7 +32,7 @@ class _TasksPageState extends State<TasksPage> {
           // If there is an active task and we are on a small screen, we want to
           // navigate to the task details page.
           if (state.activeTask != null && mediaQuery.isSmallScreen) {
-            Navigator.of(context).pushNamed(TaskDetails.routeName);
+            Navigator.pushNamed(context, TaskDetails.routeName);
           }
         },
         builder: (context, state) {
@@ -174,7 +158,7 @@ class _DebugMenuButton extends StatelessWidget {
       itemBuilder: (context) {
         return [
           PopupMenuItem(
-            child: const Text('Show notification'),
+            child: const Text('Show test notification'),
             onTap: () async {
               await Future.delayed(const Duration(seconds: 5));
               NotificationsCubit.instance.showNotification(
