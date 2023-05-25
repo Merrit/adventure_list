@@ -157,7 +157,6 @@ class _TitleRow extends StatelessWidget {
                     tileState.task.id,
                     value!,
                   ),
-                  shape: roundedSquareBorder,
                 ),
                 Flexible(
                   child: Text(
