@@ -11,7 +11,7 @@ import 'package:http/io_client.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
-import '../logs/logs.dart';
+import '../logs/logging_manager.dart';
 
 abstract class GoogleAuthIds {
   static const String linuxClientIdString =

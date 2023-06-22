@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../logs/logs.dart';
+import '../logs/logging_manager.dart';
 import 'shortcuts_manager.dart';
 
 /// Shortcuts that are available everywhere in the app.

@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pub_semver/pub_semver.dart';
 
-import '../logs/logs.dart';
+import '../logs/logging_manager.dart';
 import 'updates.dart';
 
 /// Service for checking for version info and updates.

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../logs/logs.dart';
+import '../logs/logging_manager.dart';
 
 /// A ShortcutManager that logs all keys that it handles.
 class LoggingShortcutManager extends ShortcutManager {

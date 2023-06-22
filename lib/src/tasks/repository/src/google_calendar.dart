@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:googleapis/calendar/v3.dart';
-import '../../../logs/logs.dart';
+import '../../../logs/logging_manager.dart';
 import '../../tasks.dart';
 
 /// Notes on interfacing with the Google Calendar API.

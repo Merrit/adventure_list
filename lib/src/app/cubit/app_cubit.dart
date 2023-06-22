@@ -5,7 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:helpers/helpers.dart';
 import 'package:url_launcher/url_launcher.dart' as url_launcher;
 
-import '../../logs/logs.dart';
+import '../../logs/logging_manager.dart';
 import '../../storage/storage.dart';
 import '../../updates/updates.dart';
 
