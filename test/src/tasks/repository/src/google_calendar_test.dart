@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:adventure_list/src/logs/logs.dart';
+import 'package:adventure_list/src/logs/logging_manager.dart';
 import 'package:adventure_list/src/tasks/tasks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:googleapis/calendar/v3.dart';

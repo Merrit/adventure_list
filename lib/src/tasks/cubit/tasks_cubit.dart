@@ -16,7 +16,7 @@ import 'package:uuid/uuid.dart';
 import '../../authentication/authentication.dart';
 import '../../core/core.dart';
 import '../../home_widget/home_widget_manager.dart';
-import '../../logs/logs.dart';
+import '../../logs/logging_manager.dart';
 import '../../notifications/notifications.dart';
 import '../../settings/settings.dart';
 import '../../storage/storage_repository.dart';

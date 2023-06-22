@@ -6,7 +6,7 @@ import 'package:flutter_window_close/flutter_window_close.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:window_size/window_size.dart' as window_size;
 
-import '../logs/logs.dart';
+import '../logs/logging_manager.dart';
 import '../settings/settings.dart';
 import '../storage/storage_repository.dart';
 

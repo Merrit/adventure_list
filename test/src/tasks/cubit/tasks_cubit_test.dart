@@ -1,5 +1,5 @@
 import 'package:adventure_list/src/authentication/authentication.dart';
-import 'package:adventure_list/src/logs/logs.dart';
+import 'package:adventure_list/src/logs/logging_manager.dart';
 import 'package:adventure_list/src/storage/storage_repository.dart';
 import 'package:adventure_list/src/tasks/tasks.dart';
 import 'package:bloc_test/bloc_test.dart';
