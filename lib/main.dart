@@ -15,7 +15,7 @@ import 'firebase_options.dart';
 import 'src/app.dart';
 import 'src/app/cubit/app_cubit.dart';
 import 'src/authentication/authentication.dart';
-import 'src/logs/logs.dart';
+import 'src/core/helpers/helpers.dart';
 import 'src/notifications/notifications.dart';
 import 'src/settings/cubit/settings_cubit.dart';
 import 'src/storage/storage_repository.dart';
@@ -31,12 +31,7 @@ Future<void> main(List<String> args) async {
       args.contains('--verbose') || const bool.fromEnvironment('VERBOSE');
 
   await LoggingManager.initialize(verbose: verbose);
-
-  // Handle platform errors not caught by Flutter.
-  PlatformDispatcher.instance.onError = (error, stack) {
-    log.e('Uncaught platform error', error, stack);
-    return true;
-  };
+  initializePlatformErrorHandler();
 
   final storageRepository = await StorageRepository.initialize(Hive);
 
