@@ -9,13 +9,14 @@ import 'package:helpers/helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:http/http.dart' as http;
-import 'package:workmanager/workmanager.dart';
 
 import 'firebase_options.dart';
 import 'src/app.dart';
 import 'src/app/cubit/app_cubit.dart';
 import 'src/authentication/authentication.dart';
+import 'src/background_tasks/background_tasks.dart';
 import 'src/core/helpers/helpers.dart';
+import 'src/logs/logging_manager.dart';
 import 'src/notifications/notifications.dart';
 import 'src/settings/cubit/settings_cubit.dart';
 import 'src/storage/storage_repository.dart';
@@ -50,7 +51,6 @@ Future<void> main(List<String> args) async {
   }
 
   if (Platform.isAndroid) {
-    Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
     HomeWidget.registerBackgroundCallback(backgroundCallback);
   }
 
@@ -96,29 +96,8 @@ Future<void> main(List<String> args) async {
       ),
     ),
   );
-}
 
-/// Used for Background Updates using Workmanager Plugin
-void callbackDispatcher() {
-  Workmanager().executeTask((taskName, inputData) {
-    final now = DateTime.now();
-    return Future.wait<bool?>([
-      HomeWidget.saveWidgetData(
-        'title',
-        'Updated from Background',
-      ),
-      HomeWidget.saveWidgetData(
-        'message',
-        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
-      ),
-      HomeWidget.updateWidget(
-        name: 'HomeWidgetExampleProvider',
-        iOSName: 'HomeWidgetExample',
-      ),
-    ]).then((value) {
-      return !value.contains(false);
-    });
-  });
+  initializeBackgroundTasks();
 }
 
 /// Called when Doing Background Work initiated from Widget
