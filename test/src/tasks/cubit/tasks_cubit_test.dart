@@ -12,6 +12,8 @@ import 'package:uuid/uuid.dart';
 class MockAuthenticationCubit extends MockCubit<AuthenticationState>
     implements AuthenticationCubit {}
 
+class MockGoogleAuth extends Mock implements GoogleAuth {}
+
 class MockStorageRepository extends Mock implements StorageRepository {}
 
 class MockTasksRepository extends Mock implements TasksRepository {}
@@ -23,6 +25,7 @@ class FakeTaskList extends Fake implements TaskList {}
 class FakeTask extends Fake implements Task {}
 
 late MockAuthenticationCubit _authCubit;
+late MockGoogleAuth _googleAuth;
 late MockStorageRepository _storageRepository;
 late MockTasksRepository _tasksRepository;
 MockUuid _uuid = MockUuid();
@@ -74,6 +77,10 @@ void main() {
       /* -------------------------------- AuthCubit ------------------------------- */
       _authCubit = MockAuthenticationCubit();
       when(() => _authCubit.state).thenReturn(defaultAuthState);
+
+      /* -------------------------------- GoogleAuth ------------------------------- */
+      _googleAuth = MockGoogleAuth();
+      when(() => _googleAuth.signin()).thenAnswer((_) async => null);
 
       /* ----------------------------- TasksRepository ---------------------------- */
       _tasksRepository = MockTasksRepository();
@@ -136,6 +143,7 @@ void main() {
 
       testCubit = TasksCubit(
         _authCubit,
+        _googleAuth,
         tasksRepository: _tasksRepository,
         uuid: _uuid,
       );
@@ -291,6 +299,7 @@ void main() {
       'initial state is correct',
       build: () => TasksCubit(
         _authCubit,
+        _googleAuth,
         tasksRepository: _tasksRepository,
       ),
       expect: () => [TasksState.initial().copyWith(loading: false)],

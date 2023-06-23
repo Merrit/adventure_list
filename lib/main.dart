@@ -54,7 +54,7 @@ Future<void> main(List<String> args) async {
     HomeWidget.registerBackgroundCallback(backgroundCallback);
   }
 
-  final googleAuth = GoogleAuth();
+  final googleAuth = GoogleAuth(storageRepository);
   final authenticationCubit = await AuthenticationCubit.initialize(
     googleAuth: googleAuth,
     storageRepository: storageRepository,
@@ -64,7 +64,7 @@ Future<void> main(List<String> args) async {
     flutterLocalNotificationsPlugin: FlutterLocalNotificationsPlugin(),
   );
 
-  final tasksCubit = TasksCubit(authenticationCubit);
+  final tasksCubit = TasksCubit(authenticationCubit, googleAuth);
   final settingsCubitInstance = await SettingsCubit.initialize();
 
   runApp(
