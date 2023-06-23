@@ -10,7 +10,6 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:googleapis/calendar/v3.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
-import 'package:http/http.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../authentication/authentication.dart';
@@ -33,13 +32,17 @@ late TasksCubit tasksCubit;
 
 /// Cubit that manages the state of the tasks.
 class TasksCubit extends Cubit<TasksState> {
+  /// The service used to authenticate with Google and get an [AuthClient].
+  final GoogleAuth _googleAuth;
+
   /// Uuid generator.
   ///
   /// Passed in as a dependency to allow for mocking in unit tests.
   final Uuid _uuid;
 
   TasksCubit(
-    AuthenticationCubit authCubit, {
+    AuthenticationCubit authCubit,
+    this._googleAuth, {
     TasksRepository? tasksRepository,
     Uuid? uuid,
   })  : _uuid = uuid ?? const Uuid(),
@@ -103,38 +106,12 @@ class TasksCubit extends Cubit<TasksState> {
   }) async {
     if (tasksRepository == null) {
       /// If [tasksRepository] is non-null it was passed in as a mock.
-      final client = await _getAuthClient();
+      final client = await _googleAuth.getAuthClient();
       final calendarApi = CalendarApi(client!);
       tasksRepository ??= GoogleCalendar(calendarApi);
     }
 
     initialize(tasksRepository);
-  }
-
-  /// Returns an `AuthClient` that can be used to make authenticated requests.
-  Future<AuthClient?> _getAuthClient() async {
-    final credentials = await StorageRepository.instance.get(
-      'accessCredentials',
-    );
-    if (credentials == null) return null;
-
-    final accessCredentials = AccessCredentials.fromJson(
-      json.decode(credentials),
-    );
-
-    AuthClient? client;
-    // `google_sign_in` can't get us a refresh token, so.
-    if (accessCredentials.refreshToken != null) {
-      client = autoRefreshingClient(
-        GoogleAuthIds.clientId,
-        accessCredentials,
-        Client(),
-      );
-    } else {
-      client = await GoogleAuth.refreshAuthClient();
-    }
-
-    return client;
   }
 
   late TasksRepository _tasksRepository;

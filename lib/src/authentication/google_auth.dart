@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
@@ -12,6 +13,7 @@ import 'package:http/io_client.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../logs/logging_manager.dart';
+import '../storage/storage_repository.dart';
 
 abstract class GoogleAuthIds {
   static const String linuxClientIdString =
@@ -59,7 +61,38 @@ abstract class GoogleAuthIds {
 }
 
 class GoogleAuth {
+  final StorageRepository _storageRepository;
+
+  const GoogleAuth(
+    this._storageRepository,
+  );
+
   static final scopes = [CalendarApi.calendarScope];
+
+  /// Returns an `AuthClient` that can be used to make authenticated requests
+  /// if the user is signed in, or `null` if the user is not signed in.
+  Future<AuthClient?> getAuthClient() async {
+    final credentials = await _storageRepository.get('accessCredentials');
+    if (credentials == null) return null;
+
+    final accessCredentials = AccessCredentials.fromJson(
+      json.decode(credentials),
+    );
+
+    AuthClient? client;
+    // `google_sign_in` can't get us a refresh token, so.
+    if (accessCredentials.refreshToken != null) {
+      client = autoRefreshingClient(
+        GoogleAuthIds.clientId,
+        accessCredentials,
+        Client(),
+      );
+    } else {
+      client = await refreshAuthClient();
+    }
+
+    return client;
+  }
 
   Future<AccessCredentials?> signin() async {
     if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
@@ -119,12 +152,12 @@ class GoogleAuth {
 
   /// google_sign_in doesn't provide us with a refresh token, so this is a
   /// workaround to refresh authentication for platforms that use google_sign_in
-  static Future<AuthClient?> refreshAuthClient() async {
+  Future<AuthClient?> refreshAuthClient() async {
     final GoogleSignIn googleSignIn = GoogleSignIn(scopes: scopes);
     final GoogleSignInAccount? googleSignInAccount =
         await googleSignIn.signInSilently();
 
-    if (googleSignInAccount == null) await GoogleAuth().signin();
+    if (googleSignInAccount == null) await signin();
 
     final AuthClient? client = await googleSignIn.authenticatedClient();
 
