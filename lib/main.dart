@@ -57,6 +57,7 @@ Future<void> main(List<String> args) async {
   final googleAuth = GoogleAuth();
   final authenticationCubit = await AuthenticationCubit.initialize(
     googleAuth: googleAuth,
+    storageRepository: storageRepository,
   );
 
   final notificationsCubit = await NotificationsCubit.initialize(
