@@ -49,10 +49,12 @@ class HomeWidgetConfigPage extends StatelessWidget {
                                 items: selectedListItems,
                               );
 
-                              await updateHomeWidget(
-                                'selectedList',
-                                selectedList.toJson(),
-                              );
+                              await context
+                                  .read<HomeWidgetManager>()
+                                  .updateHomeWidget(
+                                    'selectedList',
+                                    selectedList.toJson(),
+                                  );
                             },
                             title: Text(e.title),
                           ))

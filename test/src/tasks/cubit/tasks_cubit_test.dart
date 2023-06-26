@@ -1,4 +1,5 @@
 import 'package:adventure_list/src/authentication/authentication.dart';
+import 'package:adventure_list/src/home_widget/home_widget.dart';
 import 'package:adventure_list/src/logs/logging_manager.dart';
 import 'package:adventure_list/src/storage/storage_repository.dart';
 import 'package:adventure_list/src/tasks/tasks.dart';
@@ -14,6 +15,8 @@ class MockAuthenticationCubit extends MockCubit<AuthenticationState>
 
 class MockGoogleAuth extends Mock implements GoogleAuth {}
 
+class MockHomeWidgetManager extends Mock implements HomeWidgetManager {}
+
 class MockStorageRepository extends Mock implements StorageRepository {}
 
 class MockTasksRepository extends Mock implements TasksRepository {}
@@ -26,6 +29,7 @@ class FakeTask extends Fake implements Task {}
 
 late MockAuthenticationCubit _authCubit;
 late MockGoogleAuth _googleAuth;
+late MockHomeWidgetManager _homeWidgetManager;
 late MockStorageRepository _storageRepository;
 late MockTasksRepository _tasksRepository;
 MockUuid _uuid = MockUuid();
@@ -81,6 +85,11 @@ void main() {
       /* -------------------------------- GoogleAuth ------------------------------- */
       _googleAuth = MockGoogleAuth();
       when(() => _googleAuth.signin()).thenAnswer((_) async => null);
+
+      /* ----------------------------- HomeWidgetManager ---------------------------- */
+      _homeWidgetManager = MockHomeWidgetManager();
+      when(() => _homeWidgetManager.updateHomeWidget(any(), any()))
+          .thenAnswer((_) async {});
 
       /* ----------------------------- TasksRepository ---------------------------- */
       _tasksRepository = MockTasksRepository();
@@ -144,6 +153,7 @@ void main() {
       testCubit = TasksCubit(
         _authCubit,
         _googleAuth,
+        _homeWidgetManager,
         tasksRepository: _tasksRepository,
         uuid: _uuid,
       );
@@ -300,6 +310,7 @@ void main() {
       build: () => TasksCubit(
         _authCubit,
         _googleAuth,
+        _homeWidgetManager,
         tasksRepository: _tasksRepository,
       ),
       expect: () => [TasksState.initial().copyWith(loading: false)],

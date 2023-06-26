@@ -16,6 +16,7 @@ import 'src/app/cubit/app_cubit.dart';
 import 'src/authentication/authentication.dart';
 import 'src/background_tasks/background_tasks.dart';
 import 'src/core/helpers/helpers.dart';
+import 'src/home_widget/home_widget.dart';
 import 'src/logs/logging_manager.dart';
 import 'src/notifications/notifications.dart';
 import 'src/settings/cubit/settings_cubit.dart';
@@ -64,13 +65,21 @@ Future<void> main(List<String> args) async {
     flutterLocalNotificationsPlugin: FlutterLocalNotificationsPlugin(),
   );
 
-  final tasksCubit = TasksCubit(authenticationCubit, googleAuth);
+  final homeWidgetManager = HomeWidgetManager();
+
+  final tasksCubit = TasksCubit(
+    authenticationCubit,
+    googleAuth,
+    homeWidgetManager,
+  );
+
   final settingsCubitInstance = await SettingsCubit.initialize();
 
   runApp(
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: googleAuth),
+        RepositoryProvider.value(value: homeWidgetManager),
         RepositoryProvider.value(value: storageRepository),
       ],
       child: MultiBlocProvider(

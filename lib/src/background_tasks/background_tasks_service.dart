@@ -1,8 +1,17 @@
+import 'dart:convert';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:googleapis/calendar/v3.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../authentication/authentication.dart';
 import '../core/helpers/helpers.dart';
+import '../home_widget/home_widget.dart';
 import '../logs/logging_manager.dart';
+import '../storage/storage.dart';
+import '../tasks/tasks.dart';
 
 /// Background task name for refreshing data.
 const _refreshDataBackgroundTask = 'refreshDataBackgroundTask';
@@ -71,6 +80,95 @@ void _callbackDispatcher() {
 /// This function is called from the background isolate, so it does not have
 /// access to any services initialized in the main isolate.
 Future<bool> _refreshDataFromBackgroundIsolate() async {
-  // TODO: Implement this function.
-  return Future.value(true);
+  final storageRepository = await StorageRepository.initialize(Hive);
+  final googleAuth = GoogleAuth(storageRepository);
+
+  final client = await googleAuth.getAuthClient();
+  if (client == null) {
+    log.w('Could not get an authenticated client');
+    return false;
+  }
+
+  final calendarApi = CalendarApi(client);
+  final tasksRepository = GoogleCalendar(calendarApi);
+  final backgroundTasksService = BackgroundTasksService(
+    HomeWidgetManager(),
+    storageRepository,
+    tasksRepository,
+  );
+
+  final bool success = await backgroundTasksService.refreshData();
+
+  if (success) {
+    log.d('Successfully refreshed data in the background.');
+  }
+
+  return success;
+}
+
+/// Service to perform background tasks.
+class BackgroundTasksService {
+  final HomeWidgetManager _homeWidgetManager;
+  final StorageRepository _storageRepository;
+  final TasksRepository _tasksRepository;
+
+  const BackgroundTasksService(
+    this._homeWidgetManager,
+    this._storageRepository,
+    this._tasksRepository,
+  );
+
+  /// Fetches the latest data from the repository then updates the local storage
+  /// and the Android home screen widget.
+  Future<bool> refreshData() async {
+    // Get the latest data from the repository.
+    final List<TaskList>? remoteTaskLists = await _tasksRepository.getAll();
+    if (remoteTaskLists == null) {
+      log.w('Could not get data from the repository');
+      return false;
+    } else if (remoteTaskLists.isEmpty) {
+      log.d('Remote data is empty');
+      return false;
+    }
+
+    // Update the local storage.
+    await _storageRepository.save(
+      key: 'taskListsJson',
+      value: remoteTaskLists.map((e) => jsonEncode(e.toJson())).toList(),
+      storageArea: 'cache',
+    );
+
+    // Update the widget.
+    await _updateHomeWidget(remoteTaskLists);
+
+    return true;
+  }
+
+  /// Update the Android home screen widget with the latest data.
+  Future<void> _updateHomeWidget(List<TaskList> remoteTaskLists) async {
+    // The id of the list that the home widget displays.
+    final String? listId = await _storageRepository.get(
+      'homeWidgetSelectedListId',
+    );
+    if (listId == null) {
+      log.w('Could not get the id of the list that the home widget displays, '
+          'or the widget is not configured.');
+      return;
+    }
+
+    // The list that the home widget displays.
+    final TaskList? taskList = remoteTaskLists.firstWhereOrNull(
+      (e) => e.id == listId,
+    );
+    if (taskList == null) {
+      log.w('Could not find the list that the home widget displays');
+      return;
+    }
+
+    // Update the widget.
+    await _homeWidgetManager.updateHomeWidget(
+      listId,
+      jsonEncode(taskList.toJson()),
+    );
+  }
 }

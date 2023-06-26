@@ -104,20 +104,21 @@ dependency_overrides:
       ref: 5f8143d6b0f181f397b31ed313bc17f08608ed11
 
 dev_dependencies:
+  bloc_test: ^9.1.0
+  build_runner: ^2.3.3
   flutter_app_builder:
     git:
       url: https://github.com/Merrit/flutter_app_builder.git
       ref: 3c38d05af2ab6355e8c72a6d42ff7ad6c29c9348
+  flutter_launcher_icons: ^0.13.1
+  flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
-  flutter_launcher_icons: ^0.13.1
-  mocktail: ^0.3.0
-  msix: ^3.6.2
-  bloc_test: ^9.1.0
-  build_runner: ^2.3.3
   freezed: ^2.3.2
   json_serializable: ^6.6.1
+  mockito: ^5.4.2
+  mocktail: ^0.3.0
+  msix: ^3.6.2
 
 flutter:
   uses-material-design: true
