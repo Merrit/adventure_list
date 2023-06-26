@@ -35,6 +35,9 @@ class TasksCubit extends Cubit<TasksState> {
   /// The service used to authenticate with Google and get an [AuthClient].
   final GoogleAuth _googleAuth;
 
+  /// The service used to update the Android home screen widget.
+  final HomeWidgetManager _homeWidgetManager;
+
   /// Uuid generator.
   ///
   /// Passed in as a dependency to allow for mocking in unit tests.
@@ -42,7 +45,8 @@ class TasksCubit extends Cubit<TasksState> {
 
   TasksCubit(
     AuthenticationCubit authCubit,
-    this._googleAuth, {
+    this._googleAuth,
+    this._homeWidgetManager, {
     TasksRepository? tasksRepository,
     Uuid? uuid,
   })  : _uuid = uuid ?? const Uuid(),
@@ -684,7 +688,7 @@ class TasksCubit extends Cubit<TasksState> {
   }
 
   /// Updates the Android home screen widget.
-  void _updateAndroidWidget(TasksState data) {
+  Future<void> _updateAndroidWidget(TasksState data) async {
     final selectedListId = settingsCubit.state.homeWidgetSelectedListId;
     final selectedList = data //
         .taskLists
@@ -701,7 +705,11 @@ class TasksCubit extends Cubit<TasksState> {
           .where((e) => !e.completed && e.parent == null)
           .toList(),
     );
-    updateHomeWidget('selectedList', jsonEncode(listCopy.toJson()));
+
+    await _homeWidgetManager.updateHomeWidget(
+      'selectedList',
+      jsonEncode(listCopy.toJson()),
+    );
   }
 
   @override

@@ -9,6 +9,7 @@
 # Generated code
 generated*
 Generated*
+*.mocks.dart
 
 # Packaging
 *.tar.gz
