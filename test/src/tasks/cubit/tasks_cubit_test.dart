@@ -7,31 +7,29 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
-import 'package:mocktail/mocktail.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 import 'package:uuid/uuid.dart';
 
-class MockAuthenticationCubit extends MockCubit<AuthenticationState>
-    implements AuthenticationCubit {}
-
-class MockGoogleAuth extends Mock implements GoogleAuth {}
-
-class MockHomeWidgetManager extends Mock implements HomeWidgetManager {}
-
-class MockStorageRepository extends Mock implements StorageRepository {}
-
-class MockTasksRepository extends Mock implements TasksRepository {}
-
-class MockUuid extends Mock implements Uuid {}
+@GenerateNiceMocks([
+  MockSpec<AuthenticationCubit>(),
+  MockSpec<GoogleAuth>(),
+  MockSpec<HomeWidgetManager>(),
+  MockSpec<StorageRepository>(),
+  MockSpec<TasksRepository>(),
+  MockSpec<Uuid>(),
+])
+import 'tasks_cubit_test.mocks.dart';
 
 class FakeTaskList extends Fake implements TaskList {}
 
 class FakeTask extends Fake implements Task {}
 
-late MockAuthenticationCubit _authCubit;
-late MockGoogleAuth _googleAuth;
-late MockHomeWidgetManager _homeWidgetManager;
-late MockStorageRepository _storageRepository;
-late MockTasksRepository _tasksRepository;
+MockAuthenticationCubit _authCubit = MockAuthenticationCubit();
+MockGoogleAuth _googleAuth = MockGoogleAuth();
+MockHomeWidgetManager _homeWidgetManager = MockHomeWidgetManager();
+MockStorageRepository _storageRepository = MockStorageRepository();
+MockTasksRepository _tasksRepository = MockTasksRepository();
 MockUuid _uuid = MockUuid();
 
 final AccessToken defaultAccessToken = AccessToken(
@@ -51,26 +49,6 @@ final AuthenticationState defaultAuthState = AuthenticationState(
 
 void main() {
   setUpAll(() async {
-    registerFallbackValue(FakeTaskList());
-    registerFallbackValue(FakeTask());
-    registerFallbackValue(TaskList(
-      items: const [],
-      id: '',
-      index: 0,
-      title: '',
-    ));
-    registerFallbackValue(Task(
-      id: '',
-      index: 0,
-      title: '',
-      taskListId: '',
-      updated: DateTime.now(),
-      completed: false,
-      description: null,
-      dueDate: null,
-      parent: null,
-    ));
-
     await LoggingManager.initialize(verbose: false);
   });
 
@@ -79,76 +57,71 @@ void main() {
 
     setUp(() async {
       /* -------------------------------- AuthCubit ------------------------------- */
-      _authCubit = MockAuthenticationCubit();
-      when(() => _authCubit.state).thenReturn(defaultAuthState);
+      reset(_authCubit);
+      when(_authCubit.state).thenReturn(defaultAuthState);
+      when(_authCubit.state).thenReturn(defaultAuthState);
 
       /* -------------------------------- GoogleAuth ------------------------------- */
-      _googleAuth = MockGoogleAuth();
-      when(() => _googleAuth.signin()).thenAnswer((_) async => null);
+      reset(_googleAuth);
+      when(_googleAuth.signin()).thenAnswer((_) async => null);
 
       /* ----------------------------- HomeWidgetManager ---------------------------- */
-      _homeWidgetManager = MockHomeWidgetManager();
-      when(() => _homeWidgetManager.updateHomeWidget(any(), any()))
+      reset(_homeWidgetManager);
+      when(_homeWidgetManager.updateHomeWidget(any, any))
           .thenAnswer((_) async {});
 
       /* ----------------------------- TasksRepository ---------------------------- */
-      _tasksRepository = MockTasksRepository();
-      when(() => _tasksRepository.getAll()).thenAnswer((_) async => []);
-      when(() => _tasksRepository.createList(any()))
+      reset(_tasksRepository);
+      when(_tasksRepository.getAll()).thenAnswer((_) async => []);
+      when(_tasksRepository.createList(any))
           .thenAnswer((invokation) async => TaskList(
                 id: UniqueKey().toString(),
                 index: 0,
                 items: const [],
                 title: (invokation.positionalArguments.first as TaskList).title,
               ));
-      when(() => _tasksRepository.deleteList(id: any(named: 'id')))
+      when(_tasksRepository.deleteList(id: anyNamed('id')))
           .thenAnswer((_) async => true);
-      when(() => _tasksRepository.updateList(list: any(named: 'list')))
-          .thenAnswer((_) async =>
+      when(_tasksRepository.updateList(list: anyNamed('list'))).thenAnswer(
+          (_) async =>
               TaskList(id: 'id', index: 0, items: const [], title: ''));
-      when(() => _tasksRepository.createTask(
-            newTask: any(named: 'newTask'),
-            taskListId: any(named: 'taskListId'),
-          )).thenAnswer((invokation) async {
+      when(_tasksRepository.createTask(
+              newTask: anyNamed('newTask'), taskListId: anyNamed('taskListId')))
+          .thenAnswer((invokation) async {
         final providedTask =
             invokation.namedArguments[const Symbol('newTask')] as Task;
-        return providedTask.copyWith(
-          id: UniqueKey().toString(),
-        );
+        return providedTask.copyWith(id: UniqueKey().toString());
       });
-      when(() => _tasksRepository.updateTask(
-            taskListId: any(named: 'taskListId'),
-            updatedTask: any(named: 'updatedTask'),
-          )).thenAnswer((invokation) async {
+      when(_tasksRepository.updateTask(
+              taskListId: anyNamed('taskListId'),
+              updatedTask: anyNamed('updatedTask')))
+          .thenAnswer((invokation) async {
         final providedTask =
             invokation.namedArguments[const Symbol('updatedTask')] as Task;
         return providedTask;
       });
 
       /* ----------------------------- StorageRepository ----------------------------- */
-      _storageRepository = MockStorageRepository();
+      reset(_storageRepository);
       StorageRepository.instance = _storageRepository;
-      when(() => _storageRepository.delete(any(),
-          storageArea: any(named: 'storageArea'))).thenAnswer((_) async {});
-      when(() => _storageRepository.getStorageAreaValues(any())).thenAnswer(
-        (_) async => [],
-      );
-      when(() => _storageRepository.get(
-            any(),
-            storageArea: any(named: 'storageArea'),
-          )).thenAnswer((_) async => null);
-      when(() => _storageRepository.saveStorageAreaValues(
-            storageArea: any(named: 'storageArea'),
-            entries: any(named: 'entries'),
-          )).thenAnswer((_) async {});
-      when(() => _storageRepository.save(
-            key: any(named: 'key'),
-            value: any(named: 'value'),
-            storageArea: any(named: 'storageArea'),
-          )).thenAnswer((_) async {});
+      when(_storageRepository.delete(any, storageArea: anyNamed('storageArea')))
+          .thenAnswer((_) async {});
+      when(_storageRepository.getStorageAreaValues(any))
+          .thenAnswer((_) async => []);
+      when(_storageRepository.get(any, storageArea: anyNamed('storageArea')))
+          .thenAnswer((_) async => null);
+      when(_storageRepository.saveStorageAreaValues(
+        storageArea: anyNamed('storageArea'),
+        entries: anyNamed('entries'),
+      )).thenAnswer((_) async {});
+      when(_storageRepository.save(
+        key: anyNamed('key'),
+        value: anyNamed('value'),
+        storageArea: anyNamed('storageArea'),
+      )).thenAnswer((_) async {});
 
       // Mock the uuid generator
-      when(() => _uuid.v4()).thenReturn('test-uuid');
+      when(_uuid.v4()).thenReturn('test-uuid');
 
       testCubit = TasksCubit(
         _authCubit,
@@ -318,10 +291,9 @@ void main() {
 
     group('clearCompletedTasks():', () {
       test('works as expected', () async {
-        when(() => _tasksRepository.deleteTask(
-              taskListId: any(named: 'taskListId'),
-              taskId: any(named: 'taskId'),
-            )).thenAnswer((_) async => true);
+        when(_tasksRepository.deleteTask(
+                taskListId: anyNamed('taskListId'), taskId: anyNamed('taskId')))
+            .thenAnswer((_) async => true);
 
         // Seed the state with a task list and tasks
         final taskList = testTaskList.copyWith(
@@ -467,7 +439,7 @@ void main() {
     blocTest<TasksCubit, TasksState>(
       'createList() creates a new task list',
       setUp: () {
-        when(() => _tasksRepository.createList(any())).thenAnswer(
+        when(_tasksRepository.createList(any)).thenAnswer(
           (_) async => TaskList(
             id: 'test-list-id-5',
             title: 'New List',
@@ -476,12 +448,12 @@ void main() {
           ),
         );
 
-        when(() => _uuid.v4()).thenReturn('temp-test-list-id-5');
+        when(_uuid.v4()).thenReturn('temp-test-list-id-5');
       },
       build: () => testCubit,
       act: (cubit) => cubit.createList('New List'),
       verify: (cubit) {
-        verify(() => _tasksRepository.createList(any())).called(1);
+        verify(_tasksRepository.createList(any)).called(1);
         expect(cubit.state.taskLists.length, 1);
         expect(cubit.state.taskLists.first.id, 'test-list-id-5');
       },
@@ -528,9 +500,8 @@ void main() {
     blocTest<TasksCubit, TasksState>(
       'createList() reverts to previous state if an error occurs',
       setUp: () {
-        when(() => _tasksRepository.createList(any()))
-            .thenAnswer((_) async => null);
-        when(() => _uuid.v4()).thenReturn('test-list-id-2');
+        when(_tasksRepository.createList(any)).thenAnswer((_) async => null);
+        when(_uuid.v4()).thenReturn('test-list-id-2');
       },
       build: () => testCubit,
       seed: () => TasksState(
@@ -552,7 +523,7 @@ void main() {
       ),
       act: (cubit) => cubit.createList('New List'),
       verify: (cubit) {
-        verify(() => _tasksRepository.createList(any())).called(1);
+        verify(_tasksRepository.createList(any)).called(1);
         expect(cubit.state.taskLists.length, 1);
         expect(cubit.state.taskLists.first.id, 'test-list-id-1');
       },
@@ -603,8 +574,7 @@ void main() {
     blocTest<TasksCubit, TasksState>(
       'updateList() updates a task list',
       setUp: () {
-        when(() => _tasksRepository.updateList(list: any(named: 'list')))
-            .thenAnswer(
+        when(_tasksRepository.updateList(list: anyNamed('list'))).thenAnswer(
           (_) async => TaskList(
             id: 'test-list-id-5',
             title: 'Updated List',
@@ -640,8 +610,7 @@ void main() {
         ),
       ),
       verify: (cubit) {
-        verify(() => _tasksRepository.updateList(list: any(named: 'list')))
-            .called(1);
+        verify(_tasksRepository.updateList(list: anyNamed('list'))).called(1);
         expect(cubit.state.taskLists.length, 1);
         expect(cubit.state.taskLists.first.id, 'test-list-id-5');
         expect(cubit.state.taskLists.first.title, 'Updated List');
@@ -670,7 +639,7 @@ void main() {
     blocTest<TasksCubit, TasksState>(
       'deleteList() deletes a task list',
       setUp: () {
-        when(() => _tasksRepository.deleteList(id: any(named: 'id')))
+        when(_tasksRepository.deleteList(id: anyNamed('id')))
             .thenAnswer((_) async => true);
       },
       build: () => testCubit,
@@ -693,8 +662,7 @@ void main() {
       ),
       act: (cubit) => cubit.deleteList(),
       verify: (cubit) {
-        verify(() => _tasksRepository.deleteList(id: any(named: 'id')))
-            .called(1);
+        verify(_tasksRepository.deleteList(id: anyNamed('id'))).called(1);
         expect(cubit.state.taskLists.length, 0);
       },
       expect: () => [
@@ -709,10 +677,10 @@ void main() {
     blocTest<TasksCubit, TasksState>(
       'createTask() creates a new task',
       setUp: () {
-        when(() => _tasksRepository.createTask(
-              taskListId: any(named: 'taskListId'),
-              newTask: any(named: 'newTask'),
-            )).thenAnswer(
+        when(_tasksRepository.createTask(
+          taskListId: anyNamed('taskListId'),
+          newTask: anyNamed('newTask'),
+        )).thenAnswer(
           (_) async => Task(
             id: 'test-task-id-5',
             taskListId: 'test-list-id-5',
@@ -722,7 +690,7 @@ void main() {
           ),
         );
 
-        when(() => _uuid.v4()).thenReturn('temp-test-task-id-5');
+        when(_uuid.v4()).thenReturn('temp-test-task-id-5');
       },
       build: () => testCubit,
       seed: () => TasksState(
@@ -750,10 +718,10 @@ void main() {
         completed: false,
       )),
       verify: (cubit) {
-        verify(() => _tasksRepository.createTask(
-              taskListId: any(named: 'taskListId'),
-              newTask: any(named: 'newTask'),
-            )).called(1);
+        verify(_tasksRepository.createTask(
+          taskListId: anyNamed('taskListId'),
+          newTask: anyNamed('newTask'),
+        )).called(1);
         expect(cubit.state.activeList?.items.length, 1);
         expect(cubit.state.activeList?.items.first.id, 'test-task-id-5');
         expect(cubit.state.activeList?.items.first.title, 'New Task');
@@ -763,10 +731,10 @@ void main() {
     blocTest<TasksCubit, TasksState>(
       'createTask() reverts to previous state if task creation fails',
       setUp: () {
-        when(() => _tasksRepository.createTask(
-              taskListId: any(named: 'taskListId'),
-              newTask: any(named: 'newTask'),
-            )).thenAnswer((_) async => null);
+        when(_tasksRepository.createTask(
+          taskListId: anyNamed('taskListId'),
+          newTask: anyNamed('newTask'),
+        )).thenAnswer((_) async => null);
       },
       build: () => testCubit,
       seed: () => TasksState(
@@ -794,10 +762,10 @@ void main() {
         completed: false,
       )),
       verify: (cubit) {
-        verify(() => _tasksRepository.createTask(
-              taskListId: any(named: 'taskListId'),
-              newTask: any(named: 'newTask'),
-            )).called(1);
+        verify(_tasksRepository.createTask(
+          taskListId: anyNamed('taskListId'),
+          newTask: anyNamed('newTask'),
+        )).called(1);
         expect(cubit.state.activeList?.items.length, 0);
       },
     );
