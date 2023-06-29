@@ -38,8 +38,12 @@ Future<void> main(List<String> args) async {
 
   final storageRepository = await StorageRepository.initialize(Hive);
 
+  final settingsCubit = await SettingsCubit.initialize(
+    AutostartService(),
+  );
+
   if (defaultTargetPlatform.isDesktop) {
-    final appWindow = AppWindow() //
+    final appWindow = AppWindow(settingsCubit) //
       ..initialize();
     final systemTray = SystemTrayManager(appWindow);
     await systemTray.initialize();
@@ -72,10 +76,7 @@ Future<void> main(List<String> args) async {
     authenticationCubit,
     googleAuth,
     homeWidgetManager,
-  );
-
-  final settingsCubitInstance = await SettingsCubit.initialize(
-    AutostartService(),
+    settingsCubit,
   );
 
   runApp(
@@ -98,11 +99,11 @@ Future<void> main(List<String> args) async {
           ),
           BlocProvider.value(value: authenticationCubit),
           BlocProvider.value(value: notificationsCubit),
-          BlocProvider.value(value: settingsCubitInstance),
+          BlocProvider.value(value: settingsCubit),
           BlocProvider.value(value: tasksCubit),
           if (defaultTargetPlatform.isDesktop)
             BlocProvider(
-              create: (context) => WindowCubit(),
+              create: (context) => WindowCubit(settingsCubit),
             ),
         ],
         child: const App(),

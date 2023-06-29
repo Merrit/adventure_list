@@ -38,6 +38,9 @@ class TasksCubit extends Cubit<TasksState> {
   /// The service used to update the Android home screen widget.
   final HomeWidgetManager _homeWidgetManager;
 
+  /// The cubit that manages settings.
+  final SettingsCubit _settingsCubit;
+
   /// Uuid generator.
   ///
   /// Passed in as a dependency to allow for mocking in unit tests.
@@ -46,7 +49,8 @@ class TasksCubit extends Cubit<TasksState> {
   TasksCubit(
     AuthenticationCubit authCubit,
     this._googleAuth,
-    this._homeWidgetManager, {
+    this._homeWidgetManager,
+    this._settingsCubit, {
     TasksRepository? tasksRepository,
     Uuid? uuid,
   })  : _uuid = uuid ?? const Uuid(),
@@ -689,7 +693,7 @@ class TasksCubit extends Cubit<TasksState> {
 
   /// Updates the Android home screen widget.
   Future<void> _updateAndroidWidget(TasksState data) async {
-    final selectedListId = settingsCubit.state.homeWidgetSelectedListId;
+    final selectedListId = _settingsCubit.state.homeWidgetSelectedListId;
     final selectedList = data //
         .taskLists
         .singleWhereOrNull(

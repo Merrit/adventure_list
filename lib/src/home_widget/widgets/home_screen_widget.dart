@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:home_widget/home_widget.dart';
 
 import '../../logs/logging_manager.dart';
@@ -23,12 +24,16 @@ class HomeScreenWidget extends StatefulWidget {
 
 class _HomeScreenWidgetState extends State<HomeScreenWidget> {
   StreamSubscription? homeWidgetListener;
+  late SettingsCubit settingsCubit;
+
   @override
   void initState() {
     super.initState();
     homeWidgetListener = HomeWidget.widgetClicked.listen(
       _handleAppLaunchedFromHomeWidget,
     );
+
+    settingsCubit = context.read<SettingsCubit>();
   }
 
   @override

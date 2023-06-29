@@ -11,7 +11,9 @@ import '../settings/settings.dart';
 import '../storage/storage_repository.dart';
 
 class AppWindow {
-  AppWindow() {
+  final SettingsCubit _settingsCubit;
+
+  AppWindow(this._settingsCubit) {
     instance = this;
   }
 
@@ -42,7 +44,7 @@ class AppWindow {
   }
 
   Future<bool> handleWindowCloseEvent() async {
-    if (settingsCubit.state.closeToTray) {
+    if (_settingsCubit.state.closeToTray) {
       log.i('Hiding app window.');
       hide();
       return false;

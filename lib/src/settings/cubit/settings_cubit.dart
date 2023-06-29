@@ -15,8 +15,6 @@ import '../settings.dart';
 part 'settings_state.dart';
 part 'settings_cubit.freezed.dart';
 
-late final SettingsCubit settingsCubit;
-
 class SettingsCubit extends Cubit<SettingsState> {
   /// Service for managing autostart.
   final AutostartService _autostartService;
@@ -24,9 +22,7 @@ class SettingsCubit extends Cubit<SettingsState> {
   SettingsCubit(
     this._autostartService, {
     required SettingsState initialState,
-  }) : super(initialState) {
-    settingsCubit = this;
-  }
+  }) : super(initialState);
 
   static Future<SettingsCubit> initialize(
     AutostartService autostartService,
