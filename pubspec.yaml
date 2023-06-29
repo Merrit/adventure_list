@@ -117,7 +117,6 @@ dev_dependencies:
   freezed: ^2.3.2
   json_serializable: ^6.6.1
   mockito: ^5.4.2
-  mocktail: ^0.3.0
   msix: ^3.6.2
 
 flutter:
