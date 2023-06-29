@@ -14,14 +14,14 @@ dependencies:
   collection: ^1.17.1
   extension_google_sign_in_as_googleapis_auth: ^2.0.9
   firebase_auth: ^4.0.0
-  firebase_core: ^2.14.0
+  firebase_core: 2.10.0
 
   # Temporary lock of firebase_core_platform_interface.
   # To be removed when the fix for Windows in firebase_core has been released.
   # See:
   # https://github.com/firebase/flutterfire/issues/10931#event-9267220776
   # https://github.com/firebase/flutterfire/pull/10972
-  firebase_core_platform_interface: ^4.8.0
+  firebase_core_platform_interface: 4.6.0
 
   flex_color_scheme: ^7.0.5
   flutter:
