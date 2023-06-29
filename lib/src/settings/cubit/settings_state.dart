@@ -7,6 +7,8 @@ class SettingsState with _$SettingsState {
     ///
     /// This is only used on desktop platforms.
     required bool autostart,
+
+    /// True if the app should be closed to the system tray instead of exiting.
     required bool closeToTray,
 
     /// The settings for the desktop widget.
@@ -14,6 +16,8 @@ class SettingsState with _$SettingsState {
 
     /// The id of the list to show in the Android home widget / AppWidget.
     required String homeWidgetSelectedListId,
+
+    /// The theme to use.
     required ThemeData theme,
   }) = _SettingsState;
 }
