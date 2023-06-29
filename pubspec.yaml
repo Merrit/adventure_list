@@ -7,21 +7,21 @@ publish_to: "none"
 version: 0.5.0+17
 
 environment:
-  sdk: ">=2.17.3 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   badges: ^3.0.2
-  collection: ^1.16.0
+  collection: ^1.17.1
   extension_google_sign_in_as_googleapis_auth: ^2.0.9
   firebase_auth: ^4.0.0
-  firebase_core: 2.10.0
+  firebase_core: ^2.14.0
 
   # Temporary lock of firebase_core_platform_interface.
   # To be removed when the fix for Windows in firebase_core has been released.
   # See:
   # https://github.com/firebase/flutterfire/issues/10931#event-9267220776
   # https://github.com/firebase/flutterfire/pull/10972
-  firebase_core_platform_interface: 4.6.0
+  firebase_core_platform_interface: ^4.8.0
 
   flex_color_scheme: ^7.0.5
   flutter:
@@ -51,17 +51,17 @@ dependencies:
   flutter_slidable: ^3.0.0
   flutter_window_close: ^0.2.2
   freezed_annotation: ^2.2.0
-  google_fonts: ^4.0.4
+  google_fonts: ^5.1.0
   google_sign_in: ^6.1.0
   googleapis: ^11.0.0
   googleapis_auth: ^1.3.1
   helpers:
     git:
       url: https://github.com/Merrit/helpers.git
-      ref: be754e0b6b23625bd83e60a2fb4f1e0939218632
+      ref: 3b8b7acebb96f43932579f15dcf136e282f6602c
   hive_flutter: ^1.1.0
   home_widget: ^0.2.0+1
-  http: ^0.13.4
+  http: ^1.1.0
   intl: ^0.18.0
   json_annotation: ^4.8.0
   launcher_entry: ^0.1.1
@@ -93,15 +93,6 @@ dependencies:
       ref: 6c66ad23ee79749f30a8eece542cf54eaf157ed8
   window_to_front: ^0.0.3
   workmanager: ^0.5.0
-
-dependency_overrides:
-  # Override window_manager to use the fork with the fix for Linux that
-  # restores the window frame until the fix is merged.
-  # See: https://github.com/leanflutter/window_manager/pull/323
-  window_manager:
-    git:
-      url: https://github.com/Merrit/window_manager
-      ref: 5f8143d6b0f181f397b31ed313bc17f08608ed11
 
 dev_dependencies:
   bloc_test: ^9.1.0
