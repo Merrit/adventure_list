@@ -9,6 +9,7 @@ import '../../app/cubit/app_cubit.dart';
 import '../../authentication/cubit/authentication_cubit.dart';
 import '../../authentication/sign_in_page.dart';
 import '../../core/core.dart';
+import '../../core/helpers/helpers.dart';
 import '../../home_widget/home_widget.dart';
 import '../../theme/theme.dart';
 import '../settings.dart';
@@ -137,8 +138,14 @@ class _CurrentVersionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AppCubit, AppState>(
       builder: (context, state) {
+        String text = 'Current version: ${state.runningVersion}';
+
+        if (runningInFlatpak) {
+          text += ' (Flatpak)';
+        }
+
         return ListTile(
-          title: Text('Current version: ${state.runningVersion}'),
+          title: Text(text),
         );
       },
     );
