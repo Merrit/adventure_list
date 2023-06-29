@@ -9,10 +9,12 @@ part 'window_state.dart';
 part 'window_cubit.freezed.dart';
 
 class WindowCubit extends Cubit<WindowState> {
+  final SettingsCubit settingsCubit;
+
   /// Singleton instance of the [WindowCubit].
   static late WindowCubit instance;
 
-  WindowCubit() : super(WindowState.initial()) {
+  WindowCubit(this.settingsCubit) : super(WindowState.initial()) {
     instance = this;
   }
 

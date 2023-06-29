@@ -30,9 +30,9 @@ class HomeWidgetConfigPage extends StatelessWidget {
                             onChanged: (String? value) async {
                               if (value == null) return;
 
-                              settingsCubit.updateHomeWidgetSelectedListId(
-                                value,
-                              );
+                              context
+                                  .read<SettingsCubit>()
+                                  .updateHomeWidgetSelectedListId(value);
 
                               TaskList selectedList = tasksState //
                                   .taskLists

@@ -214,7 +214,8 @@ class _ThemeTile extends StatelessWidget {
           title: const Text('Dark mode'),
           secondary: const Icon(Icons.brightness_4),
           onChanged: (bool value) {
-            settingsCubit
+            context
+                .read<SettingsCubit>()
                 .updateThemeMode(value ? ThemeMode.dark : ThemeMode.light);
           },
         );
@@ -248,7 +249,7 @@ class _AutostartTile extends StatelessWidget {
           ),
           secondary: const Icon(Icons.autorenew),
           value: state.autostart,
-          onChanged: (value) => settingsCubit.toggleAutostart(),
+          onChanged: (value) => context.read<SettingsCubit>().toggleAutostart(),
         );
       },
     );
@@ -268,7 +269,8 @@ class _CloseToTrayTile extends StatelessWidget {
           title: const Text('Close to tray'),
           secondary: const Icon(Icons.bedtime),
           value: state.closeToTray,
-          onChanged: (value) => settingsCubit.updateCloseToTray(value),
+          onChanged: (value) =>
+              context.read<SettingsCubit>().updateCloseToTray(value),
         );
       },
     );
@@ -303,11 +305,12 @@ class _CustomizeDesktopWidgetTile extends StatelessWidget {
           title: const Text('Transparent background'),
           secondary: const Icon(Icons.desktop_windows),
           value: state.desktopWidgetSettings.transparentBackground,
-          onChanged: (value) => settingsCubit.updateDesktopWidgetSettings(
-            state.desktopWidgetSettings.copyWith(
-              transparentBackground: value,
-            ),
-          ),
+          onChanged: (value) =>
+              context.read<SettingsCubit>().updateDesktopWidgetSettings(
+                    state.desktopWidgetSettings.copyWith(
+                      transparentBackground: value,
+                    ),
+                  ),
         );
       },
     );

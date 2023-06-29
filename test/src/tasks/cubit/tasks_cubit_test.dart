@@ -1,6 +1,7 @@
 import 'package:adventure_list/src/authentication/authentication.dart';
 import 'package:adventure_list/src/home_widget/home_widget.dart';
 import 'package:adventure_list/src/logs/logging_manager.dart';
+import 'package:adventure_list/src/settings/settings.dart';
 import 'package:adventure_list/src/storage/storage_repository.dart';
 import 'package:adventure_list/src/tasks/tasks.dart';
 import 'package:bloc_test/bloc_test.dart';
@@ -15,6 +16,7 @@ import 'package:uuid/uuid.dart';
   MockSpec<AuthenticationCubit>(),
   MockSpec<GoogleAuth>(),
   MockSpec<HomeWidgetManager>(),
+  MockSpec<SettingsCubit>(),
   MockSpec<StorageRepository>(),
   MockSpec<TasksRepository>(),
   MockSpec<Uuid>(),
@@ -28,6 +30,7 @@ class FakeTask extends Fake implements Task {}
 MockAuthenticationCubit _authCubit = MockAuthenticationCubit();
 MockGoogleAuth _googleAuth = MockGoogleAuth();
 MockHomeWidgetManager _homeWidgetManager = MockHomeWidgetManager();
+MockSettingsCubit _settingsCubit = MockSettingsCubit();
 MockStorageRepository _storageRepository = MockStorageRepository();
 MockTasksRepository _tasksRepository = MockTasksRepository();
 MockUuid _uuid = MockUuid();
@@ -101,6 +104,9 @@ void main() {
         return providedTask;
       });
 
+      /* ----------------------------- SettingsCubit ---------------------------- */
+      reset(_settingsCubit);
+
       /* ----------------------------- StorageRepository ----------------------------- */
       reset(_storageRepository);
       StorageRepository.instance = _storageRepository;
@@ -127,6 +133,7 @@ void main() {
         _authCubit,
         _googleAuth,
         _homeWidgetManager,
+        _settingsCubit,
         tasksRepository: _tasksRepository,
         uuid: _uuid,
       );
@@ -284,6 +291,7 @@ void main() {
         _authCubit,
         _googleAuth,
         _homeWidgetManager,
+        _settingsCubit,
         tasksRepository: _tasksRepository,
       ),
       expect: () => [TasksState.initial().copyWith(loading: false)],
