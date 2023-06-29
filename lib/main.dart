@@ -14,6 +14,7 @@ import 'firebase_options.dart';
 import 'src/app.dart';
 import 'src/app/cubit/app_cubit.dart';
 import 'src/authentication/authentication.dart';
+import 'src/autostart/autostart_service.dart';
 import 'src/background_tasks/background_tasks.dart';
 import 'src/core/helpers/helpers.dart';
 import 'src/home_widget/home_widget.dart';
@@ -73,7 +74,9 @@ Future<void> main(List<String> args) async {
     homeWidgetManager,
   );
 
-  final settingsCubitInstance = await SettingsCubit.initialize();
+  final settingsCubitInstance = await SettingsCubit.initialize(
+    AutostartService(),
+  );
 
   runApp(
     MultiRepositoryProvider(

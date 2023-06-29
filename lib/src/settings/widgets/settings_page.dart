@@ -62,6 +62,7 @@ class _SettingsView extends StatelessWidget {
         const integrationSection = _SectionCard(
           title: 'Integration',
           children: [
+            _AutostartTile(),
             _CloseToTrayTile(),
           ],
         );
@@ -216,6 +217,38 @@ class _ThemeTile extends StatelessWidget {
             settingsCubit
                 .updateThemeMode(value ? ThemeMode.dark : ThemeMode.light);
           },
+        );
+      },
+    );
+  }
+}
+
+/// Shows whether the app is set to autostart, and a switch to toggle it.
+///
+/// Only available on Desktop platforms.
+class _AutostartTile extends StatelessWidget {
+  const _AutostartTile();
+
+  @override
+  Widget build(BuildContext context) {
+    if (!defaultTargetPlatform.isDesktop) return const SizedBox();
+
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, state) {
+        return SwitchListTile(
+          title: const Row(
+            children: [
+              Text('Autostart'),
+              SizedBox(width: 8),
+              Tooltip(
+                message: 'Start the app when you log in to your computer',
+                child: Icon(Icons.info_outline),
+              ),
+            ],
+          ),
+          secondary: const Icon(Icons.autorenew),
+          value: state.autostart,
+          onChanged: (value) => settingsCubit.toggleAutostart(),
         );
       },
     );

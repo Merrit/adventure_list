@@ -1,10 +1,13 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:system_theme/system_theme.dart';
 
+import '../../autostart/autostart_service.dart';
+import '../../core/core.dart';
 import '../../storage/storage_repository.dart';
 import '../../theme/theme.dart';
 import '../settings.dart';
@@ -15,11 +18,19 @@ part 'settings_cubit.freezed.dart';
 late final SettingsCubit settingsCubit;
 
 class SettingsCubit extends Cubit<SettingsState> {
-  SettingsCubit({required SettingsState initialState}) : super(initialState) {
+  /// Service for managing autostart.
+  final AutostartService _autostartService;
+
+  SettingsCubit(
+    this._autostartService, {
+    required SettingsState initialState,
+  }) : super(initialState) {
     settingsCubit = this;
   }
 
-  static Future<SettingsCubit> initialize() async {
+  static Future<SettingsCubit> initialize(
+    AutostartService autostartService,
+  ) async {
     final String? desktopWidgetSettingsJson = await StorageRepository //
         .instance
         .get('desktopWidgetSettings');
@@ -35,7 +46,9 @@ class SettingsCubit extends Cubit<SettingsState> {
         .get('homeWidgetSelectedListId');
 
     return SettingsCubit(
+      autostartService,
       initialState: SettingsState(
+        autostart: await StorageRepository.instance.get('autostart') ?? false,
         closeToTray:
             await StorageRepository.instance.get('closeToTray') ?? true,
         desktopWidgetSettings: desktopWidgetSettings,
@@ -74,6 +87,23 @@ class SettingsCubit extends Cubit<SettingsState> {
       default:
         return (SystemTheme.isDarkMode) ? ThemeMode.dark : ThemeMode.light;
     }
+  }
+
+  /// Toggle autostart on Desktop.
+  Future<void> toggleAutostart() async {
+    assert(defaultTargetPlatform.isDesktop);
+
+    if (state.autostart) {
+      await _autostartService.disable();
+    } else {
+      await _autostartService.enable();
+    }
+
+    emit(state.copyWith(autostart: !state.autostart));
+    await StorageRepository.instance.save(
+      key: 'autostart',
+      value: state.autostart,
+    );
   }
 
   Future<void> updateCloseToTray(bool value) async {
