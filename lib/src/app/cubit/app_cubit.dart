@@ -80,9 +80,13 @@ class AppCubit extends Cubit<AppState> {
     if (releaseNotes == null) return;
 
     emit(state.copyWith(releaseNotes: releaseNotes));
+  }
+
+  /// The user has dismissed the release notes dialog.
+  Future<void> dismissReleaseNotesDialog() async {
     emit(state.copyWith(releaseNotes: null));
 
-    StorageRepository.instance.save(
+    await StorageRepository.instance.save(
       key: 'lastReleaseNotesVersionShown',
       value: state.runningVersion,
     );
