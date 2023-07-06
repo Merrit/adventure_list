@@ -23,7 +23,6 @@ dependencies:
   # https://github.com/firebase/flutterfire/pull/10972
   firebase_core_platform_interface: 4.6.0
 
-  flex_color_scheme: ^7.0.5
   flutter:
     sdk: flutter
   flutter_adaptive_scaffold: ^0.1.2
