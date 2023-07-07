@@ -1,0 +1,46 @@
+{
+    "appName": "Adventure List",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "getStartedPrompt": "Wähle oder erstelle eine Liste um zu starten",
+    "homeWidgetConfig": {
+        "listToDisplay": "Anzuzeigende Liste",
+        "title": "Widget konfigurieren"
+    },
+    "listSettings": {
+        "confirmDelete": "Willst du diese Liste wirklich löschen?",
+        "deleteList": "Liste löschen",
+        "listName": "Listenname",
+        "title": "Listeneinstellungen"
+    },
+    "newList": "Neue Liste",
+    "newTask": "Neue Aufgabe",
+    "settings": {
+        "appearance": {
+            "darkMode": "Dunkler Modus",
+            "title": "Erscheinungsbild"
+        },
+        "integration": {
+            "autostart": "Autostart",
+            "autostartDescription": "Starte die App automatisch beim Anmelden",
+            "closeToTray": "Schließen in die Taskleiste",
+            "title": "Integration"
+        },
+        "settings": "Einstellungen",
+        "sync": {
+            "confirmSignOut": "Willst du dich wirklich abmelden?",
+            "signOut": "Abmelden",
+            "title": "Synchronisieren"
+        },
+        "version": {
+            "currentVersion": "Aktuelle Version: {}",
+            "title": "Version",
+            "updateAvailable": "Update verfügbar: {}",
+            "upToDate": "Auf dem Laufenden"
+        },
+        "widget": {
+            "title": "Widget",
+            "transparentBackground": "Transparenter Hintergrund"
+        }
+    }
+}
