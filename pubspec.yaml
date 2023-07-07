@@ -12,6 +12,7 @@ environment:
 dependencies:
   badges: ^3.0.2
   collection: ^1.17.1
+  easy_localization: ^3.0.2
   extension_google_sign_in_as_googleapis_auth: ^2.0.9
   firebase_auth: ^4.0.0
   firebase_core: 2.10.0
@@ -44,8 +45,6 @@ dependencies:
       path: flutter_local_notifications_linux
   # ----------------- End flutter_local_notifications override --------------- #
 
-  flutter_localizations:
-    sdk: flutter
   flutter_signin_button: ^2.0.0
   flutter_slidable: ^3.0.0
   flutter_window_close: ^0.2.2
@@ -116,11 +115,10 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  # Enable generation of localized Strings from arb files.
-  generate: true
   assets:
     - assets/icons/
     - packaging/linux/codes.merritt.adventurelist.desktop
+    - translations/
 
 flutter_icons:
   android: true

@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:helpers/helpers.dart';
 import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../generated/locale_keys.g.dart';
 import 'authentication/authentication.dart';
 import 'authentication/sign_in_page.dart';
 import 'home_widget/widgets/home_screen_widget.dart';
@@ -101,17 +101,10 @@ class _AppState extends State<App> with TrayListener, WindowListener {
               return MaterialApp(
                 debugShowCheckedModeBanner: false,
                 restorationScopeId: 'app',
-                localizationsDelegates: const [
-                  AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                supportedLocales: const [
-                  Locale('en', ''),
-                ],
-                onGenerateTitle: (BuildContext context) =>
-                    AppLocalizations.of(context)!.appTitle,
+                localizationsDelegates: context.localizationDelegates,
+                supportedLocales: context.supportedLocales,
+                locale: context.locale,
+                onGenerateTitle: (BuildContext context) => LocaleKeys.appName,
                 theme: settingsState.theme,
                 onGenerateRoute: (RouteSettings routeSettings) {
                   return MaterialPageRoute<void>(
