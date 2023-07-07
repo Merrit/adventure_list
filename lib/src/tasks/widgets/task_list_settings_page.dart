@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../generated/locale_keys.g.dart';
 import '../../core/core.dart';
 import '../tasks.dart';
 
@@ -36,7 +38,7 @@ class TaskListSettingsView extends StatelessWidget {
             children: [
               Card(
                 child: ListTile(
-                  leading: const Text('List Name'),
+                  leading: Text(LocaleKeys.listSettings_listName.tr()),
                   title: Align(
                     alignment: Alignment.centerRight,
                     child: Text(taskList.title),
@@ -64,20 +66,23 @@ class TaskListSettingsView extends StatelessWidget {
                     context: context,
                     builder: (context) {
                       return AlertDialog(
-                        content: const Text(
-                          'This will permanently delete this list. Are you sure?',
+                        content: Text(
+                          LocaleKeys.listSettings_confirmDelete.tr(),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: const Text('CANCEL'),
+                            child: Text(LocaleKeys.cancel.tr()),
                           ),
                           TextButton(
                             onPressed: () {
                               tasksCubit.deleteList();
                               Navigator.pop(context, true);
                             },
-                            child: const Text('CONFIRM'),
+                            child: Text(
+                              LocaleKeys.confirm.tr(),
+                              style: const TextStyle(color: Colors.red),
+                            ),
                           )
                         ],
                       );
@@ -88,9 +93,9 @@ class TaskListSettingsView extends StatelessWidget {
                     navigator.pushReplacementNamed(TasksPage.routeName);
                   }
                 },
-                child: const Text(
-                  'Delete List',
-                  style: TextStyle(color: Colors.red),
+                child: Text(
+                  LocaleKeys.listSettings_deleteList.tr(),
+                  style: const TextStyle(color: Colors.red),
                 ),
               ),
             ],

@@ -1,7 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide PopupMenuButton, PopupMenuItem;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../generated/locale_keys.g.dart';
 import '../../core/core.dart';
 import '../../core/helpers/helpers.dart';
 import '../tasks.dart';
@@ -102,18 +104,18 @@ class _CreateSelectListPrompt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(50.0),
+    return Padding(
+      padding: const EdgeInsets.all(50.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: double.infinity),
-          Icon(Icons.arrow_back),
-          SizedBox(width: 10),
+          const SizedBox(height: double.infinity),
+          const Icon(Icons.arrow_back),
+          const SizedBox(width: 10),
           Flexible(
             child: Text(
-              'Select or create a list to get started',
-              style: TextStyle(
+              LocaleKeys.getStartedPrompt.tr(),
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
               ),
@@ -134,7 +136,7 @@ class _NewTaskButton extends StatelessWidget {
     return TextInputListTile(
       debugLabel: 'NewTaskButton FocusNode',
       leading: const Icon(Icons.add),
-      placeholderText: 'New Task',
+      placeholderText: LocaleKeys.newTask.tr(),
       retainFocus: true,
       callback: (value) => tasksCubit.createTask(
         Task(

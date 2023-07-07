@@ -1,10 +1,12 @@
 import 'package:badges/badges.dart' as badges;
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
+import '../../../generated/locale_keys.g.dart';
 import '../../app/cubit/app_cubit.dart';
 import '../../core/helpers/helpers.dart';
 import '../../settings/widgets/settings_page.dart';
@@ -68,7 +70,7 @@ class _SettingsTile extends StatelessWidget {
             badgeStyle: const badges.BadgeStyle(
               badgeColor: Colors.lightBlue,
             ),
-            child: const Text('Settings'),
+            child: Text(LocaleKeys.settings_settings.tr()),
           ),
           trailing: const _PinWindowButton(),
           onTap: () => Navigator.pushNamed(context, SettingsPage.routeName),
@@ -85,12 +87,13 @@ class _CreateListButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextInputListTile(
       leading: const Icon(Icons.add),
-      placeholderText: 'New List',
+      placeholderText: LocaleKeys.newList.tr(),
       callback: (String value) => tasksCubit.createList(value),
     );
   }
 }
 
+// TODO: Give this a tooltip.
 /// Button to pin the window to the desktop as a widget.
 class _PinWindowButton extends StatelessWidget {
   const _PinWindowButton({Key? key}) : super(key: key);

@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:badges/badges.dart' as badges;
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../generated/locale_keys.g.dart';
 import '../../app/cubit/app_cubit.dart';
 import '../../authentication/cubit/authentication_cubit.dart';
 import '../../authentication/sign_in_page.dart';
@@ -23,7 +25,7 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(LocaleKeys.settings_settings.tr()),
       ),
       body: const SafeArea(
         child: _SettingsView(),
@@ -44,40 +46,40 @@ class _SettingsView extends StatelessWidget {
           horizontalPadding = (constraints.maxWidth - 600) / 2;
         }
 
-        const versionSection = _SectionCard(
-          title: 'Version',
-          children: [
+        final versionSection = _SectionCard(
+          title: LocaleKeys.settings_version_title.tr(),
+          children: const [
             _CurrentVersionTile(),
             _UpdateTile(),
           ],
         );
 
-        const appearanceSection = _SectionCard(
-          title: 'Appearance',
-          children: [
+        final appearanceSection = _SectionCard(
+          title: LocaleKeys.settings_appearance_title.tr(),
+          children: const [
             _ThemeTile(),
           ],
         );
 
-        const integrationSection = _SectionCard(
-          title: 'Integration',
-          children: [
+        final integrationSection = _SectionCard(
+          title: LocaleKeys.settings_integration_title.tr(),
+          children: const [
             _AutostartTile(),
             _CloseToTrayTile(),
           ],
         );
 
-        const widgetSection = _SectionCard(
-          title: 'Widget',
-          children: [
+        final widgetSection = _SectionCard(
+          title: LocaleKeys.settings_widget_title.tr(),
+          children: const [
             _CustomizeAndroidWidgetTile(),
             _CustomizeDesktopWidgetTile(),
           ],
         );
 
-        const syncSection = _SectionCard(
-          title: 'Sync',
-          children: [
+        final syncSection = _SectionCard(
+          title: LocaleKeys.settings_sync_title.tr(),
+          children: const [
             _SignOutTile(),
           ],
         );
@@ -87,7 +89,7 @@ class _SettingsView extends StatelessWidget {
             horizontal: horizontalPadding,
             vertical: 16,
           ),
-          children: const [
+          children: [
             versionSection,
             appearanceSection,
             integrationSection,
@@ -139,7 +141,9 @@ class _CurrentVersionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AppCubit, AppState>(
       builder: (context, state) {
-        String text = 'Current version: ${state.runningVersion}';
+        String text = LocaleKeys.settings_version_currentVersion.tr(
+          args: [state.runningVersion],
+        );
 
         if (runningInFlatpak) {
           text += ' (Flatpak)';
@@ -179,7 +183,11 @@ class _UpdateTile extends StatelessWidget {
               badgeStyle: const badges.BadgeStyle(
                 badgeColor: Colors.lightBlue,
               ),
-              child: Text('Update available: ${state.updateVersion}'),
+              child: Text(
+                LocaleKeys.settings_version_updateAvailable.tr(
+                  args: [state.updateVersion ?? ''],
+                ),
+              ),
             ),
             trailing: kIsWeb
                 ? null
@@ -191,8 +199,8 @@ class _UpdateTile extends StatelessWidget {
                   ),
           );
         } else {
-          return const ListTile(
-            title: Text('Up to date'),
+          return ListTile(
+            title: Text(LocaleKeys.settings_version_upToDate.tr()),
           );
         }
       },
@@ -211,7 +219,7 @@ class _ThemeTile extends StatelessWidget {
       builder: (context, state) {
         return SwitchListTile(
           value: state.theme == darkTheme,
-          title: const Text('Dark mode'),
+          title: Text(LocaleKeys.settings_appearance_darkMode.tr()),
           secondary: const Icon(Icons.brightness_4),
           onChanged: (bool value) {
             context
@@ -237,13 +245,14 @@ class _AutostartTile extends StatelessWidget {
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, state) {
         return SwitchListTile(
-          title: const Row(
+          title: Row(
             children: [
-              Text('Autostart'),
-              SizedBox(width: 8),
+              Text(LocaleKeys.settings_integration_autostart.tr()),
+              const SizedBox(width: 8),
               Tooltip(
-                message: 'Start the app when you log in to your computer',
-                child: Icon(Icons.info_outline),
+                message:
+                    LocaleKeys.settings_integration_autostartDescription.tr(),
+                child: const Icon(Icons.info_outline),
               ),
             ],
           ),
@@ -266,7 +275,7 @@ class _CloseToTrayTile extends StatelessWidget {
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, state) {
         return SwitchListTile(
-          title: const Text('Close to tray'),
+          title: Text(LocaleKeys.settings_integration_closeToTray.tr()),
           secondary: const Icon(Icons.bedtime),
           value: state.closeToTray,
           onChanged: (value) =>
@@ -285,7 +294,7 @@ class _CustomizeAndroidWidgetTile extends StatelessWidget {
     if (!defaultTargetPlatform.isAndroid) return const SizedBox();
 
     return ListTile(
-      title: const Text('Settings'),
+      title: Text(LocaleKeys.settings_settings.tr()),
       trailing: const Icon(Icons.keyboard_arrow_right),
       onTap: () => Navigator.pushNamed(context, HomeWidgetConfigPage.routeName),
     );
@@ -302,7 +311,7 @@ class _CustomizeDesktopWidgetTile extends StatelessWidget {
     return BlocBuilder<SettingsCubit, SettingsState>(
       builder: (context, state) {
         return SwitchListTile(
-          title: const Text('Transparent background'),
+          title: Text(LocaleKeys.settings_widget_transparentBackground.tr()),
           secondary: const Icon(Icons.desktop_windows),
           value: state.desktopWidgetSettings.transparentBackground,
           onChanged: (value) =>
@@ -329,7 +338,7 @@ class _SignOutTile extends StatelessWidget {
         }
 
         return ListTile(
-          title: const Text('Sign out'),
+          title: Text(LocaleKeys.settings_sync_signOut.tr()),
           leading: const Icon(Icons.logout),
           onTap: () => _showSignOutDialog(context),
         );
@@ -343,12 +352,12 @@ class _SignOutTile extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Sign out'),
-          content: const Text('Are you sure you want to sign out?'),
+          title: Text(LocaleKeys.settings_sync_signOut.tr()),
+          content: Text(LocaleKeys.settings_sync_confirmSignOut.tr()),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(LocaleKeys.cancel.tr()),
             ),
             TextButton(
               onPressed: () async {
@@ -363,7 +372,7 @@ class _SignOutTile extends StatelessWidget {
                 await authCubit.signOut();
                 navigator.pushReplacementNamed(SignInPage.routeName);
               },
-              child: const Text('Sign out'),
+              child: Text(LocaleKeys.settings_sync_signOut.tr()),
             ),
           ],
         );
