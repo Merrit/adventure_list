@@ -46,6 +46,9 @@ jobs:
 
       # ----------------------------------- Build ---------------------------- #
 
+      - name: Generate localizations
+        run: dart run easy_localization:generate --source-dir translations --output-dir lib/generated --output-file locale_keys.g.dart --format keys --skip-unnecessary-keys
+
       - name: Run build script
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASES_TOKEN }}

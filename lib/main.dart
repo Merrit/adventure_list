@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ import 'src/window/window.dart';
 
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
 
   final bool verbose =
       args.contains('--verbose') || const bool.fromEnvironment('VERBOSE');
@@ -80,33 +82,42 @@ Future<void> main(List<String> args) async {
   );
 
   runApp(
-    MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider.value(value: googleAuth),
-        RepositoryProvider.value(value: homeWidgetManager),
-        RepositoryProvider.value(value: storageRepository),
+    EasyLocalization(
+      fallbackLocale: const Locale('en'),
+      path: 'translations',
+      saveLocale: false,
+      supportedLocales: const [
+        Locale('de'),
+        Locale('en'),
       ],
-      child: MultiBlocProvider(
+      child: MultiRepositoryProvider(
         providers: [
-          BlocProvider(
-            create: (context) => AppCubit(
-              releaseNotesService: ReleaseNotesService(
-                client: http.Client(),
-                repository: 'merrit/adventure_list',
-              ),
-              updateService: UpdateService(),
-            ),
-          ),
-          BlocProvider.value(value: authenticationCubit),
-          BlocProvider.value(value: notificationsCubit),
-          BlocProvider.value(value: settingsCubit),
-          BlocProvider.value(value: tasksCubit),
-          if (defaultTargetPlatform.isDesktop)
-            BlocProvider(
-              create: (context) => WindowCubit(settingsCubit),
-            ),
+          RepositoryProvider.value(value: googleAuth),
+          RepositoryProvider.value(value: homeWidgetManager),
+          RepositoryProvider.value(value: storageRepository),
         ],
-        child: const App(),
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => AppCubit(
+                releaseNotesService: ReleaseNotesService(
+                  client: http.Client(),
+                  repository: 'merrit/adventure_list',
+                ),
+                updateService: UpdateService(),
+              ),
+            ),
+            BlocProvider.value(value: authenticationCubit),
+            BlocProvider.value(value: notificationsCubit),
+            BlocProvider.value(value: settingsCubit),
+            BlocProvider.value(value: tasksCubit),
+            if (defaultTargetPlatform.isDesktop)
+              BlocProvider(
+                create: (context) => WindowCubit(settingsCubit),
+              ),
+          ],
+          child: const App(),
+        ),
       ),
     ),
   );
