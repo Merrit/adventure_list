@@ -1,5 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import '../../../generated/locale_keys.g.dart';
 
 /// Allows to easily specify dialog properties such as the text field only
 /// accepting input as a double, which type of soft keyboard to show, etc.
@@ -124,11 +127,11 @@ class InputDialog extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(LocaleKeys.cancel.tr()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('Confirm'),
+            child: Text(LocaleKeys.confirm.tr()),
           ),
         ],
       ),

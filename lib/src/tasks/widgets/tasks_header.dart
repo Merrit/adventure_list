@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart' hide PopupMenuButton, PopupMenuItem;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../generated/locale_keys.g.dart';
 import '../../core/core.dart';
 import '../../core/helpers/helpers.dart';
 import '../tasks.dart';
@@ -52,13 +54,15 @@ class TasksHeader extends StatelessWidget {
                                   final mediaQuery = MediaQuery.of(context);
 
                                   return AlertDialog(
-                                    title: const Row(
+                                    title: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        SizedBox(),
-                                        Text('List Settings'),
-                                        CloseButton(),
+                                        const SizedBox(),
+                                        Text(
+                                          LocaleKeys.listSettings_title.tr(),
+                                        ),
+                                        const CloseButton(),
                                       ],
                                     ),
                                     contentPadding: const EdgeInsets.symmetric(
