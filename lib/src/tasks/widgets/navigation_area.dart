@@ -93,7 +93,6 @@ class _CreateListButton extends StatelessWidget {
   }
 }
 
-// TODO: Give this a tooltip.
 /// Button to pin the window to the desktop as a widget.
 class _PinWindowButton extends StatelessWidget {
   const _PinWindowButton({Key? key}) : super(key: key);
@@ -111,6 +110,7 @@ class _PinWindowButton extends StatelessWidget {
         return IconButton(
           icon: Icon(icon),
           onPressed: () => WindowCubit.instance.togglePinned(),
+          tooltip: LocaleKeys.pinWindow.tr(),
         );
       },
     );
