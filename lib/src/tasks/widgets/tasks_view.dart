@@ -38,10 +38,6 @@ class TasksView extends StatelessWidget {
         final TaskList? activeList = state.activeList;
         if (activeList == null) return const _CreateSelectListPrompt();
 
-        final tasks = activeList //
-            .items
-            .topLevelTasks();
-
         final Widget tasksHeader = (mediaQuery.isSmallScreen) //
             ? const SizedBox()
             : const Padding(
@@ -57,44 +53,66 @@ class TasksView extends StatelessWidget {
           children: [
             tasksHeader,
             const _NewTaskButton(),
-            Expanded(
-              child: SizedBox(
-                width: mediaQuery.size.width,
-                child: ReorderableListView.builder(
-                  scrollController: ScrollController(),
-                  buildDefaultDragHandles:
-                      (defaultTargetPlatform == TargetPlatform.android ||
-                              defaultTargetPlatform == TargetPlatform.android)
-                          ? true
-                          : false,
-                  padding: const EdgeInsets.only(bottom: 20),
-                  itemBuilder: (_, int index) {
-                    final task = tasks[index];
-
-                    return Column(
-                      key: ValueKey(task),
-                      children: [
-                        TaskTile(key: ValueKey(task), index: index, task: task),
-                        if (index != tasks.length - 1)
-                          SizedBox(
-                            width: mediaQuery.size.width,
-                            child: const Divider(height: 16),
-                          ),
-                        // const Divider(height: 16),
-                      ],
-                    );
-                  },
-                  itemCount: tasks.length,
-                  onReorder: (oldIndex, newIndex) {
-                    if (oldIndex < newIndex) newIndex -= 1;
-                    tasksCubit.reorderTasks(oldIndex, newIndex);
-                  },
-                ),
-              ),
-            ),
+            const _TasksListWidget(),
           ],
         );
       },
+    );
+  }
+}
+
+class _TasksListWidget extends StatelessWidget {
+  const _TasksListWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+
+    return Expanded(
+      child: SizedBox(
+        width: mediaQuery.size.width,
+        child: BlocBuilder<TasksCubit, TasksState>(
+          builder: (context, state) {
+            final TaskList? activeList = state.activeList;
+            if (activeList == null) return const SizedBox();
+
+            final tasks = activeList.items.topLevelTasks();
+
+            final bool buildDefaultDragHandles =
+                (defaultTargetPlatform == TargetPlatform.android ||
+                        defaultTargetPlatform == TargetPlatform.android)
+                    ? true
+                    : false;
+
+            return ReorderableListView.builder(
+              scrollController: ScrollController(),
+              buildDefaultDragHandles: buildDefaultDragHandles,
+              padding: const EdgeInsets.only(bottom: 20),
+              itemBuilder: (_, int index) {
+                final task = tasks[index];
+
+                return Column(
+                  key: ValueKey(task),
+                  children: [
+                    TaskTile(key: ValueKey(task), index: index, task: task),
+                    if (index != tasks.length - 1)
+                      SizedBox(
+                        width: mediaQuery.size.width,
+                        child: const Divider(height: 16),
+                      ),
+                    // const Divider(height: 16),
+                  ],
+                );
+              },
+              itemCount: tasks.length,
+              onReorder: (oldIndex, newIndex) {
+                if (oldIndex < newIndex) newIndex -= 1;
+                tasksCubit.reorderTasks(oldIndex, newIndex);
+              },
+            );
+          },
+        ),
+      ),
     );
   }
 }
