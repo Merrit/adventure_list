@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:easy_logger/easy_logger.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,11 @@ import 'src/window/window.dart';
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+
+  EasyLocalization.logger.enableLevels = [
+    LevelMessages.warning,
+    LevelMessages.error,
+  ];
 
   final bool verbose =
       args.contains('--verbose') || const bool.fromEnvironment('VERBOSE');
