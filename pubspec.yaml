@@ -13,6 +13,12 @@ dependencies:
   badges: ^3.0.2
   collection: ^1.17.1
   easy_localization: ^3.0.2
+
+  # easy_logger is only a dependency so we can customize the logs from
+  # easy_localization, just until it allows using a custom logger.
+  # See: https://github.com/aissat/easy_localization/issues/374
+  easy_logger: ^0.0.2
+
   extension_google_sign_in_as_googleapis_auth: ^2.0.9
   firebase_auth: ^4.0.0
   firebase_core: 2.10.0
