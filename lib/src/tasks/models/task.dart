@@ -135,6 +135,12 @@ class Task with _$Task {
 
   factory Task.fromJson(Map<String, dynamic> json) => _$TaskFromJson(json);
 
+  /// Whether the task is overdue.
+  bool get isOverdue {
+    if (completed || dueDate == null) return false;
+    return dueDate!.isBefore(DateTime.now());
+  }
+
   /// Update the due date of the task to the next occurrence.
   ///
   /// If the task is not recurring, the returned task is unchanged.
