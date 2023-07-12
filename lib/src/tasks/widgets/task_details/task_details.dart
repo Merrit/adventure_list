@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/helpers/helpers.dart';
 import '../../tasks.dart';
+import 'sub_tasks.dart';
 
 class TaskDetails extends StatelessWidget {
   static const routeName = '/task_details';
@@ -86,17 +87,13 @@ class TaskDetailsView extends StatelessWidget {
                   child: _MoreActionsButton(),
                 ),
               const _TitleWidget(),
-              const _DueDateWidget(),
-              const _DueTimeWidget(),
-              const _DescriptionWidget(),
-              const _ParentSelectionWidget(),
+              const DueDateWidget(),
+              const DueTimeWidget(),
+              const DescriptionWidget(),
+              const ParentSelectionWidget(),
               const SizedBox(height: 20),
-              const Text('Sub-tasks'),
-              ...activeList.items
-                  .subtasksOf(task.id)
-                  .map((e) => TaskTile(key: ValueKey(e), index: 0, task: e))
-                  .toList(),
-              _AddSubTaskWidget(parentTask: task),
+              const SubTasks(),
+              AddSubTaskWidget(parentTask: task),
             ],
           ),
         );
@@ -215,14 +212,14 @@ class _TitleWidget extends StatelessWidget {
 /// Due date widget.
 ///
 /// Displays the due date of the task and allows the user to change it.
-class _DueDateWidget extends StatefulWidget {
-  const _DueDateWidget({Key? key}) : super(key: key);
+class DueDateWidget extends StatefulWidget {
+  const DueDateWidget({Key? key}) : super(key: key);
 
   @override
-  State<_DueDateWidget> createState() => _DueDateWidgetState();
+  State<DueDateWidget> createState() => _DueDateWidgetState();
 }
 
-class _DueDateWidgetState extends State<_DueDateWidget> {
+class _DueDateWidgetState extends State<DueDateWidget> {
   @override
   void initState() {
     super.initState();
@@ -344,8 +341,8 @@ class _DueDateWidgetState extends State<_DueDateWidget> {
 /// Displays the due time of the task and allows the user to change it.
 ///
 /// This widget is only visible if the task has a due date.
-class _DueTimeWidget extends StatelessWidget {
-  const _DueTimeWidget({Key? key}) : super(key: key);
+class DueTimeWidget extends StatelessWidget {
+  const DueTimeWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -393,8 +390,8 @@ class _DueTimeWidget extends StatelessWidget {
 }
 
 /// Displays the description of the task and allows the user to change it.
-class _DescriptionWidget extends StatelessWidget {
-  const _DescriptionWidget({Key? key}) : super(key: key);
+class DescriptionWidget extends StatelessWidget {
+  const DescriptionWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -456,8 +453,8 @@ class _DescriptionWidget extends StatelessWidget {
 
 /// Displays the parent task of the active task and allows the user to change
 /// it.
-class _ParentSelectionWidget extends StatelessWidget {
-  const _ParentSelectionWidget({Key? key}) : super(key: key);
+class ParentSelectionWidget extends StatelessWidget {
+  const ParentSelectionWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -537,10 +534,10 @@ class _ParentSelectionWidget extends StatelessWidget {
   }
 }
 
-class _AddSubTaskWidget extends StatelessWidget {
+class AddSubTaskWidget extends StatelessWidget {
   final Task parentTask;
 
-  _AddSubTaskWidget({
+  AddSubTaskWidget({
     Key? key,
     required this.parentTask,
   }) : super(key: key);

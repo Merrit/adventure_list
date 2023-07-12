@@ -83,7 +83,6 @@ class _TasksPageState extends State<TasksPage> {
                     flex: 1,
                     child: TasksView(),
                   ),
-                  if (!mediaQuery.isSmallScreen) const VerticalDivider(),
                 ],
               );
 
@@ -109,11 +108,10 @@ class _TasksPageState extends State<TasksPage> {
                 body: AdaptiveLayout(
                   primaryNavigation: SlotLayout(
                     config: <Breakpoint, SlotLayoutConfig>{
-                      Breakpoints.large: SlotLayout.from(
+                      Breakpoints.mediumAndUp: SlotLayout.from(
                         key: const Key('Primary Navigation Large'),
-                        // inAnimation: AdaptiveScaffold.leftOutIn,
                         builder: (_) => const CustomNavigationRail(
-                          breakpoint: Breakpoints.large,
+                          breakpoint: Breakpoints.mediumAndUp,
                         ),
                       ),
                     },
@@ -123,14 +121,6 @@ class _TasksPageState extends State<TasksPage> {
                       Breakpoints.standard: SlotLayout.from(
                         key: const Key('Body Standard'),
                         builder: (_) => bodyContainer,
-                      ),
-                    },
-                  ),
-                  secondaryBody: SlotLayout(
-                    config: {
-                      Breakpoints.large: SlotLayout.from(
-                        key: const Key('Secondary Body Standard'),
-                        builder: (_) => const TaskDetails(),
                       ),
                     },
                   ),
