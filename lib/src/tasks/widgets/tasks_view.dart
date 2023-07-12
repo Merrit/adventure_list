@@ -87,22 +87,14 @@ class _TasksListWidget extends StatelessWidget {
             return ReorderableListView.builder(
               scrollController: ScrollController(),
               buildDefaultDragHandles: buildDefaultDragHandles,
-              padding: const EdgeInsets.only(bottom: 20),
+              padding: const EdgeInsets.only(
+                bottom: 20,
+                right: 6,
+              ),
               itemBuilder: (_, int index) {
                 final task = tasks[index];
 
-                return Column(
-                  key: ValueKey(task),
-                  children: [
-                    TaskTile(key: ValueKey(task), index: index, task: task),
-                    if (index != tasks.length - 1)
-                      SizedBox(
-                        width: mediaQuery.size.width,
-                        child: const Divider(height: 16),
-                      ),
-                    // const Divider(height: 16),
-                  ],
-                );
+                return TaskTile(key: ValueKey(task), index: index, task: task);
               },
               itemCount: tasks.length,
               onReorder: (oldIndex, newIndex) {
