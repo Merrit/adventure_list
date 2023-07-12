@@ -17,8 +17,8 @@ class Task with _$Task {
 
   const factory Task._internal({
     /// Whether the task is completed.
-    @JsonKey(defaultValue: false)
-        required bool completed,
+    @JsonKey(defaultValue: false) //
+    required bool completed,
 
     /// Description of the task.
     required String? description,
@@ -28,21 +28,21 @@ class Task with _$Task {
       fromJson: _dueDateFromJson,
       toJson: _dueDateToJson,
     )
-        required DateTime? dueDate,
+    required DateTime? dueDate,
 
     /// ID of the task.
-    @JsonKey(defaultValue: '')
-        required String id,
+    @JsonKey(defaultValue: '') //
+    required String id,
 
     /// Index of the task in the list.
-    @JsonKey(defaultValue: -1)
-        required int index,
+    @JsonKey(defaultValue: -1) //
+    required int index,
 
     /// ID for notifications associated with the task.
     ///
     /// A 32-bit integer as required by the notifications plugin.
-    @JsonKey(defaultValue: _generateNotificationId)
-        required int notificationId,
+    @JsonKey(defaultValue: _generateNotificationId) //
+    required int notificationId,
 
     /// The ID of the task considered the parent, only if this task is nested.
     required String? parent,
@@ -50,27 +50,27 @@ class Task with _$Task {
     /// The repeat interval of the task.
     ///
     /// If null, the task is not recurring.
-    @JsonKey(defaultValue: null)
-        required RepeatInterval? repeatInterval,
+    @JsonKey(defaultValue: null) //
+    required RepeatInterval? repeatInterval,
 
     /// Whether the task has been synced with the server.
-    @JsonKey(defaultValue: false)
-        required bool synced,
+    @JsonKey(defaultValue: false) //
+    required bool synced,
 
     /// ID of the task list containing the task.
-    @JsonKey(defaultValue: '')
-        required String taskListId,
+    @JsonKey(defaultValue: '') //
+    required String taskListId,
 
     /// Title of the task.
-    @JsonKey(defaultValue: '')
-        required String title,
+    @JsonKey(defaultValue: '') //
+    required String title,
 
     /// Last time the task was updated.
     @JsonKey(
       fromJson: _updatedFromJson,
       toJson: _updatedToJson,
     )
-        required DateTime updated,
+    required DateTime updated,
   }) = _Task;
 
   factory Task.empty() => Task._internal(
