@@ -116,11 +116,13 @@ class _TaskTileContents extends StatefulWidget {
 
 class _TaskTileContentsState extends State<_TaskTileContents> {
   late String taskId;
+  late final TasksCubit tasksCubit;
 
   @override
   void initState() {
     super.initState();
     taskId = context.read<TaskTileCubit>().state.task.id;
+    tasksCubit = context.read<TasksCubit>();
   }
 
   final expansionTileController = ExpansionTileController();
@@ -156,6 +158,14 @@ class _TaskTileContentsState extends State<_TaskTileContents> {
           );
         }
 
+        Widget? trailing;
+        if (state.task.parent != null) {
+          trailing = IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () => tasksCubit.deleteTask(state.task),
+          );
+        }
+
         final expansionTile = ExpansionTile(
           collapsedBackgroundColor: Colors.transparent,
           controller: expansionTileController,
@@ -176,7 +186,7 @@ class _TaskTileContentsState extends State<_TaskTileContents> {
           },
           title: const _TitleRow(),
           subtitle: subtitle,
-          trailing: const SizedBox(),
+          trailing: trailing,
           children: [
             expansionTileCloser,
             const DueDateWidget(),
