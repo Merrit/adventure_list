@@ -65,13 +65,14 @@ class TaskTile extends StatelessWidget {
 
         if (activeList == null) return const SizedBox();
 
-        final childTasks = tasksState.activeList!.items.subtasksOf(task.id);
+        final tasks = activeList.items;
+        final subTasks = tasks.subtasksOf(task.id);
 
         return BlocProvider(
           create: (context) => TaskTileCubit(
             index,
             task,
-            childTasks: childTasks,
+            childTasks: subTasks,
             isSelected: tasksState.activeTask?.id == task.id,
           ),
           child: Builder(
@@ -291,18 +292,20 @@ class _ChildTasksIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TaskTileCubit, TaskTileState>(
-      builder: (context, tileState) {
-        final childTasks = tileState.childTasks;
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        final taskId = context.read<TaskTileCubit>().state.task.id;
+        final Task? task = state.activeList?.items.getTaskById(taskId);
+        if (task == null) return const SizedBox();
+
+        final childTasks = state.activeList!.items.subtasksOf(task.id);
         if (childTasks.isEmpty) return const SizedBox();
 
-        final completedTasks = childTasks //
-            .where((element) => element.completed)
-            .length;
+        final completedTasks = childTasks.where((element) => element.completed);
 
         return Chip(
           label: Text(
-            '$completedTasks/${childTasks.length}',
+            '${completedTasks.length}/${childTasks.length}',
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface,
             ),

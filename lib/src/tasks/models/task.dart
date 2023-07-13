@@ -223,7 +223,7 @@ extension ListOfTasksExtensions on List<Task> {
     return [...this];
   }
 
-  // Returns all [Task]s that are marked as completed.
+  /// Returns all [Task]s that are marked as completed.
   List<Task> completedTasks() {
     return where((t) => t.completed).toList();
   }
@@ -326,6 +326,11 @@ extension ListOfTasksExtensions on List<Task> {
   /// Returns a copy of the list with tasks sorted by updated date.
   List<Task> sortedByUpdated() {
     return [...this]..sort((a, b) => b.updated.compareTo(a.updated));
+  }
+
+  /// Returns all [Task]s which are subtasks.
+  List<Task> subtasks() {
+    return where((t) => t.parent != null).toList();
   }
 
   /// Returns all [Task]s which are subtasks of the [Task] with the given [id].

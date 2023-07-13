@@ -1,7 +1,10 @@
 {
     "appName": "Adventure List",
     "cancel": "Abbrechen",
+    "completed": "Erledigt",
     "confirm": "Bestätigen",
+    "deleteCompleted": "Erledigte Aufgaben löschen",
+    "deleteTask": "Aufgabe löschen",
     "getStartedPrompt": "Wähle oder erstelle eine Liste um zu starten",
     "homeWidgetConfig": {
         "listToDisplay": "Anzuzeigende Liste",
@@ -13,6 +16,7 @@
         "listName": "Listenname",
         "title": "Listeneinstellungen"
     },
+    "markUncompleted": "Als unerledigt markieren",
     "newList": "Neue Liste",
     "newTask": "Neue Aufgabe",
     "pinWindow": "Fenster anheften",

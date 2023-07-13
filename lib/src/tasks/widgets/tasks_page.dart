@@ -86,21 +86,8 @@ class _TasksPageState extends State<TasksPage> {
                 ],
               );
 
-              final PreferredSizeWidget? appBar;
-              if (mediaQuery.isSmallScreen) {
-                appBar = const _TaskListAppBar();
-              } else if (kDebugMode) {
-                appBar = AppBar(
-                  title: const Text('Debug'),
-                  actions: const [_DebugMenuButton()],
-                  backgroundColor: backgroundColor,
-                );
-              } else {
-                appBar = null;
-              }
-
               return Scaffold(
-                appBar: appBar,
+                appBar: const _TaskListAppBar(),
                 drawer: (mediaQuery.isSmallScreen)
                     ? const CustomNavigationRail(breakpoint: Breakpoints.small)
                     : null,
@@ -165,6 +152,7 @@ class _TaskListAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      centerTitle: !MediaQuery.of(context).isSmallScreen,
       title: const TasksHeader(),
       actions: const [_DebugMenuButton()],
     );
