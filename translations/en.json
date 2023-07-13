@@ -3,6 +3,7 @@
     "cancel": "Cancel",
     "completed": "Completed",
     "confirm": "Confirm",
+    "delete": "Delete",
     "deleteCompleted": "Delete all completed tasks",
     "deleteTask": "Delete task",
     "getStartedPrompt": "Select or create a list to get started",
@@ -12,9 +13,11 @@
     },
     "listSettings": {
         "confirmDelete": "Are you sure you want to delete this list?",
-        "deleteList": "Delete List",
+        "deleteList": "Delete list",
+        "deleteListName": "Delete {}",
         "listName": "List Name",
-        "title": "List Settings"
+        "renameList": "Rename list",
+        "title": "List settings"
     },
     "markUncompleted": "Mark uncompleted",
     "newList": "New list",

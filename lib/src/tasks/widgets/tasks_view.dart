@@ -7,7 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../generated/locale_keys.g.dart';
 import '../../core/core.dart';
-import '../../core/helpers/helpers.dart';
 import '../tasks.dart';
 
 class TasksView extends StatelessWidget {
@@ -15,8 +14,6 @@ class TasksView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-
     return BlocConsumer<TasksCubit, TasksState>(
       listenWhen: (previous, current) =>
           previous.awaitingClearTasksUndo != current.awaitingClearTasksUndo,
@@ -40,23 +37,12 @@ class TasksView extends StatelessWidget {
         final TaskList? activeList = state.activeList;
         if (activeList == null) return const _CreateSelectListPrompt();
 
-        final Widget tasksHeader = (mediaQuery.isSmallScreen) //
-            ? const SizedBox()
-            : const Padding(
-                padding: EdgeInsets.only(
-                  top: 20,
-                  left: 50,
-                ),
-                child: TasksHeader(),
-              );
-
-        return Column(
+        return const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            tasksHeader,
-            const _NewTaskButton(),
-            const _TasksListWidget(),
-            const _CompletedTasksWidget(),
+            _NewTaskButton(),
+            _TasksListWidget(),
+            _CompletedTasksWidget(),
           ],
         );
       },

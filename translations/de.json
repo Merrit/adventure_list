@@ -3,6 +3,7 @@
     "cancel": "Abbrechen",
     "completed": "Erledigt",
     "confirm": "Bestätigen",
+    "delete": "Löschen",
     "deleteCompleted": "Erledigte Aufgaben löschen",
     "deleteTask": "Aufgabe löschen",
     "getStartedPrompt": "Wähle oder erstelle eine Liste um zu starten",
@@ -13,7 +14,9 @@
     "listSettings": {
         "confirmDelete": "Willst du diese Liste wirklich löschen?",
         "deleteList": "Liste löschen",
+        "deleteListName": "Liste löschen: {}",
         "listName": "Listenname",
+        "renameList": "Liste umbenennen",
         "title": "Listeneinstellungen"
     },
     "markUncompleted": "Als unerledigt markieren",

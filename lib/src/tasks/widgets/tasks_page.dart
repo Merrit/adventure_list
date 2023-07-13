@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -5,10 +6,11 @@ import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 
+import '../../../generated/locale_keys.g.dart';
 import '../../app/app.dart';
 import '../../core/constants.dart';
 import '../../core/helpers/helpers.dart';
-import '../../notifications/notifications.dart';
+import '../../core/widgets/input_dialog.dart';
 import '../../settings/settings.dart';
 import '../../window/window.dart';
 import '../tasks.dart';
@@ -151,38 +153,125 @@ class _TaskListAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Widget title = BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        final TaskList? taskList = state.activeList;
+        if (taskList == null) return const SizedBox();
+
+        return Text(
+          taskList.title,
+          style: const TextStyle(
+            fontSize: 24.0,
+            fontWeight: FontWeight.bold,
+          ),
+        );
+      },
+    );
+
     return AppBar(
       centerTitle: !MediaQuery.of(context).isSmallScreen,
-      title: const TasksHeader(),
-      actions: const [_DebugMenuButton()],
+      title: title,
+      actions: const [_ListOptionsButton()],
     );
   }
 }
 
-/// A button that shows a popup menu with debug options.
-class _DebugMenuButton extends StatelessWidget {
-  const _DebugMenuButton();
+/// A popup menu button that shows options for the current list.
+class _ListOptionsButton extends StatefulWidget {
+  const _ListOptionsButton();
+
+  @override
+  State<_ListOptionsButton> createState() => _ListOptionsButtonState();
+}
+
+class _ListOptionsButtonState extends State<_ListOptionsButton> {
+  late final TasksCubit tasksCubit;
+
+  @override
+  void initState() {
+    tasksCubit = context.read<TasksCubit>();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (!kDebugMode) return const SizedBox();
-
     return PopupMenuButton(
+      tooltip: LocaleKeys.listSettings_title.tr(),
       itemBuilder: (context) {
         return [
           PopupMenuItem(
-            child: const Text('Show test notification'),
-            onTap: () async {
-              await Future.delayed(const Duration(seconds: 5));
-              NotificationsCubit.instance.showNotification(
-                title: 'Test notification',
-                body: 'This is a test notification',
-                payload: 'test payload',
-              );
-            },
+            value: LocaleKeys.listSettings_renameList,
+            child: Text(LocaleKeys.listSettings_renameList.tr()),
+          ),
+          PopupMenuItem(
+            value: LocaleKeys.listSettings_deleteList,
+            child: Text(LocaleKeys.listSettings_deleteList.tr()),
+          ),
+          PopupMenuItem(
+            value: LocaleKeys.deleteCompleted,
+            child: Text(LocaleKeys.deleteCompleted.tr()),
           ),
         ];
       },
+      onSelected: (value) {
+        switch (value) {
+          case LocaleKeys.listSettings_renameList:
+            _showRenameListDialog(context);
+          case LocaleKeys.listSettings_deleteList:
+            _showDeleteListDialog(context);
+          case LocaleKeys.deleteCompleted:
+            tasksCubit.deleteCompletedTasks();
+        }
+      },
     );
+  }
+
+  Future<void> _showRenameListDialog(BuildContext context) async {
+    final tasksCubit = context.read<TasksCubit>();
+    final taskList = tasksCubit.state.activeList!;
+
+    final String? newName = await showInputDialog(
+      context: context,
+      title: LocaleKeys.listSettings_renameList.tr(),
+      initialValue: taskList.title,
+    );
+
+    if (newName == null || newName.isEmpty) return;
+
+    tasksCubit.updateList(
+      taskList.copyWith(title: newName),
+    );
+  }
+
+  Future<void> _showDeleteListDialog(BuildContext context) async {
+    final tasksCubit = context.read<TasksCubit>();
+    final taskList = tasksCubit.state.activeList!;
+
+    final bool? delete = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(LocaleKeys.listSettings_deleteListName.tr(
+          args: [taskList.title],
+        )),
+        content: Text(LocaleKeys.listSettings_confirmDelete.tr()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(LocaleKeys.cancel.tr()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(
+              LocaleKeys.delete.tr(),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (delete != true) return;
+
+    await tasksCubit.deleteList();
   }
 }

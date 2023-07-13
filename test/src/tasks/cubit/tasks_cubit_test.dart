@@ -323,7 +323,7 @@ void main() {
         ));
 
         // Clear the completed tasks
-        await testCubit.clearCompletedTasks();
+        await testCubit.deleteCompletedTasks();
 
         // Verify that the tasks that were not completed remain
         final updatedTaskList = testCubit.state.activeList;
@@ -361,7 +361,7 @@ void main() {
         ));
 
         // Clear the completed tasks
-        await testCubit.clearCompletedTasks();
+        await testCubit.deleteCompletedTasks();
 
         // Verify that the tasks that were not completed remain
         expect(testCubit.state.activeList, taskList);
@@ -396,7 +396,7 @@ void main() {
         ));
 
         // Clear the completed tasks
-        await testCubit.clearCompletedTasks();
+        await testCubit.deleteCompletedTasks();
 
         // Verify that only the completed task in the active list was cleared.
         // The completed task in the other list should remain.
@@ -432,7 +432,7 @@ void main() {
         ));
 
         // Clear the completed tasks
-        await testCubit.clearCompletedTasks(parentId: task1.id);
+        await testCubit.deleteCompletedTasks(parentId: task1.id);
         expect(testCubit.state.activeList?.items, [
           task1.copyWith(completed: true),
           task2,
@@ -970,7 +970,7 @@ void main() {
       ));
 
       // Clear completed tasks.
-      await testCubit.clearCompletedTasks();
+      await testCubit.deleteCompletedTasks();
       expect(testCubit.state.activeList?.items, [
         task2.copyWith(index: 0),
         task3.copyWith(index: 1),

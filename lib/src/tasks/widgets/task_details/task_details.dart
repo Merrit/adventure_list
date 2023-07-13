@@ -129,7 +129,7 @@ class _MoreActionsButton extends StatelessWidget {
               final task = tasksCubit.state.activeTask;
               if (task == null) return;
 
-              tasksCubit.clearCompletedTasks(parentId: task.id);
+              tasksCubit.deleteCompletedTasks(parentId: task.id);
             },
             child: const Text('Clear completed sub-tasks'),
           ),
