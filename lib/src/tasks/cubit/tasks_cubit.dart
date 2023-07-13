@@ -225,6 +225,31 @@ class TasksCubit extends Cubit<TasksState> {
     await _tasksRepository.deleteList(id: activeList.id);
   }
 
+  /// Deletes the provided [Task].
+  Future<void> deleteTask(Task task) async {
+    final taskList = state.taskLists.getTaskListById(task.taskListId);
+    if (taskList == null) {
+      log.w('Task list not found');
+      return;
+    }
+
+    assert(state.activeList?.id == taskList.id);
+
+    final updatedTasks = taskList.items.removeTask(task);
+    final updatedTaskList = taskList.copyWith(items: updatedTasks);
+    final updatedTaskLists = state.taskLists.updateTaskList(updatedTaskList);
+
+    emit(state.copyWith(
+      activeList: updatedTaskList,
+      taskLists: updatedTaskLists,
+    ));
+
+    await _tasksRepository.deleteTask(
+      taskListId: task.taskListId,
+      taskId: task.id,
+    );
+  }
+
   /// Called when the user is reordering the list of TaskLists.
   Future<void> reorderLists(int oldIndex, int newIndex) async {
     if (oldIndex < newIndex) newIndex -= 1;

@@ -1,7 +1,10 @@
 {
     "appName": "Adventure List",
     "cancel": "Cancel",
+    "completed": "Completed",
     "confirm": "Confirm",
+    "deleteCompleted": "Delete all completed tasks",
+    "deleteTask": "Delete task",
     "getStartedPrompt": "Select or create a list to get started",
     "homeWidgetConfig": {
         "listToDisplay": "List to display",
@@ -13,6 +16,7 @@
         "listName": "List Name",
         "title": "List Settings"
     },
+    "markUncompleted": "Mark uncompleted",
     "newList": "New list",
     "newTask": "New task",
     "pinWindow": "Pin window",
