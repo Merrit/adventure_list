@@ -157,6 +157,7 @@ class _TaskTileContentsState extends State<_TaskTileContents> {
         }
 
         final expansionTile = ExpansionTile(
+          collapsedBackgroundColor: Colors.transparent,
           controller: expansionTileController,
           initiallyExpanded: state.isSelected,
           onExpansionChanged: (value) {
