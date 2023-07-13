@@ -540,7 +540,7 @@ class TasksCubit extends Cubit<TasksState> {
   ///
   /// The user can cancel the clear operation by calling
   /// [undoClearCompletedTasks].
-  Future<void> clearCompletedTasks({String? parentId}) async {
+  Future<void> deleteCompletedTasks({String? parentId}) async {
     final activeList = state.activeList;
     if (activeList == null) return;
 
