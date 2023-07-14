@@ -17,6 +17,8 @@ Adventure List is ready to help you get things done. Download it today and start
 
 [Releases](https://github.com/Merrit/adventure_list/releases)
 
+[Flathub](https://flathub.org/apps/codes.merritt.adventurelist)
+
 [Google Play](https://play.google.com/store/apps/details?id=codes.merritt.adventurelist)
 
 
