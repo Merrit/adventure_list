@@ -122,11 +122,20 @@ class _TasksPageState extends State<TasksPage> {
     );
   }
 
+  /// Whether or not the release notes dialog has been shown.
+  ///
+  /// This is used to prevent the dialog from showing multiple times,
+  /// for example if the window is resized.
+  bool shownReleaseNotesDialog = false;
+
   Future<void> _showReleaseNotesDialog(
     BuildContext context,
     ReleaseNotes releaseNotes,
   ) {
+    if (shownReleaseNotesDialog) return Future.value();
+
     final appCubit = context.read<AppCubit>();
+    shownReleaseNotesDialog = true;
 
     return showDialog(
       context: context,
