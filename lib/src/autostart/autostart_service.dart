@@ -7,6 +7,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:xdg_desktop_portal/xdg_desktop_portal.dart';
 
 import '../core/helpers/helpers.dart';
+import '../logs/logging_manager.dart';
 
 /// Service to enable/disable autostart on desktop platforms.
 class AutostartService {
@@ -43,14 +44,16 @@ class AutostartService {
   }
 
   Future<void> _setForFlatpak(bool enable) async {
+    log.i('Setting up autostart for Flatpak app.');
     final client = XdgDesktopPortalClient();
 
-    await client.background.requestBackground(
+    final result = await client.background.requestBackground(
       reason: 'Autostarting Adventure List',
       autostart: enable,
-      commandLine: ['flatpak', 'run', 'codes.merritt.adventurelist'],
+      commandLine: ['adventure_list'],
     ).first;
 
+    log.i('Result: $result');
     await client.close();
   }
 
