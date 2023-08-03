@@ -1,11 +1,12 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
+import '../../../../generated/locale_keys.g.dart';
 import '../../../core/helpers/helpers.dart';
 import '../../tasks.dart';
-import 'sub_tasks.dart';
+import 'sub_tasks_list_widget.dart';
 
 class TaskDetails extends StatelessWidget {
   static const routeName = '/task_details';
@@ -46,7 +47,7 @@ class TaskDetails extends StatelessWidget {
             appBar: AppBar(
               key: ValueKey(task),
               actions: const [
-                _MoreActionsButton(),
+                ContextMenuButton(),
               ],
             ),
             body: TaskDetailsView(key: ValueKey(task)),
@@ -84,7 +85,7 @@ class TaskDetailsView extends StatelessWidget {
               if (!mediaQuery.isSmallScreen)
                 const Align(
                   alignment: Alignment.centerRight,
-                  child: _MoreActionsButton(),
+                  child: ContextMenuButton(),
                 ),
               const _TitleWidget(),
               const DueDateWidget(),
@@ -92,7 +93,7 @@ class TaskDetailsView extends StatelessWidget {
               const DescriptionWidget(),
               const ParentSelectionWidget(),
               const SizedBox(height: 20),
-              const SubTasks(),
+              const SubTasksListWidget(),
               AddSubTaskWidget(parentTask: task),
             ],
           ),
@@ -115,9 +116,9 @@ class TaskDetailsView extends StatelessWidget {
   }
 }
 
-/// A button that shows a popup menu with more actions.
-class _MoreActionsButton extends StatelessWidget {
-  const _MoreActionsButton();
+/// A button that shows a popup menu with more actions for the task.
+class ContextMenuButton extends StatelessWidget {
+  const ContextMenuButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -551,8 +552,8 @@ class AddSubTaskWidget extends StatelessWidget {
       leading: const Icon(Icons.add),
       title: TextField(
         controller: controller,
-        decoration: const InputDecoration(
-          hintText: 'Add sub-task',
+        decoration: InputDecoration(
+          hintText: LocaleKeys.subtasks_addSubtask.tr(),
           border: InputBorder.none,
         ),
         focusNode: addSubTaskFocusNode,
