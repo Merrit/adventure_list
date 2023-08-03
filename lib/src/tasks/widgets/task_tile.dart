@@ -5,7 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../core/helpers/helpers.dart';
 import '../tasks.dart';
-import 'task_details/sub_tasks.dart';
+import 'task_details/sub_tasks_list_widget.dart';
 
 part 'task_tile.freezed.dart';
 
@@ -129,6 +129,8 @@ class _TaskTileContentsState extends State<_TaskTileContents> {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+
     final expansionTileCloser = BlocListener<TasksCubit, TasksState>(
       listenWhen: (previous, current) =>
           previous.activeTask?.id == taskId && current.activeTask?.id != taskId,
@@ -139,74 +141,74 @@ class _TaskTileContentsState extends State<_TaskTileContents> {
       child: const SizedBox(),
     );
 
-    return BlocBuilder<TaskTileCubit, TaskTileState>(
-      builder: (context, state) {
-        Widget? subtitle;
-        if (state.task.isOverdue || state.hasChildTasks) {
-          final children = <Widget>[
-            const _OverdueIndicator(),
-            const _ChildTasksIndicator(),
-          ];
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, tasksState) {
+        final bool selected = tasksState.activeTask?.id == taskId;
 
-          subtitle = Padding(
-            padding: const EdgeInsets.only(left: 50),
-            child: Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 8,
-              children: children,
-            ),
-          );
-        }
+        return BlocBuilder<TaskTileCubit, TaskTileState>(
+          builder: (context, taskTileState) {
+            Widget? subtitle;
+            if (taskTileState.task.isOverdue || taskTileState.hasChildTasks) {
+              final children = <Widget>[
+                const _OverdueIndicator(),
+                const _ChildTasksIndicator(),
+              ];
 
-        Widget? trailing;
-        if (state.task.parent != null) {
-          trailing = IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () => tasksCubit.deleteTask(state.task),
-          );
-        }
-
-        final expansionTile = ExpansionTile(
-          collapsedBackgroundColor: Colors.transparent,
-          controller: expansionTileController,
-          initiallyExpanded: state.isSelected,
-          onExpansionChanged: (value) {
-            if (value) {
-              tasksCubit.setActiveTask(state.task.id);
-            } else {
-              final activeTask = context.read<TasksCubit>().state.activeTask;
-              // If the task is collapsed, set the active task to null.
-              //
-              // If the task collapsed because another task was expanded,
-              // allow that task to become the active task.
-              if (activeTask?.id == state.task.id) {
-                tasksCubit.setActiveTask(null);
-              }
+              subtitle = Padding(
+                padding: const EdgeInsets.only(left: 50),
+                child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  children: children,
+                ),
+              );
             }
+
+            final Widget contextMenuButton = (selected && !mediaQuery.isSmallScreen)
+                ? const ContextMenuButton()
+                : const SizedBox();
+
+            final expansionTile = ExpansionTile(
+              collapsedBackgroundColor: Colors.transparent,
+              controller: expansionTileController,
+              initiallyExpanded: taskTileState.isSelected,
+              onExpansionChanged: (value) {
+                if (value) {
+                  tasksCubit.setActiveTask(taskTileState.task.id);
+                } else {
+                  final activeTask = context.read<TasksCubit>().state.activeTask;
+                  // If the task is collapsed, set the active task to null.
+                  //
+                  // If the task collapsed because another task was expanded,
+                  // allow that task to become the active task.
+                  if (activeTask?.id == taskTileState.task.id) {
+                    tasksCubit.setActiveTask(null);
+                  }
+                }
+              },
+              title: const _TitleRow(),
+              subtitle: subtitle,
+              trailing: contextMenuButton,
+              children: [
+                expansionTileCloser,
+                const DueDateWidget(),
+                const DueTimeWidget(),
+                const DescriptionWidget(),
+                const ParentSelectionWidget(),
+                const SubTasksListWidget(),
+                AddSubTaskWidget(parentTask: taskTileState.task),
+              ],
+            );
+
+            final listTile = ListTile(
+              title: const _TitleRow(),
+              subtitle: subtitle,
+              onTap: () => tasksCubit.setActiveTask(taskTileState.task.id),
+            );
+
+            return (MediaQuery.of(context).isSmallScreen) ? listTile : expansionTile;
           },
-          title: const _TitleRow(),
-          subtitle: subtitle,
-          trailing: trailing,
-          children: [
-            expansionTileCloser,
-            const DueDateWidget(),
-            const DueTimeWidget(),
-            const DescriptionWidget(),
-            const ParentSelectionWidget(),
-            const SubTasks(),
-            AddSubTaskWidget(parentTask: state.task),
-          ],
         );
-
-        final listTile = ListTile(
-          title: const _TitleRow(),
-          subtitle: subtitle,
-          onTap: () => tasksCubit.setActiveTask(state.task.id),
-        );
-
-        return (MediaQuery.of(context).isSmallScreen)
-            ? listTile
-            : expansionTile;
       },
     );
   }
@@ -221,11 +223,10 @@ class _TitleRow extends StatelessWidget {
       builder: (context, tasksState) {
         return BlocBuilder<TaskTileCubit, TaskTileState>(
           builder: (context, tileState) {
-            final bool selected =
-                tasksState.activeTask?.id == tileState.task.id;
+            final bool selected = tasksState.activeTask?.id == tileState.task.id;
+
             final TextStyle titleTextStyle = TextStyle(
-              decoration:
-                  tileState.task.completed ? TextDecoration.lineThrough : null,
+              decoration: tileState.task.completed ? TextDecoration.lineThrough : null,
               color: selected ? Theme.of(context).colorScheme.primary : null,
             );
 
@@ -259,7 +260,7 @@ class _TitleRow extends StatelessWidget {
                     value!,
                   ),
                 ),
-                Flexible(
+                Expanded(
                   child: Text(
                     tileState.task.title,
                     style: titleTextStyle,

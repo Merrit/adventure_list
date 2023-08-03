@@ -50,5 +50,9 @@
             "title": "Widget",
             "transparentBackground": "Transparent background"
         }
+    },
+    "subtasks": {
+        "addSubtask": "Add subtask",
+        "title": "Subtasks"
     }
 }
