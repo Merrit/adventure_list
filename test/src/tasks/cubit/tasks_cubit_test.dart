@@ -845,12 +845,19 @@ void main() {
       ]);
 
       // Reorder tasks.
-      await testCubit.reorderTasks(2, 0);
+      await testCubit.reorderTasks(2, 1);
       expect(testCubit.state.activeList?.items, [
-        task3?.copyWith(index: 0),
-        task1?.copyWith(index: 1),
+        task1?.copyWith(index: 0),
+        task3?.copyWith(index: 1),
         task2?.copyWith(index: 2),
       ]);
+
+      verify(_tasksRepository.updateTask(
+        taskListId: anyNamed('taskListId'),
+        updatedTask: anyNamed('updatedTask'),
+      )).called(2);
+
+      await Future.delayed(const Duration(milliseconds: 600));
     });
 
     test('setActiveTask() works', () async {
