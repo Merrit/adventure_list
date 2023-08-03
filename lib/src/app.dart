@@ -99,7 +99,6 @@ class _AppState extends State<App> with TrayListener, WindowListener {
           return BlocBuilder<SettingsCubit, SettingsState>(
             builder: (context, settingsState) {
               return MaterialApp(
-                debugShowCheckedModeBanner: false,
                 restorationScopeId: 'app',
                 localizationsDelegates: context.localizationDelegates,
                 supportedLocales: context.supportedLocales,
