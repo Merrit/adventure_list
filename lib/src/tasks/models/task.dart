@@ -343,6 +343,11 @@ extension ListOfTasksExtensions on List<Task> {
     return where((t) => t.parent == null).toList();
   }
 
+  /// Returns all [Task]s that are not marked as completed.
+  List<Task> uncompletedTasks() {
+    return where((t) => !t.completed).toList();
+  }
+
   /// Returns a copy of the list with the task indexes updated.
   ///
   /// Subtasks have a separate index than top-level tasks.

@@ -57,8 +57,6 @@ class TasksCubit extends Cubit<TasksState> {
         super(TasksState.initial()) {
     tasksCubit = this;
 
-    _getCachedData();
-
     // If already signed in, initialize the tasks.
     if (authCubit.state.signedIn) {
       _getTasksRepo(
@@ -76,35 +74,6 @@ class TasksCubit extends Cubit<TasksState> {
         );
       }
     });
-  }
-
-  /// Loads cached data from local storage.
-  ///
-  /// This is used to show the user something while the tasks are being fetched.
-  Future<void> _getCachedData() async {
-    final List<String>? taskListsJson = await StorageRepository.instance.get(
-      'taskListsJson',
-      storageArea: 'cache',
-    );
-
-    if (taskListsJson == null) {
-      emit(state.copyWith(loading: false));
-      return;
-    }
-
-    final List<TaskList> taskLists = taskListsJson //
-        .map((e) => TaskList.fromJson(jsonDecode(e)))
-        .toList();
-
-    final String? activeListId = await StorageRepository.instance.get(
-      'activeList',
-    );
-
-    emit(state.copyWith(
-      activeList: taskLists.singleWhereOrNull((e) => e.id == activeListId),
-      loading: false,
-      taskLists: taskLists.sortedByIndex(),
-    ));
   }
 
   /// Initializes the tasks repository.
@@ -392,26 +361,31 @@ class TasksCubit extends Cubit<TasksState> {
   /// Called when the user is reordering Tasks.
   Future<void> reorderTasks(int oldIndex, int newIndex) async {
     if (oldIndex < newIndex) newIndex -= 1;
-    final List<Task> items = state.activeList!.items.copy()
-      ..removeAt(oldIndex)
-      ..insert(newIndex, state.activeList!.items[oldIndex]);
-    for (var i = 0; i < items.length; i++) {
-      items[i] = items[i].copyWith(index: i, synced: false);
-    }
-    final TaskList updatedList = state.activeList!.copyWith(items: items);
-    final updatedLists = state.taskLists.copy()
-      ..remove(state.activeList)
-      ..add(updatedList);
+
+    final List<Task> oldTasks = state //
+        .activeList!
+        .items
+        .topLevelTasks()
+        .uncompletedTasks();
+
+    final updatedTasks = oldTasks.reorderTasks(
+      oldTasks[oldIndex],
+      newIndex,
+    );
+
+    // Emit the active list again because its index might have changed.
+    final activeList = state.activeList!.copyWith(items: updatedTasks);
+
     emit(state.copyWith(
-      activeList: updatedList,
-      taskLists: updatedLists.sortedByIndex(),
+      activeList: activeList,
     ));
-    // sync tasks that have changed
-    for (var i = 0; i < items.length; i++) {
-      if (items[i].index != i) {
+
+    for (final task in updatedTasks) {
+      // Sync the task if it has changed.
+      if (oldTasks[task.index] != task) {
         await _tasksRepository.updateTask(
-          taskListId: state.activeList!.id,
-          updatedTask: items[i].copyWith(index: i),
+          taskListId: activeList.id,
+          updatedTask: task,
         );
       }
     }
@@ -633,10 +607,6 @@ class TasksCubit extends Cubit<TasksState> {
 
     super.onChange(change);
 
-    if (change.currentState != change.nextState) {
-      _cacheData(change.nextState);
-    }
-
     if (Platform.isAndroid) _updateAndroidWidget(change.nextState);
 
     _updateNotificationBadge(change.nextState);
@@ -656,30 +626,6 @@ class TasksCubit extends Cubit<TasksState> {
     }
 
     await NotificationsCubit.instance.setNotificationBadge(overdueTaskCount);
-  }
-
-  /// Timer ensures we aren't caching constantly.
-  Timer? _cacheTimer;
-
-  /// Caches the current state to local storage.
-  Future<void> _cacheData(TasksState state) async {
-    if (_cacheTimer?.isActive == true) {
-      _cacheTimer?.cancel();
-      _cacheTimer = null;
-    }
-
-    _cacheTimer = Timer(const Duration(seconds: 10), () async {
-      final taskListsJson = <String>[];
-      for (var taskList in state.taskLists) {
-        taskListsJson.add(jsonEncode(taskList.toJson()));
-      }
-
-      await StorageRepository.instance.save(
-        key: 'taskListsJson',
-        value: taskListsJson,
-        storageArea: 'cache',
-      );
-    });
   }
 
   /// Stream subscription for listening for when the user taps on a notification.
@@ -744,7 +690,6 @@ class TasksCubit extends Cubit<TasksState> {
   @override
   Future<void> close() {
     _notificationResponseSubscription?.cancel();
-    _cacheTimer?.cancel();
     _clearTimer?.cancel();
     return super.close();
   }
