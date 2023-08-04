@@ -351,9 +351,7 @@ class TasksCubit extends Cubit<TasksState> {
           .where((element) => element.parent == parentTask!.id)
           .length;
     } else {
-      index = state.activeList!.items
-          .where((element) => element.parent == null)
-          .length;
+      index = state.activeList!.items.where((element) => element.parent == null).length;
     }
     return index;
   }
@@ -457,8 +455,8 @@ class TasksCubit extends Cubit<TasksState> {
       return;
     }
 
-    final TaskList? taskList = state.taskLists
-        .firstWhereOrNull((element) => element.items.contains(task));
+    final TaskList? taskList =
+        state.taskLists.firstWhereOrNull((element) => element.items.contains(task));
     if (taskList == null) {
       emit(state.copyWith(activeTask: null));
       return;
@@ -633,8 +631,8 @@ class TasksCubit extends Cubit<TasksState> {
 
   /// Listens for when the user taps on a notification.
   void _listenForNotificationResponse() {
-    _notificationResponseSubscription = notificationResponseStream.stream
-        .listen((NotificationResponse response) async {
+    _notificationResponseSubscription =
+        notificationResponseStream.stream.listen((NotificationResponse response) async {
       if (response.payload == null) return;
 
       final task = Task.fromJson(
@@ -676,9 +674,7 @@ class TasksCubit extends Cubit<TasksState> {
     // widget.
     final TaskList listCopy = selectedList.copyWith(
       // Don't show completed/deleted items in widget.
-      items: selectedList.items
-          .where((e) => !e.completed && e.parent == null)
-          .toList(),
+      items: selectedList.items.where((e) => !e.completed && e.parent == null).toList(),
     );
 
     await _homeWidgetManager.updateHomeWidget(

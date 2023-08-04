@@ -49,8 +49,7 @@ class TaskList with _$TaskList {
     );
   }
 
-  factory TaskList.fromJson(Map<String, dynamic> json) =>
-      _$TaskListFromJson(json);
+  factory TaskList.fromJson(Map<String, dynamic> json) => _$TaskListFromJson(json);
 
   factory TaskList.empty() {
     return TaskList(

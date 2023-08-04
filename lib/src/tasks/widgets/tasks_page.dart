@@ -64,19 +64,16 @@ class _TasksPageState extends State<TasksPage> {
 
               final bool transparentBackgroundEnabled;
               if (defaultTargetPlatform.isDesktop) {
-                transparentBackgroundEnabled =
-                    context.select<SettingsCubit, bool>(
-                  (cubit) =>
-                      cubit.state.desktopWidgetSettings.transparentBackground,
+                transparentBackgroundEnabled = context.select<SettingsCubit, bool>(
+                  (cubit) => cubit.state.desktopWidgetSettings.transparentBackground,
                 );
               } else {
                 transparentBackgroundEnabled = false;
               }
 
-              final Color backgroundColor =
-                  (pinned && transparentBackgroundEnabled)
-                      ? Colors.transparent
-                      : Theme.of(context).scaffoldBackgroundColor;
+              final Color backgroundColor = (pinned && transparentBackgroundEnabled)
+                  ? Colors.transparent
+                  : Theme.of(context).scaffoldBackgroundColor;
 
               final Widget bodyContainer = Row(
                 children: [

@@ -30,8 +30,7 @@ void main() {
       reset(mockTasksRepository);
     });
 
-    test('refreshData returns false if the remote repository returns null',
-        () async {
+    test('refreshData returns false if the remote repository returns null', () async {
       when(mockTasksRepository.getAll()).thenAnswer((_) async => null);
 
       final service = BackgroundTasksService(
@@ -45,8 +44,7 @@ void main() {
       expect(result, false);
     });
 
-    test(
-        'refreshData returns false if the remote repository returns an empty list',
+    test('refreshData returns false if the remote repository returns an empty list',
         () async {
       when(mockTasksRepository.getAll()).thenAnswer((_) async => []);
 
@@ -61,8 +59,7 @@ void main() {
       expect(result, false);
     });
 
-    test(
-        'refreshData returns true if the remote repository returns a non-empty list',
+    test('refreshData returns true if the remote repository returns a non-empty list',
         () async {
       when(mockTasksRepository.getAll()).thenAnswer((_) async => [
             TaskList(

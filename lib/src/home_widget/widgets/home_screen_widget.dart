@@ -59,8 +59,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
           // No selected list, launch selection dialog.
           navigator.pushReplacementNamed(HomeWidgetConfigPage.routeName);
         } else {
-          tasksCubit
-              .setActiveList(settingsCubit.state.homeWidgetSelectedListId);
+          tasksCubit.setActiveList(settingsCubit.state.homeWidgetSelectedListId);
           // Ensure we are on the TasksPage when launched from the android
           // widget.
           navigator.popUntil((route) => route.isFirst);
