@@ -19,6 +19,9 @@ jobs:
           flutter upgrade --force
           flutter pub get
 
+      - name: Verify formatting
+        run: dart format -o none --set-exit-if-changed --line-length=90 .
+
       - name: Run translations generation
         run: dart run easy_localization:generate --source-dir translations --output-dir lib/generated --output-file locale_keys.g.dart --format keys --skip-unnecessary-keys
       
