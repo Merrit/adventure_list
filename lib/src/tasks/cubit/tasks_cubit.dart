@@ -618,7 +618,7 @@ class TasksCubit extends Cubit<TasksState> {
       return;
     }
 
-    log.v('Updating notification badge...');
+    log.t('Updating notification badge...');
 
     int overdueTaskCount = 0;
     for (final taskList in state.taskLists) {

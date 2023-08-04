@@ -62,8 +62,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
     await flutterLocalNotificationsPlugin.initialize(
       initSettings,
-      onDidReceiveBackgroundNotificationResponse:
-          _notificationBackgroundCallback,
+      onDidReceiveBackgroundNotificationResponse: _notificationBackgroundCallback,
       onDidReceiveNotificationResponse: _notificationCallback,
     );
 
@@ -141,7 +140,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   Future<void> setNotificationBadge(int count) async {
     if (state.overdueTasksCount == count) return;
 
-    log.v('Setting notification badge count to $count');
+    log.t('Setting notification badge count to $count');
 
     if (defaultTargetPlatform.isLinux) {
       await _setNotificationBadgeLinux(count);
@@ -157,17 +156,17 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   /// This will only schedule a notification if notifications are enabled and
   /// permission has been granted.
   Future<void> scheduleNotification(Task task) async {
-    log.v('Scheduling notification for task: ${task.id}');
+    log.t('Scheduling notification for task: ${task.id}');
 
     if (!state.enabled) {
-      log.v('Notifications are disabled. Not scheduling notification.');
+      log.t('Notifications are disabled. Not scheduling notification.');
       return;
     }
 
     if (!state.permissionGranted) {
       await _requestPermission();
       if (!state.permissionGranted) {
-        log.v(
+        log.t(
           'Notifications permission not granted. Not scheduling notification.',
         );
         return;
@@ -207,17 +206,17 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     required String body,
     String? payload,
   }) async {
-    log.v('Showing notification: $title, $body, $payload');
+    log.t('Showing notification: $title, $body, $payload');
 
     if (!state.enabled) {
-      log.v('Notifications are disabled. Not showing notification.');
+      log.t('Notifications are disabled. Not showing notification.');
       return;
     }
 
     if (!state.permissionGranted) {
       await _requestPermission();
       if (!state.permissionGranted) {
-        log.v(
+        log.t(
           'Notifications permission not granted. Not showing notification.',
         );
         return;
@@ -244,7 +243,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
   /// Snooze a task's notification.
   Future<void> snoozeTask(Task task) async {
-    log.v('Snoozing notification for task: ${task.id}');
+    log.t('Snoozing notification for task: ${task.id}');
     await cancelNotification(task.notificationId);
     const snoozeDuration = Duration(minutes: 10);
     final snoozeTime = DateTime.now().add(snoozeDuration);
@@ -322,22 +321,22 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
     final task = Task.fromJson(jsonDecode(notification.payload!));
 
-    log.v('Scheduling notification for task: ${task.id}');
+    log.t('Scheduling notification for task: ${task.id}');
 
     if (!state.enabled) {
-      log.v('Notifications are disabled. Not scheduling notification.');
+      log.t('Notifications are disabled. Not scheduling notification.');
       return;
     }
 
     final dueDate = task.dueDate;
     if (dueDate == null) {
-      log.v('Task has no due date. Not scheduling notification.');
+      log.t('Task has no due date. Not scheduling notification.');
       return;
     }
 
     // If the task is already overdue, show the notification immediately.
     if (dueDate.isBefore(DateTime.now())) {
-      log.v('Task is already overdue. Showing notification immediately.');
+      log.t('Task is already overdue. Showing notification immediately.');
       await showNotification(
         id: notification.id,
         title: notification.title,
@@ -350,7 +349,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     final timer = Timer(
       dueDate.difference(DateTime.now()),
       () async {
-        log.v('Showing scheduled notification for task: ${task.id}');
+        log.t('Showing scheduled notification for task: ${task.id}');
         await showNotification(
           id: notification.id,
           title: notification.title,
@@ -361,7 +360,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     );
 
     _timers[task.id] = timer;
-    log.v('Scheduled notification for task: ${task.id}');
+    log.t('Scheduled notification for task: ${task.id}');
   }
 
   /// Schedule a notification on mobile.
@@ -370,22 +369,22 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   Future<void> _scheduleNotificationMobile(Notification notification) async {
     final task = Task.fromJson(jsonDecode(notification.payload!));
 
-    log.v('Scheduling notification for task: ${task.id}');
+    log.t('Scheduling notification for task: ${task.id}');
 
     if (!state.enabled) {
-      log.v('Notifications are disabled. Not scheduling notification.');
+      log.t('Notifications are disabled. Not scheduling notification.');
       return;
     }
 
     final dueDate = task.dueDate;
     if (dueDate == null) {
-      log.v('Task has no due date. Not scheduling notification.');
+      log.t('Task has no due date. Not scheduling notification.');
       return;
     }
 
     // If the task is already overdue, show the notification immediately.
     if (dueDate.isBefore(DateTime.now())) {
-      log.v('Task is already overdue. Showing notification immediately.');
+      log.t('Task is already overdue. Showing notification immediately.');
       await showNotification(
         id: notification.id,
         title: notification.title,
@@ -420,7 +419,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     required DateTime scheduledDate,
     String? payload,
   }) async {
-    log.v('Scheduling notification: $title');
+    log.t('Scheduling notification: $title');
 
     const notificationDetails = NotificationDetails(
       android: _androidNotificationDetails,
@@ -451,17 +450,17 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   /// `_scheduleNotificationDesktop` should be used instead.
   Future<void> _scheduleNotificationWindows(Notification notification) async {
     final task = Task.fromJson(jsonDecode(notification.payload!));
-    log.v('Scheduling notification for task: ${task.id}');
+    log.t('Scheduling notification for task: ${task.id}');
 
     if (!state.enabled) {
-      log.v('Notifications are disabled. Not scheduling notification.');
+      log.t('Notifications are disabled. Not scheduling notification.');
       return;
     }
 
     final dueDate = task.dueDate;
 
     if (dueDate == null) {
-      log.v('Task has no due date. Not scheduling notification.');
+      log.t('Task has no due date. Not scheduling notification.');
       return;
     }
 
@@ -481,7 +480,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
     // If the task is already overdue, show the notification immediately.
     if (dueDate.isBefore(DateTime.now())) {
-      log.v('Task is already overdue. Showing notification immediately.');
+      log.t('Task is already overdue. Showing notification immediately.');
       localNotification.show();
       return;
     }
@@ -489,13 +488,13 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     final timer = Timer(
       dueDate.difference(DateTime.now()),
       () async {
-        log.v('Showing scheduled notification for task: ${task.id}');
+        log.t('Showing scheduled notification for task: ${task.id}');
         localNotification.show();
       },
     );
 
     _timers[task.id] = timer;
-    log.v('Scheduled notification for task: ${task.id}');
+    log.t('Scheduled notification for task: ${task.id}');
   }
 
   /// Set the notification badges on Linux.
@@ -531,8 +530,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
   /// Set the notification badge on the Windows taskbar.
   Future<void> _setNotificationBadgeWindowsTaskbar(int count) async {
-    final icon =
-        (count > 0) ? AppIcons.windowsWithNotificationBadge : AppIcons.windows;
+    final icon = (count > 0) ? AppIcons.windowsWithNotificationBadge : AppIcons.windows;
 
     // await TaskbarManager.instance.setIcon(icon);
     await windowManager.setIcon(icon);

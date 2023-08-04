@@ -58,8 +58,7 @@ class AppCubit extends Cubit<AppState> {
       runningVersion: versionInfo.currentVersion,
       updateVersion: versionInfo.latestVersion,
       updateAvailable: versionInfo.updateAvailable,
-      showUpdateButton:
-          (defaultTargetPlatform.isDesktop && versionInfo.updateAvailable),
+      showUpdateButton: (defaultTargetPlatform.isDesktop && versionInfo.updateAvailable),
     ));
   }
 
@@ -104,7 +103,7 @@ class AppCubit extends Cubit<AppState> {
     try {
       return await url_launcher.launchUrl(uri);
     } on PlatformException catch (e) {
-      log.e('Could not launch url: $url', e);
+      log.e('Could not launch url: $url', error: e);
       return false;
     }
   }

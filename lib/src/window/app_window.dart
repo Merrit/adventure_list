@@ -110,7 +110,7 @@ class AppWindow {
     final Rect bounds = await windowManager.getBounds();
     final screenConfigurationId = await _getScreenConfigurationId();
 
-    log.v(
+    log.t(
       'Saving window size and position. \n'
       'Screen configuration ID: $screenConfigurationId \n'
       'Window bounds: left: ${bounds.left}, top: ${bounds.top}, '
@@ -129,7 +129,7 @@ class AppWindow {
   /// If the window size and position has been saved previously, it will be
   /// restored. Otherwise, the window will be centered on the primary screen.
   Future<void> setWindowSizeAndPosition() async {
-    log.v('Setting window size and position.');
+    log.t('Setting window size and position.');
     final screenConfigurationId = await _getScreenConfigurationId();
     final Rect currentWindowFrame = await windowManager.getBounds();
 
@@ -146,11 +146,11 @@ class AppWindow {
     targetWindowFrame ??= const Rect.fromLTWH(0, 0, 1100, 660);
 
     if (targetWindowFrame == currentWindowFrame) {
-      log.v('Target matches current window frame, nothing to do.');
+      log.t('Target matches current window frame, nothing to do.');
       return;
     }
 
-    log.v(
+    log.t(
       'Screen configuration ID: $screenConfigurationId \n'
       'Current window bounds: \n'
       'left: ${currentWindowFrame.left}, top: ${currentWindowFrame.top}, '
