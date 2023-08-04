@@ -39,10 +39,8 @@ void main() {
 
     when(calendarsResource.delete(any)).thenAnswer((_) async {});
     when(calendarsResource.get(any)).thenAnswer((_) async => Calendar(id: ''));
-    when(calendarsResource.insert(any))
-        .thenAnswer((_) async => Calendar(id: ''));
-    when(calendarsResource.update(any, any))
-        .thenAnswer((_) async => Calendar(id: ''));
+    when(calendarsResource.insert(any)).thenAnswer((_) async => Calendar(id: ''));
+    when(calendarsResource.update(any, any)).thenAnswer((_) async => Calendar(id: ''));
 
     when(calendarListResource.list(showHidden: anyNamed('showHidden')))
         .thenAnswer((_) async => CalendarList(items: []));
@@ -63,8 +61,7 @@ void main() {
       any,
       showDeleted: anyNamed('showDeleted'),
     )).thenAnswer((_) async => Events(items: []));
-    when(eventsResource.update(any, any, any))
-        .thenAnswer((_) async => Event(id: ''));
+    when(eventsResource.update(any, any, any)).thenAnswer((_) async => Event(id: ''));
 
     calendar = GoogleCalendar(calendarApi);
   });
@@ -79,8 +76,7 @@ void main() {
       });
 
       test('returns empty list if calendar.toModel fails', () async {
-        when(calendarsResource.get(any))
-            .thenThrow(Exception('Failed to get list'));
+        when(calendarsResource.get(any)).thenThrow(Exception('Failed to get list'));
         final result = await calendar.getAll();
         expect(result, isEmpty);
       });
@@ -94,8 +90,7 @@ void main() {
                 CalendarListEntry(id: 'fakeid2', location: 'adventure_list'),
               ],
             ));
-        when(calendarsResource.get(any))
-            .thenThrow(Exception('Failed to get list'));
+        when(calendarsResource.get(any)).thenThrow(Exception('Failed to get list'));
         final result = await calendar.getAll();
         expect(result, isNull);
       });
@@ -118,8 +113,7 @@ void main() {
 
     group('createList:', () {
       test('returns null if api call fails', () async {
-        when(calendarsResource.insert(any))
-            .thenThrow(Exception('Failed to create list'));
+        when(calendarsResource.insert(any)).thenThrow(Exception('Failed to create list'));
         final result = await calendar.createList(TaskList.empty());
         expect(result, isNull);
       });
@@ -139,8 +133,7 @@ void main() {
 
     group('deleteList:', () {
       test('returns false if api call fails', () async {
-        when(calendarsResource.delete(any))
-            .thenThrow(Exception('Failed to delete list'));
+        when(calendarsResource.delete(any)).thenThrow(Exception('Failed to delete list'));
         final result = await calendar.deleteList(id: 'fakeid');
         expect(result, isFalse);
       });
@@ -264,18 +257,17 @@ void main() {
           completed: true,
         );
 
-        when(eventsResource.update(any, any, any))
-            .thenAnswer((_) async => Event(
-                  id: 'fakeid',
-                  description: jsonEncode(fakeTask.toJson()),
-                  summary: 'fake task',
-                  start: EventDateTime(
-                    dateTime: DateTime.now(),
-                  ),
-                  end: EventDateTime(
-                    dateTime: DateTime.now(),
-                  ),
-                ));
+        when(eventsResource.update(any, any, any)).thenAnswer((_) async => Event(
+              id: 'fakeid',
+              description: jsonEncode(fakeTask.toJson()),
+              summary: 'fake task',
+              start: EventDateTime(
+                dateTime: DateTime.now(),
+              ),
+              end: EventDateTime(
+                dateTime: DateTime.now(),
+              ),
+            ));
 
         final result = await calendar.updateTask(
           taskListId: 'fakeid',

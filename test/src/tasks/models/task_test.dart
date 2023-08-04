@@ -117,9 +117,8 @@ void main() {
       final completedTasks = tasks.completedTasks();
       expect(completedTasks, isA<List<Task>>());
       expect(completedTasks.length, 0);
-      final updatedTasks = tasks
-          .map((t) => t.copyWith(completed: t.title == 'Test Task 2'))
-          .toList();
+      final updatedTasks =
+          tasks.map((t) => t.copyWith(completed: t.title == 'Test Task 2')).toList();
       final updatedCompletedTasks = updatedTasks.completedTasks();
       expect(updatedCompletedTasks.length, 1);
       expect(updatedCompletedTasks.first.title, 'Test Task 2');
@@ -131,9 +130,8 @@ void main() {
       final incompleteTasks = tasks.incompleteTasks();
       expect(incompleteTasks, isA<List<Task>>());
       expect(incompleteTasks.length, 3);
-      final updatedTasks = tasks
-          .map((t) => t.copyWith(completed: t.title == 'Test Task 2'))
-          .toList();
+      final updatedTasks =
+          tasks.map((t) => t.copyWith(completed: t.title == 'Test Task 2')).toList();
       final updatedIncompleteTasks = updatedTasks.incompleteTasks();
       expect(updatedIncompleteTasks.length, 2);
       expect(updatedIncompleteTasks.first.title, 'Test Task 1');
@@ -177,8 +175,8 @@ void main() {
       expect(overdueTasks, isA<List<Task>>());
       expect(overdueTasks.length, 0);
       final updatedTasks = tasks
-          .map((t) => t.copyWith(
-              dueDate: DateTime.now().subtract(const Duration(days: 1))))
+          .map((t) =>
+              t.copyWith(dueDate: DateTime.now().subtract(const Duration(days: 1))))
           .toList();
       final updatedOverdueTasks = updatedTasks.overdueTasks();
       expect(updatedOverdueTasks.length, 3);

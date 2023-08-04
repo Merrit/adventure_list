@@ -99,8 +99,7 @@ class PopupMenuDivider extends PopupMenuEntry<Never> {
   /// Creates a horizontal divider for a popup menu.
   ///
   /// By default, the divider has a height of 16 logical pixels.
-  const PopupMenuDivider({Key? key, this.height = _kMenuDividerHeight})
-      : super(key: key);
+  const PopupMenuDivider({Key? key, this.height = _kMenuDividerHeight}) : super(key: key);
 
   /// The height of the divider entry.
   ///
@@ -140,8 +139,7 @@ class _MenuItem extends SingleChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(
-      BuildContext context, covariant _RenderMenuItem renderObject) {
+  void updateRenderObject(BuildContext context, covariant _RenderMenuItem renderObject) {
     renderObject.onLayout = onLayout;
   }
 }
@@ -342,9 +340,8 @@ class PopupMenuItemState<T, W extends PopupMenuItem<T>> extends State<W> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final PopupMenuThemeData popupMenuTheme = PopupMenuTheme.of(context);
-    TextStyle style = widget.textStyle ??
-        popupMenuTheme.textStyle ??
-        theme.textTheme.titleMedium!;
+    TextStyle style =
+        widget.textStyle ?? popupMenuTheme.textStyle ?? theme.textTheme.titleMedium!;
 
     if (!widget.enabled) style = style.copyWith(color: theme.disabledColor);
 
@@ -375,8 +372,8 @@ class PopupMenuItemState<T, W extends PopupMenuItem<T>> extends State<W> {
         child: InkWell(
           onTap: widget.enabled ? handleTap : null,
           canRequestFocus: widget.enabled,
-          mouseCursor: _EffectiveMouseCursor(
-              widget.mouseCursor, popupMenuTheme.mouseCursor),
+          mouseCursor:
+              _EffectiveMouseCursor(widget.mouseCursor, popupMenuTheme.mouseCursor),
           child: item,
         ),
       ),
@@ -496,8 +493,7 @@ class CheckedPopupMenuItem<T> extends PopupMenuItem<T> {
       _CheckedPopupMenuItemState<T>();
 }
 
-class _CheckedPopupMenuItemState<T>
-    extends PopupMenuItemState<T, CheckedPopupMenuItem<T>>
+class _CheckedPopupMenuItemState<T> extends PopupMenuItemState<T, CheckedPopupMenuItem<T>>
     with SingleTickerProviderStateMixin {
   static const Duration _fadeDuration = Duration(milliseconds: 150);
   late AnimationController _controller;
@@ -549,8 +545,7 @@ class _PopupMenu<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double unit = 1.0 /
-        (route.items.length +
-            1.5); // 1.0 for the width and 0.5 for the last item's fade.
+        (route.items.length + 1.5); // 1.0 for the width and 0.5 for the last item's fade.
     final List<Widget> children = <Widget>[];
     final PopupMenuThemeData popupMenuTheme = PopupMenuTheme.of(context);
 
@@ -562,8 +557,7 @@ class _PopupMenu<T> extends StatelessWidget {
         curve: Interval(start, end),
       );
       Widget item = route.items[i];
-      if (route.initialValue != null &&
-          route.items[i].represents(route.initialValue)) {
+      if (route.initialValue != null && route.items[i].represents(route.initialValue)) {
         item = Container(
           color: Theme.of(context).highlightColor,
           child: item,
@@ -582,11 +576,9 @@ class _PopupMenu<T> extends StatelessWidget {
       );
     }
 
-    final CurveTween opacity =
-        CurveTween(curve: const Interval(0.0, 1.0 / 3.0));
+    final CurveTween opacity = CurveTween(curve: const Interval(0.0, 1.0 / 3.0));
     final CurveTween width = CurveTween(curve: Interval(0.0, unit));
-    final CurveTween height =
-        CurveTween(curve: Interval(0.0, unit * route.items.length));
+    final CurveTween height = CurveTween(curve: Interval(0.0, unit * route.items.length));
 
     final Widget child = ConstrainedBox(
       constraints: constraints ??
@@ -719,8 +711,7 @@ class _PopupMenuRouteLayout extends SingleChildLayoutDelegate {
     final Offset wantedPosition = Offset(x, y);
     final Offset originCenter = position.toRect(Offset.zero & size).center;
     final Iterable<Rect> subScreens =
-        DisplayFeatureSubScreen.subScreensInBounds(
-            Offset.zero & size, avoidBounds);
+        DisplayFeatureSubScreen.subScreensInBounds(Offset.zero & size, avoidBounds);
     final Rect subScreen = _closestScreen(subScreens, originCenter);
     return _fitInsideScreen(subScreen, childSize, wantedPosition);
   }
@@ -728,8 +719,7 @@ class _PopupMenuRouteLayout extends SingleChildLayoutDelegate {
   Rect _closestScreen(Iterable<Rect> screens, Offset point) {
     Rect closest = screens.first;
     for (final Rect screen in screens) {
-      if ((screen.center - point).distance <
-          (closest.center - point).distance) {
+      if ((screen.center - point).distance < (closest.center - point).distance) {
         closest = screen;
       }
     }
@@ -743,17 +733,12 @@ class _PopupMenuRouteLayout extends SingleChildLayoutDelegate {
     // edge of the screen in every direction.
     if (x < screen.left + _kMenuScreenPadding + padding.left)
       x = screen.left + _kMenuScreenPadding + padding.left;
-    else if (x + childSize.width >
-        screen.right - _kMenuScreenPadding - padding.right)
+    else if (x + childSize.width > screen.right - _kMenuScreenPadding - padding.right)
       x = screen.right - childSize.width - _kMenuScreenPadding - padding.right;
     if (y < screen.top + _kMenuScreenPadding + padding.top)
       y = _kMenuScreenPadding + padding.top;
-    else if (y + childSize.height >
-        screen.bottom - _kMenuScreenPadding - padding.bottom)
-      y = screen.bottom -
-          childSize.height -
-          _kMenuScreenPadding -
-          padding.bottom;
+    else if (y + childSize.height > screen.bottom - _kMenuScreenPadding - padding.bottom)
+      y = screen.bottom - childSize.height - _kMenuScreenPadding - padding.bottom;
 
     return Offset(x, y);
   }
@@ -825,9 +810,7 @@ class _PopupMenuRoute<T> extends PopupRoute<T> {
       Animation<double> secondaryAnimation) {
     int? selectedItemIndex;
     if (initialValue != null) {
-      for (int index = 0;
-          selectedItemIndex == null && index < items.length;
-          index += 1) {
+      for (int index = 0; selectedItemIndex == null && index < items.length; index += 1) {
         if (items[index].represents(initialValue)) selectedItemIndex = index;
       }
     }
@@ -951,8 +934,7 @@ Future<T?> showMenu<T>({
       semanticLabel ??= MaterialLocalizations.of(context).popupMenuLabel;
   }
 
-  final NavigatorState navigator =
-      Navigator.of(context, rootNavigator: useRootNavigator);
+  final NavigatorState navigator = Navigator.of(context, rootNavigator: useRootNavigator);
   return navigator.push(_PopupMenuRoute<T>(
     position: position,
     items: items,
@@ -962,8 +944,7 @@ Future<T?> showMenu<T>({
     barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
     shape: shape,
     color: color,
-    capturedThemes:
-        InheritedTheme.capture(from: context, to: navigator.context),
+    capturedThemes: InheritedTheme.capture(from: context, to: navigator.context),
     constraints: constraints,
   ));
 }
@@ -985,8 +966,7 @@ typedef PopupMenuCanceled = void Function();
 /// the button is pressed.
 ///
 /// Used by [PopupMenuButton.itemBuilder].
-typedef PopupMenuItemBuilder<T> = List<PopupMenuEntry<T>> Function(
-    BuildContext context);
+typedef PopupMenuItemBuilder<T> = List<PopupMenuEntry<T>> Function(BuildContext context);
 
 /// Displays a menu when pressed and calls [onSelected] when the menu is dismissed
 /// because an item was selected. The value passed to [onSelected] is the value of
@@ -1195,9 +1175,8 @@ class PopupMenuButtonState<T> extends State<PopupMenuButton<T>> {
         offset = widget.offset;
         break;
       case PopupMenuPosition.under:
-        offset =
-            Offset(0.0, button.size.height - (widget.padding.vertical / 2)) +
-                widget.offset;
+        offset = Offset(0.0, button.size.height - (widget.padding.vertical / 2)) +
+            widget.offset;
         break;
     }
     final RelativeRect position = RelativeRect.fromRect(
@@ -1232,8 +1211,8 @@ class PopupMenuButtonState<T> extends State<PopupMenuButton<T>> {
   }
 
   bool get _canRequestFocus {
-    final NavigationMode mode = MediaQuery.maybeOf(context)?.navigationMode ??
-        NavigationMode.traditional;
+    final NavigationMode mode =
+        MediaQuery.maybeOf(context)?.navigationMode ?? NavigationMode.traditional;
     switch (mode) {
       case NavigationMode.traditional:
         return widget.enabled;
@@ -1245,16 +1224,14 @@ class PopupMenuButtonState<T> extends State<PopupMenuButton<T>> {
   @override
   Widget build(BuildContext context) {
     final IconThemeData iconTheme = IconTheme.of(context);
-    final bool enableFeedback = widget.enableFeedback ??
-        PopupMenuTheme.of(context).enableFeedback ??
-        true;
+    final bool enableFeedback =
+        widget.enableFeedback ?? PopupMenuTheme.of(context).enableFeedback ?? true;
 
     assert(debugCheckHasMaterialLocalizations(context));
 
     if (widget.child != null)
       return Tooltip(
-        message:
-            widget.tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,
+        message: widget.tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,
         child: InkWell(
           onTap: widget.enabled ? showButtonMenu : null,
           canRequestFocus: _canRequestFocus,
@@ -1269,8 +1246,7 @@ class PopupMenuButtonState<T> extends State<PopupMenuButton<T>> {
       padding: widget.padding,
       splashRadius: widget.splashRadius,
       iconSize: widget.iconSize ?? iconTheme.size ?? _kDefaultIconSize,
-      tooltip:
-          widget.tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,
+      tooltip: widget.tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,
       onPressed: widget.enabled ? showButtonMenu : null,
       enableFeedback: enableFeedback,
     );
@@ -1288,8 +1264,7 @@ class _EffectiveMouseCursor extends MaterialStateMouseCursor {
 
   @override
   MouseCursor resolve(Set<MaterialState> states) {
-    return MaterialStateProperty.resolveAs<MouseCursor?>(
-            widgetCursor, states) ??
+    return MaterialStateProperty.resolveAs<MouseCursor?>(widgetCursor, states) ??
         themeCursor?.resolve(states) ??
         MaterialStateMouseCursor.clickable.resolve(states);
   }

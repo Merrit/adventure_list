@@ -240,22 +240,19 @@ extension ListOfTasksExtensions on List<Task> {
 
   /// Returns a copy of the list with the task marked as completed.
   List<Task> markTaskCompleted(Task task) {
-    return map((t) => t.id == task.id ? task.copyWith(completed: true) : t)
-        .toList();
+    return map((t) => t.id == task.id ? task.copyWith(completed: true) : t).toList();
   }
 
   /// Returns a copy of the list with the task marked as uncompleted.
   List<Task> markTaskNotCompleted(Task task) {
-    return map((t) => t.id == task.id ? task.copyWith(completed: false) : t)
-        .toList();
+    return map((t) => t.id == task.id ? task.copyWith(completed: false) : t).toList();
   }
 
   /// Returns all [Task]s that have a due date in the past and are not completed.
   List<Task> overdueTasks() {
     return where((t) =>
-        !t.completed &&
-        t.dueDate != null &&
-        t.dueDate!.isBefore(DateTime.now())).toList();
+            !t.completed && t.dueDate != null && t.dueDate!.isBefore(DateTime.now()))
+        .toList();
   }
 
   /// Returns a copy of the list with the task updated to the new index.

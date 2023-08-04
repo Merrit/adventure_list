@@ -18,6 +18,5 @@ class TasksState with _$TasksState {
     );
   }
 
-  factory TasksState.fromJson(Map<String, dynamic> json) =>
-      _$TasksStateFromJson(json);
+  factory TasksState.fromJson(Map<String, dynamic> json) => _$TasksStateFromJson(json);
 }

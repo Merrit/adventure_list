@@ -45,8 +45,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       autostartService,
       initialState: SettingsState(
         autostart: await StorageRepository.instance.get('autostart') ?? false,
-        closeToTray:
-            await StorageRepository.instance.get('closeToTray') ?? true,
+        closeToTray: await StorageRepository.instance.get('closeToTray') ?? true,
         desktopWidgetSettings: desktopWidgetSettings,
         homeWidgetSelectedListId: homeWidgetSelectedListId ?? '',
         theme: await _getTheme(),

@@ -70,34 +70,28 @@ void main() {
 
       /* ----------------------------- HomeWidgetManager ---------------------------- */
       reset(_homeWidgetManager);
-      when(_homeWidgetManager.updateHomeWidget(any, any))
-          .thenAnswer((_) async {});
+      when(_homeWidgetManager.updateHomeWidget(any, any)).thenAnswer((_) async {});
 
       /* ----------------------------- TasksRepository ---------------------------- */
       reset(_tasksRepository);
       when(_tasksRepository.getAll()).thenAnswer((_) async => []);
-      when(_tasksRepository.createList(any))
-          .thenAnswer((invokation) async => TaskList(
-                id: UniqueKey().toString(),
-                index: 0,
-                items: const [],
-                title: (invokation.positionalArguments.first as TaskList).title,
-              ));
-      when(_tasksRepository.deleteList(id: anyNamed('id')))
-          .thenAnswer((_) async => true);
+      when(_tasksRepository.createList(any)).thenAnswer((invokation) async => TaskList(
+            id: UniqueKey().toString(),
+            index: 0,
+            items: const [],
+            title: (invokation.positionalArguments.first as TaskList).title,
+          ));
+      when(_tasksRepository.deleteList(id: anyNamed('id'))).thenAnswer((_) async => true);
       when(_tasksRepository.updateList(list: anyNamed('list'))).thenAnswer(
-          (_) async =>
-              TaskList(id: 'id', index: 0, items: const [], title: ''));
+          (_) async => TaskList(id: 'id', index: 0, items: const [], title: ''));
       when(_tasksRepository.createTask(
               newTask: anyNamed('newTask'), taskListId: anyNamed('taskListId')))
           .thenAnswer((invokation) async {
-        final providedTask =
-            invokation.namedArguments[const Symbol('newTask')] as Task;
+        final providedTask = invokation.namedArguments[const Symbol('newTask')] as Task;
         return providedTask.copyWith(id: UniqueKey().toString());
       });
       when(_tasksRepository.updateTask(
-              taskListId: anyNamed('taskListId'),
-              updatedTask: anyNamed('updatedTask')))
+              taskListId: anyNamed('taskListId'), updatedTask: anyNamed('updatedTask')))
           .thenAnswer((invokation) async {
         final providedTask =
             invokation.namedArguments[const Symbol('updatedTask')] as Task;
@@ -112,8 +106,7 @@ void main() {
       StorageRepository.instance = _storageRepository;
       when(_storageRepository.delete(any, storageArea: anyNamed('storageArea')))
           .thenAnswer((_) async {});
-      when(_storageRepository.getStorageAreaValues(any))
-          .thenAnswer((_) async => []);
+      when(_storageRepository.getStorageAreaValues(any)).thenAnswer((_) async => []);
       when(_storageRepository.get(any, storageArea: anyNamed('storageArea')))
           .thenAnswer((_) async => null);
       when(_storageRepository.saveStorageAreaValues(
@@ -409,8 +402,7 @@ void main() {
         expect(testCubit.state.taskLists[1], taskList2);
       });
 
-      test("if provided a parentId, only clears that task's subtasks",
-          () async {
+      test("if provided a parentId, only clears that task's subtasks", () async {
         final taskList = testTaskList.copyWith(
           items: [
             task1.copyWith(completed: true),

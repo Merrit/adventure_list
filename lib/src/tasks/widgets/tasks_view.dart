@@ -196,9 +196,8 @@ class _CompletedTasksWidgetState extends State<_CompletedTasksWidget> {
             ),
             AnimatedCrossFade(
               duration: const Duration(milliseconds: 200),
-              crossFadeState: expanded
-                  ? CrossFadeState.showSecond
-                  : CrossFadeState.showFirst,
+              crossFadeState:
+                  expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
               firstChild: const SizedBox(),
               secondChild: const _CompletedTasksList(),
             ),
@@ -286,8 +285,7 @@ class _CompletedTaskTileState extends State<_CompletedTaskTile> {
         leading: IconButton(
           icon: const Icon(Icons.check),
           tooltip: LocaleKeys.markUncompleted.tr(),
-          onPressed: () =>
-              tasksCubit.updateTask(task.copyWith(completed: false)),
+          onPressed: () => tasksCubit.updateTask(task.copyWith(completed: false)),
         ),
         title: Text(
           task.title,

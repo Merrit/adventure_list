@@ -130,9 +130,7 @@ class _AppState extends State<App> with TrayListener, WindowListener {
                           child = const TasksPage();
                       }
 
-                      return Platform.isAndroid
-                          ? HomeScreenWidget(child: child)
-                          : child;
+                      return Platform.isAndroid ? HomeScreenWidget(child: child) : child;
                     },
                   );
                 },

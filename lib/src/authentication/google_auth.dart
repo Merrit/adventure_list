@@ -26,8 +26,7 @@ abstract class GoogleAuthIds {
 
   static const String windowsClientIdString =
       '478765689275-vlsnua919pmsrh27gtgut52grv798goi.apps.googleusercontent.com';
-  static const String windowsClientSecret =
-      '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';
+  static const String windowsClientSecret = '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';
   static final ClientId windowsClientId = ClientId(
     windowsClientIdString,
     windowsClientSecret,
@@ -154,8 +153,7 @@ class GoogleAuth {
   /// workaround to refresh authentication for platforms that use google_sign_in
   Future<AuthClient?> refreshAuthClient() async {
     final GoogleSignIn googleSignIn = GoogleSignIn(scopes: scopes);
-    final GoogleSignInAccount? googleSignInAccount =
-        await googleSignIn.signInSilently();
+    final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signInSilently();
 
     if (googleSignInAccount == null) await signin();
 

@@ -43,17 +43,14 @@ class HomeWidgetConfigPage extends StatelessWidget {
                               );
 
                               final selectedListItems = selectedList.items
-                                  .where(
-                                      (e) => !e.completed && e.parent == null)
+                                  .where((e) => !e.completed && e.parent == null)
                                   .toList();
 
                               selectedList = selectedList.copyWith(
                                 items: selectedListItems,
                               );
 
-                              await context
-                                  .read<HomeWidgetManager>()
-                                  .updateHomeWidget(
+                              await context.read<HomeWidgetManager>().updateHomeWidget(
                                     'selectedList',
                                     selectedList.toJson(),
                                   );
