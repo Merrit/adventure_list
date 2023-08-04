@@ -8,7 +8,7 @@ import '../../logs/logging_manager.dart';
 /// errors in the platform, or plugins.
 void initializePlatformErrorHandler() {
   PlatformDispatcher.instance.onError = (error, stack) {
-    log.e('Uncaught platform error', error, stack);
+    log.e('Uncaught platform error', error: error, stackTrace: stack);
     return true;
   };
 }

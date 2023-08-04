@@ -71,7 +71,7 @@ dependencies:
   launch_at_startup: ^0.2.2
   launcher_entry: ^0.1.1
   local_notifier: ^0.1.5
-  logger: ^1.1.0
+  logger: ^2.0.1
   # move_to_background sends the Android app to background when user exits
   # instead of the app closing entirely.
   #
@@ -109,7 +109,7 @@ dev_dependencies:
   flutter_app_builder:
     git:
       url: https://github.com/Merrit/flutter_app_builder.git
-      ref: 3c38d05af2ab6355e8c72a6d42ff7ad6c29c9348
+      ref: c1b6d965ba8dd5c4cf792d536f6ae83746fda18c
   flutter_launcher_icons: ^0.13.1
   flutter_lints: ^2.0.0
   flutter_test:

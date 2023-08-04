@@ -53,7 +53,7 @@ class GoogleCalendar implements TasksRepository {
         showHidden: true,
       );
     } on Exception catch (e) {
-      log.e('Failed to get all lists', e);
+      log.e('Failed to get all lists', error: e);
       return null;
     }
 
@@ -75,7 +75,7 @@ class GoogleCalendar implements TasksRepository {
       try {
         calendar = await _api.calendars.get(calendarListEntry.id!);
       } on Exception catch (e) {
-        log.e('Failed to get list', e);
+        log.e('Failed to get list', error: e);
         return null;
       }
 
@@ -97,7 +97,7 @@ class GoogleCalendar implements TasksRepository {
         summary: taskList.title,
       ));
     } on Exception catch (e) {
-      log.e('Failed to create list', e);
+      log.e('Failed to create list', error: e);
       return null;
     }
 
@@ -116,7 +116,7 @@ class GoogleCalendar implements TasksRepository {
     try {
       await _api.calendars.delete(id);
     } on Exception catch (e) {
-      log.e('Failed to delete list', e);
+      log.e('Failed to delete list', error: e);
       return false;
     }
 
@@ -131,7 +131,7 @@ class GoogleCalendar implements TasksRepository {
     try {
       await _api.events.delete(taskListId, taskId);
     } on Exception catch (e) {
-      log.e('Failed to delete task', e);
+      log.e('Failed to delete task', error: e);
       return false;
     }
 
@@ -147,7 +147,7 @@ class GoogleCalendar implements TasksRepository {
         list.id,
       );
     } on Exception catch (e) {
-      log.e('Failed to update list', e);
+      log.e('Failed to update list', error: e);
       return null;
     }
 
@@ -166,7 +166,7 @@ class GoogleCalendar implements TasksRepository {
         taskListId,
       );
     } on Exception catch (e) {
-      log.e('Failed to create task', e);
+      log.e('Failed to create task', error: e);
       return null;
     }
 
@@ -186,7 +186,7 @@ class GoogleCalendar implements TasksRepository {
         updatedTask.id,
       );
     } on DetailedApiRequestError catch (e) {
-      log.e('Failed to update task', e);
+      log.e('Failed to update task', error: e);
       return null;
     }
 
@@ -202,7 +202,7 @@ class GoogleCalendar implements TasksRepository {
         calendarId,
       );
     } on Exception catch (e) {
-      log.e('Failed to set list hidden', e);
+      log.e('Failed to set list hidden', error: e);
       return false;
     }
 
@@ -216,7 +216,7 @@ extension CalendarHelper on Calendar {
     try {
       apiTasks = await api.events.list(id!);
     } on Exception catch (e) {
-      log.e('Failed to get tasks for list', e);
+      log.e('Failed to get tasks for list', error: e);
       return null;
     }
 

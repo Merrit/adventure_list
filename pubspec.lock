@@ -378,8 +378,8 @@ packages:
     dependency: "direct dev"
     description:
       path: "."
-      ref: "3c38d05af2ab6355e8c72a6d42ff7ad6c29c9348"
-      resolved-ref: "3c38d05af2ab6355e8c72a6d42ff7ad6c29c9348"
+      ref: c1b6d965ba8dd5c4cf792d536f6ae83746fda18c
+      resolved-ref: c1b6d965ba8dd5c4cf792d536f6ae83746fda18c
       url: "https://github.com/Merrit/flutter_app_builder.git"
     source: git
     version: "1.0.0"
@@ -749,10 +749,10 @@ packages:
     dependency: "direct main"
     description:
       name: logger
-      sha256: "7ad7215c15420a102ec687bb320a7312afd449bac63bfb1c60d9787c27b9767f"
+      sha256: "66cb048220ca51cf9011da69fa581e4ee2bed4be6e82870d9e9baae75739da49"
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.0"
+    version: "2.0.1"
   logging:
     dependency: transitive
     description:

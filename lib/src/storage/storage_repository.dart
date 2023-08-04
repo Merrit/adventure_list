@@ -98,7 +98,7 @@ class StorageRepository {
     } on Exception catch (e) {
       log.e(
         'Unable to access storage; is another app instance already running?',
-        e,
+        error: e,
       );
       exit(1);
     }
