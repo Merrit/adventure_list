@@ -40,6 +40,11 @@
             "signOut": "Sign out",
             "title": "Sync"
         },
+        "troubleshooting": {
+            "crashReporting": "Crash reporting",
+            "crashReportingDescription": "Automatically send crash reports to the developer",
+            "title": "Troubleshooting"
+        },
         "version": {
             "currentVersion": "Current version: {}",
             "title": "Version",
