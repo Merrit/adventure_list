@@ -1,6 +1,5 @@
 #define MyAppName "Adventure List"
 #define MyAppNameNoSpaces "AdventureList"
-#define MyAppVersion "0.3.1"
 #define MyAppPublisher "Merritt Codes"
 #define MyAppURL "https://merritt.codes/"
 #define MyAppExeName "adventure_list.exe"
@@ -10,7 +9,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{89C0BB60-00AF-43D3-B89B-C08E7E0F6BE4}
 AppName={#MyAppName}
-AppVersion={#MyAppVersion}
+AppVersion={#AppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
