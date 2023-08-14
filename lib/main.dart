@@ -38,16 +38,19 @@ Future<void> main(List<String> args) async {
     LevelMessages.error,
   ];
 
-  final bool verbose =
-      args.contains('--verbose') || const bool.fromEnvironment('VERBOSE');
+  final storageRepository = await StorageRepository.initialize(Hive);
+
+  bool verbose = args.contains('--verbose') || const bool.fromEnvironment('VERBOSE');
+  if (!verbose) {
+    verbose = await storageRepository.get('verboseLogging') ?? false;
+  }
 
   await LoggingManager.initialize(verbose: verbose);
   initializePlatformErrorHandler();
 
-  final storageRepository = await StorageRepository.initialize(Hive);
-
   final settingsCubit = await SettingsCubit.initialize(
     AutostartService(),
+    storageRepository,
   );
 
   if (defaultTargetPlatform.isDesktop) {
