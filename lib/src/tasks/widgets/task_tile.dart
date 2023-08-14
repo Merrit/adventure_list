@@ -127,6 +127,8 @@ class _TaskTileContentsState extends State<_TaskTileContents> {
 
   final expansionTileController = ExpansionTileController();
 
+  bool expanded = false;
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -148,9 +150,9 @@ class _TaskTileContentsState extends State<_TaskTileContents> {
         return BlocBuilder<TaskTileCubit, TaskTileState>(
           builder: (context, taskTileState) {
             Widget? subtitle;
-            if (taskTileState.task.isOverdue || taskTileState.hasChildTasks) {
+            if (taskTileState.task.dueDate != null || taskTileState.hasChildTasks) {
               final children = <Widget>[
-                const _OverdueIndicator(),
+                if (!expanded) const _DueDateChip(),
                 const _ChildTasksIndicator(),
               ];
 
@@ -173,6 +175,8 @@ class _TaskTileContentsState extends State<_TaskTileContents> {
               controller: expansionTileController,
               initiallyExpanded: taskTileState.isSelected,
               onExpansionChanged: (value) {
+                setState(() => expanded = value);
+
                 if (value) {
                   tasksCubit.setActiveTask(taskTileState.task.id);
                 } else {
@@ -275,22 +279,24 @@ class _TitleRow extends StatelessWidget {
   }
 }
 
-/// Displays an "Overdue" label if the task is overdue.
-class _OverdueIndicator extends StatelessWidget {
-  const _OverdueIndicator({Key? key}) : super(key: key);
+/// Displays a chip indicating when the task is due.
+class _DueDateChip extends StatelessWidget {
+  const _DueDateChip({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TaskTileCubit, TaskTileState>(
       builder: (context, tileState) {
         final task = tileState.task;
-        if (!task.isOverdue) return const SizedBox();
+        if (task.dueDate == null) return const SizedBox();
+
+        final color = task.isOverdue ? Theme.of(context).colorScheme.error : null;
 
         return Chip(
           label: Text(
-            'Overdue',
+            task.dueDate!.toDueDateLabel(),
             style: TextStyle(
-              color: Theme.of(context).colorScheme.error,
+              color: color,
             ),
           ),
         );
