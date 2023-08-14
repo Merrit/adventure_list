@@ -257,27 +257,8 @@ class _TitleWidget extends StatelessWidget {
 /// Due date widget.
 ///
 /// Displays the due date of the task and allows the user to change it.
-class DueDateWidget extends StatefulWidget {
+class DueDateWidget extends StatelessWidget {
   const DueDateWidget({Key? key}) : super(key: key);
-
-  @override
-  State<DueDateWidget> createState() => _DueDateWidgetState();
-}
-
-class _DueDateWidgetState extends State<DueDateWidget> {
-  @override
-  void initState() {
-    super.initState();
-    final Task? task = tasksCubit.state.activeTask;
-    if (task == null) return;
-
-    selectedDate = task.dueDate ?? noneDate;
-  }
-
-  final dateFocusNode = FocusNode();
-
-  final noneDate = DateTime(1900);
-  DateTime? selectedDate;
 
   @override
   Widget build(BuildContext context) {
@@ -286,97 +267,43 @@ class _DueDateWidgetState extends State<DueDateWidget> {
         final Task? task = state.activeTask;
         if (task == null) return const SizedBox();
 
-        final todayDate = DateTime(
-          DateTime.now().year,
-          DateTime.now().month,
-          DateTime.now().day,
-          8,
-        );
+        final String titleText;
+        if (task.dueDate == null) {
+          titleText = 'Date/time';
+        } else {
+          titleText = task.dueDate!.toDueDateLabel().split(',').first;
+        }
 
-        final tomorrowDate = DateTime(
-          DateTime.now().year,
-          DateTime.now().month,
-          DateTime.now().day + 1,
-          8,
-        );
+        final Widget title = Text(titleText);
 
-        final bool selectedDateIsCustom = selectedDate != noneDate &&
-            selectedDate != todayDate &&
-            selectedDate != tomorrowDate;
-
-        final List<DropdownMenuItem<DateTime>> dropdownItems = [
-          DropdownMenuItem(
-            value: noneDate,
-            child: const Text('None'),
-          ),
-          DropdownMenuItem(
-            value: todayDate,
-            child: const Text('Today'),
-          ),
-          DropdownMenuItem(
-            value: tomorrowDate,
-            child: const Text('Tomorrow'),
-          ),
-          const DropdownMenuItem(
-            value: null,
-            child: Text('Pick a date'),
-          ),
-          if (selectedDateIsCustom)
-            DropdownMenuItem(
-              value: selectedDate,
-              child: Text(
-                DateFormat('EEEE, MMMM d').format(selectedDate!),
-              ),
-            ),
-        ];
-
-        final bool isOverdue = task.dueDate?.isBefore(DateTime.now()) ?? false;
-
-        TextStyle? textStyle;
-        if (isOverdue) {
-          textStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Theme.of(context).colorScheme.error,
-              );
+        final Widget? trailing;
+        if (task.dueDate == null) {
+          trailing = null;
+        } else {
+          trailing = IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () {
+              tasksCubit.updateTask(task.copyWith(dueDate: null));
+            },
+          );
         }
 
         return ListTile(
           leading: const Icon(Icons.calendar_today),
-          title: const Text('Due date'),
-          trailing: IntrinsicWidth(
-            child: DropdownButtonFormField<DateTime>(
-              value: selectedDate,
-              // Focus color is transparent so that the dropdown button doesn't
-              // remain hightlighted after is has been closed.
-              // Related issue: https://github.com/flutter/flutter/issues/94605
-              focusColor: Colors.transparent,
-              focusNode: dateFocusNode,
-              onChanged: (DateTime? value) async {
-                dateFocusNode.unfocus();
+          title: title,
+          trailing: trailing,
+          onTap: () async {
+            final DateTime? selectedDate = await showDatePicker(
+              context: context,
+              initialDate: DateTime.now(),
+              firstDate: DateTime.now().subtract(const Duration(days: 365)),
+              lastDate: DateTime.now().add(const Duration(days: 365)),
+            );
 
-                DateTime? selectedDate;
+            if (selectedDate == null) return;
 
-                // Value is null when the selected dropdown item is Custom.
-                if (value == null) {
-                  selectedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(const Duration(days: 365)),
-                  );
-                } else {
-                  selectedDate = value;
-                }
-
-                if (value == noneDate) {
-                  tasksCubit.updateTask(task.copyWith(dueDate: null));
-                } else {
-                  tasksCubit.updateTask(task.copyWith(dueDate: selectedDate));
-                }
-              },
-              items: dropdownItems,
-              style: textStyle,
-            ),
-          ),
+            await tasksCubit.updateTask(task.copyWith(dueDate: selectedDate));
+          },
         );
       },
     );
@@ -400,9 +327,10 @@ class DueTimeWidget extends StatelessWidget {
 
         final dueTime = TimeOfDay.fromDateTime(task.dueDate!);
 
-        final trailing = Text(
-          DateFormat('h:mm a').format(task.dueDate!),
-        );
+        final timeString = DateFormat('h:mm a') //
+            .format(task.dueDate!)
+            .replaceAll('.', '')
+            .toUpperCase();
 
         return ListTile(
           leading: const Icon(Icons.access_time),
@@ -426,8 +354,7 @@ class DueTimeWidget extends StatelessWidget {
               ),
             );
           },
-          title: const Text('Due time'),
-          trailing: trailing,
+          title: Text(timeString),
         );
       },
     );
