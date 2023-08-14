@@ -122,19 +122,63 @@ class ContextMenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PopupMenuButton(
-      itemBuilder: (context) {
-        return [
-          PopupMenuItem(
-            onTap: () {
-              final task = tasksCubit.state.activeTask;
-              if (task == null) return;
+    final tasksCubit = context.read<TasksCubit>();
 
-              tasksCubit.deleteCompletedTasks(parentId: task.id);
-            },
-            child: const Text('Clear completed sub-tasks'),
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        final task = state.activeTask;
+        if (task == null) return const SizedBox.shrink();
+
+        final deleteCompletedSubtasksButton = MenuItemButton(
+          leadingIcon: const Icon(Icons.clear_all),
+          onPressed: () {
+            tasksCubit.deleteCompletedTasks(parentId: task.id);
+          },
+          child: Text(
+            LocaleKeys.deleteCompletedSubtasks.tr(),
           ),
-        ];
+        );
+
+        /// List of TaskLists so that the user can move the task to another list. The
+        /// current list has a checkmark next.
+        final listChoiceButtons = state.taskLists.map(
+          (list) {
+            final bool isCurrentList = (list.id == task.taskListId);
+
+            return MenuItemButton(
+              leadingIcon: Icon(
+                Icons.check,
+                color: (isCurrentList) ? null : Colors.transparent,
+              ),
+              onPressed: () {
+                if (isCurrentList) return;
+
+                tasksCubit.moveTaskToList(task: task, newListId: list.id);
+              },
+              child: Text(list.title),
+            );
+          },
+        );
+
+        return MenuAnchor(
+          builder: (context, controller, child) {
+            return IconButton(
+              icon: const Icon(Icons.more_vert),
+              onPressed: () {
+                if (controller.isOpen) {
+                  controller.close();
+                } else {
+                  controller.open();
+                }
+              },
+            );
+          },
+          menuChildren: [
+            deleteCompletedSubtasksButton,
+            const PopupMenuDivider(),
+            ...listChoiceButtons,
+          ],
+        );
       },
     );
   }

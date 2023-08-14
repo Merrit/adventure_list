@@ -219,6 +219,76 @@ class TasksCubit extends Cubit<TasksState> {
     );
   }
 
+  /// Moves the provided [task] to the list with the provided [newListId].
+  Future<void> moveTaskToList({
+    required Task task,
+    required String newListId,
+  }) async {
+    final taskLists = [...state.taskLists];
+
+    final oldList = taskLists.getTaskListById(task.taskListId);
+    if (oldList == null) {
+      log.w('Task list not found');
+      return;
+    }
+
+    final newList = taskLists.getTaskListById(newListId);
+    if (newList == null) {
+      log.w('New task list not found');
+      return;
+    }
+
+    assert(state.activeList?.id == oldList.id);
+
+    final updatedOldList = oldList.copyWith(items: oldList.items.removeTask(task));
+    final updatedTaskLists = taskLists.updateTaskList(updatedOldList);
+
+    emit(state.copyWith(
+      activeList: updatedOldList,
+      taskLists: updatedTaskLists,
+    ));
+
+    final bool successful = await _tasksRepository.deleteTask(
+      taskListId: oldList.id,
+      taskId: task.id,
+    );
+
+    if (!successful) {
+      emit(state.copyWith(
+        activeList: oldList,
+        taskLists: taskLists,
+      ));
+      log.w('Failed to delete task from old list');
+      return;
+    }
+
+    final updatedTask = await _tasksRepository.createTask(
+      taskListId: newList.id,
+      newTask: task.copyWith(
+        id: _uuid.v4(),
+        taskListId: newList.id,
+        index: newList.items.length,
+      ),
+    );
+
+    if (updatedTask == null) {
+      emit(state.copyWith(
+        activeList: oldList,
+        taskLists: taskLists,
+      ));
+      log.w('Failed to create task in new list');
+      return;
+    }
+
+    final updatedNewList = newList.copyWith(items: newList.items.addTask(updatedTask));
+
+    emit(state.copyWith(
+      taskLists: taskLists.updateTaskList(updatedNewList),
+    ));
+
+    log.i('Moved task to new list');
+  }
+
   /// Called when the user is reordering the list of TaskLists.
   Future<void> reorderLists(int oldIndex, int newIndex) async {
     if (oldIndex < newIndex) newIndex -= 1;
