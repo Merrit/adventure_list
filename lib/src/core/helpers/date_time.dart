@@ -33,6 +33,8 @@ extension DateTimeHelper on DateTime {
       final daysAgo = now.difference(this).inDays;
       if (daysAgo < 7) {
         label = '$daysAgo days ago';
+      } else if (daysAgo >= 7 && daysAgo < 14) {
+        label = '1 week ago';
       } else {
         final weeksAgo = daysAgo ~/ 7;
         label = '$weeksAgo weeks ago';
