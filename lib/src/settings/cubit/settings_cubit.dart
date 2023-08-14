@@ -8,6 +8,7 @@ import 'package:system_theme/system_theme.dart';
 
 import '../../autostart/autostart_service.dart';
 import '../../core/core.dart';
+import '../../logs/logging_manager.dart';
 import '../../storage/storage_repository.dart';
 import '../../theme/theme.dart';
 import '../settings.dart';
@@ -19,13 +20,18 @@ class SettingsCubit extends Cubit<SettingsState> {
   /// Service for managing autostart.
   final AutostartService _autostartService;
 
+  /// Repository for managing storage.
+  final StorageRepository _storageRepository;
+
   SettingsCubit(
-    this._autostartService, {
+    this._autostartService,
+    this._storageRepository, {
     required SettingsState initialState,
   }) : super(initialState);
 
   static Future<SettingsCubit> initialize(
     AutostartService autostartService,
+    StorageRepository storageRepository,
   ) async {
     final String? desktopWidgetSettingsJson = await StorageRepository //
         .instance
@@ -43,6 +49,7 @@ class SettingsCubit extends Cubit<SettingsState> {
 
     return SettingsCubit(
       autostartService,
+      storageRepository,
       initialState: SettingsState(
         autostart: await StorageRepository.instance.get('autostart') ?? false,
         closeToTray: await StorageRepository.instance.get('closeToTray') ?? true,
@@ -82,6 +89,12 @@ class SettingsCubit extends Cubit<SettingsState> {
       default:
         return (SystemTheme.isDarkMode) ? ThemeMode.dark : ThemeMode.light;
     }
+  }
+
+  /// Set whether or not to show verbose logging.
+  Future<void> setVerboseLogging(bool value) async {
+    await LoggingManager.initialize(verbose: value);
+    await _storageRepository.save(key: 'verboseLogging', value: value);
   }
 
   /// Toggle autostart on Desktop.
