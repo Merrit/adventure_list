@@ -40,7 +40,7 @@ extension DateTimeHelper on DateTime {
         label = '$weeksAgo weeks ago';
       }
     } else {
-      final formatter = DateFormat('EEE, MMM d, yyyy');
+      final formatter = DateFormat('EEE, MMM d');
       label = formatter.format(this);
     }
 
