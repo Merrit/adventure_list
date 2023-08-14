@@ -271,7 +271,11 @@ class DueDateWidget extends StatelessWidget {
         if (task.dueDate == null) {
           titleText = 'Date/time';
         } else {
-          titleText = task.dueDate!.toDueDateLabel().split(',').first;
+          /// `toDueDateLabel` returns a string like "Wed., Aug. 4, 10:00 AM"
+          /// and we want to remove the end with the time.
+          titleText = task.dueDate!.toDueDateLabel().split(', ').where((s) {
+            return !s.contains(':');
+          }).join(', ');
         }
 
         final Widget title = Text(titleText);
