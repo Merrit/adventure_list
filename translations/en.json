@@ -4,7 +4,8 @@
     "completed": "Completed",
     "confirm": "Confirm",
     "delete": "Delete",
-    "deleteCompleted": "Delete all completed tasks",
+    "deleteCompleted": "Delete completed tasks",
+    "deleteCompletedSubtasks": "Delete completed subtasks",
     "deleteTask": "Delete task",
     "getStartedPrompt": "Select or create a list to get started",
     "homeWidgetConfig": {
