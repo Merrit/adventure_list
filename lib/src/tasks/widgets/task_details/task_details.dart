@@ -293,7 +293,7 @@ class DueDateWidget extends StatelessWidget {
           title: title,
           trailing: trailing,
           onTap: () async {
-            final DateTime? selectedDate = await showDatePicker(
+            DateTime? selectedDate = await showDatePicker(
               context: context,
               initialDate: DateTime.now(),
               firstDate: DateTime.now().subtract(const Duration(days: 365)),
@@ -302,6 +302,8 @@ class DueDateWidget extends StatelessWidget {
 
             if (selectedDate == null) return;
 
+            // Time defaults to 8 AM
+            selectedDate = selectedDate.copyWith(hour: 8, minute: 0);
             await tasksCubit.updateTask(task.copyWith(dueDate: selectedDate));
           },
         );
