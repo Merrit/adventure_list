@@ -25,11 +25,13 @@ jobs:
       - name: Run translations generation
         run: dart run easy_localization:generate --source-dir translations --output-dir lib/generated --output-file locale_keys.g.dart --format keys --skip-unnecessary-keys
       
-      - name: Print directory structure
-        run: tree -a
-
       - name: Run code generation
         run: dart run build_runner build --delete-conflicting-outputs
-
+        
       - name: Run tests
         run: flutter test
+        
+      - name: Print directory structure
+        # Ensure this step runs even after a failure, but not when cancelled.
+        if: success() || failure()
+        run: tree -a
