@@ -1,4 +1,10 @@
-# Adventure List
+- [About](#about)
+- [Screenshots](#screenshots)
+- [Download](#download)
+- [Roadmap](#roadmap)
+
+
+## About
 
 Are you ready for an adventure? Adventure List is a Todo list app that helps you organize your tasks and goals in a fun and easy way. Whether you want to plan a trip, learn a new skill, or just get things done, Adventure List is the app for you. 
 
@@ -15,14 +21,7 @@ Here are some of the features that make Adventure List great:
 Adventure List is ready to help you get things done. Download it today and start your adventure!
 
 
-[Releases](https://github.com/Merrit/adventure_list/releases)
-
-[Flathub](https://flathub.org/apps/codes.merritt.adventurelist)
-
-[Google Play](https://play.google.com/store/apps/details?id=codes.merritt.adventurelist)
-
-
-<br>
+## Screenshots
 
 <img src="https://i.imgur.com/wdqxDFP.png" style="width:90%">
 <img src="https://i.imgur.com/oDECfhj.png" style="width:90%">
@@ -32,9 +31,20 @@ Adventure List is ready to help you get things done. Download it today and start
 <br>
 
 
+## Download
+
+[GitHub Releases](https://github.com/Merrit/adventure_list/releases)
+
+[Flathub](https://flathub.org/apps/codes.merritt.adventurelist)
+
+[Microsoft Store](https://apps.microsoft.com/store/detail/adventure-list/9NR8M88MSCC2)
+
+[Google Play](https://play.google.com/store/apps/details?id=codes.merritt.adventurelist)
+
+
 ## Roadmap
 
-### Planned
+**Planned**
 
 - ~~Due dates / reminders~~ ✅
   - ~~Recurring tasks~~ ✅
@@ -45,7 +55,8 @@ Adventure List is ready to help you get things done. Download it today and start
 - ~~Desktop notifications~~ ✅
   - ~~Notification center / popup / tray icon badge / etc~~ ✅
 
-### Considering
+**Considering**
 
 - Improve Android widget (could use assistance)
 - Web version
+- iOS/iPadOS/macOS versions
