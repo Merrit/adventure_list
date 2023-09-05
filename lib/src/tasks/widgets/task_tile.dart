@@ -5,7 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../core/helpers/helpers.dart';
 import '../tasks.dart';
-import 'task_details/sub_tasks_list_widget.dart';
+import 'task_details/task_details.dart';
 
 part 'task_tile.freezed.dart';
 
@@ -197,6 +197,7 @@ class _TaskTileContentsState extends State<_TaskTileContents> {
                 expansionTileCloser,
                 const DueDateWidget(),
                 const DueTimeWidget(),
+                const RecurrenceWidget(),
                 const DescriptionWidget(),
                 const ParentSelectionWidget(),
                 const SubTasksListWidget(),
@@ -294,7 +295,7 @@ class _DueDateChip extends StatelessWidget {
 
         return Chip(
           label: Text(
-            task.dueDate!.toDueDateLabel(),
+            task.dueDate!.toLocal().toDueDateLabel(),
             style: TextStyle(
               color: color,
             ),

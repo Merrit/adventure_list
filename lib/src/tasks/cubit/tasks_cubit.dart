@@ -461,6 +461,7 @@ class TasksCubit extends Cubit<TasksState> {
 
   /// Updates the provided [Task].
   Future<Task> updateTask(Task task) async {
+    assert(task.dueDate?.isUtc ?? true);
     final taskList = state.taskLists.getTaskListById(task.taskListId);
     if (taskList == null) throw Exception('Task list not found');
 

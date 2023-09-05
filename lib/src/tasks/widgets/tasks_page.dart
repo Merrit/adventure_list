@@ -45,7 +45,7 @@ class _TasksPageState extends State<TasksPage> {
               // If there is an active task and we are on a small screen, we want to
               // navigate to the task details page.
               if (state.activeTask != null && mediaQuery.isSmallScreen) {
-                Navigator.pushNamed(context, TaskDetails.routeName);
+                Navigator.pushNamed(context, TaskDetailsWidget.routeName);
               }
             },
             builder: (context, state) {
