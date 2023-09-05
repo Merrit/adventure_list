@@ -8,24 +8,27 @@ void main() {
   group('Task:', () {
     final int dueDate = DateTime //
             .now()
+        .toUtc()
         .add(const Duration(days: 2))
         .millisecondsSinceEpoch;
     final String id = const Uuid().v4();
-    final int updated = DateTime.now().millisecondsSinceEpoch;
+    final int updated = DateTime.now().toUtc().millisecondsSinceEpoch;
 
     final expectedTask = Task(
       completed: true,
       description: 'Gotta look good!',
-      dueDate: DateTime.fromMillisecondsSinceEpoch(dueDate),
+      dueDate: DateTime.fromMillisecondsSinceEpoch(dueDate, isUtc: true),
       id: id,
       index: 3,
       parent: null,
       taskListId: 'test-task-list-id',
       title: 'Make promo video',
-      updated: DateTime.fromMillisecondsSinceEpoch(updated),
+      updated: DateTime.fromMillisecondsSinceEpoch(updated, isUtc: true),
     );
 
     final json = jsonEncode(expectedTask.toJson());
+
+    assert(expectedTask.dueDate!.isUtc);
 
     test('fromJson() works', () {
       expect(Task.fromJson(jsonDecode(json)), expectedTask);

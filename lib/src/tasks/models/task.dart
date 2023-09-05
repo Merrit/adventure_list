@@ -2,8 +2,7 @@ import 'dart:math';
 
 import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-
-import 'models.dart';
+import 'package:rrule/rrule.dart';
 
 part 'task.freezed.dart';
 part 'task.g.dart';
@@ -24,6 +23,7 @@ class Task with _$Task {
     required String? description,
 
     /// Due date of the task.
+    @Assert('dueDate.isUtc', 'Due date must be in UTC.')
     @JsonKey(
       fromJson: _dueDateFromJson,
       toJson: _dueDateToJson,
@@ -47,11 +47,11 @@ class Task with _$Task {
     /// The ID of the task considered the parent, only if this task is nested.
     required String? parent,
 
-    /// The repeat interval of the task.
+    /// The recurrence rule of the task.
     ///
     /// If null, the task is not recurring.
     @JsonKey(defaultValue: null) //
-    required RepeatInterval? repeatInterval,
+    required RecurrenceRule? recurrenceRule,
 
     /// Whether the task has been synced with the server.
     @JsonKey(defaultValue: false) //
@@ -81,11 +81,11 @@ class Task with _$Task {
         index: -1,
         notificationId: _generateNotificationId(),
         parent: null,
-        repeatInterval: null,
+        recurrenceRule: null,
         synced: false,
         taskListId: '',
         title: '',
-        updated: DateTime.now(),
+        updated: DateTime.now().toUtc(),
       );
 
   factory Task({
@@ -96,7 +96,7 @@ class Task with _$Task {
     int index = -1,
     int? notificationId,
     String? parent,
-    RepeatInterval? repeatInterval,
+    RecurrenceRule? recurrenceRule,
     bool synced = false,
     required String taskListId,
     required String title,
@@ -106,15 +106,17 @@ class Task with _$Task {
       // Remove microseconds so serialization will work reliably.
       dueDate = DateTime.fromMillisecondsSinceEpoch(
         dueDate.millisecondsSinceEpoch,
+        isUtc: true,
       );
     }
 
     if (parent == '') parent = null;
 
-    updated ??= DateTime.now();
+    updated ??= DateTime.now().toUtc();
     // Remove microseconds so serialization will work reliably.
     updated = DateTime.fromMillisecondsSinceEpoch(
       updated.millisecondsSinceEpoch,
+      isUtc: true,
     );
 
     return Task._internal(
@@ -125,7 +127,7 @@ class Task with _$Task {
       index: index,
       notificationId: notificationId ?? _generateNotificationId(),
       parent: parent,
-      repeatInterval: repeatInterval,
+      recurrenceRule: recurrenceRule,
       synced: synced,
       taskListId: taskListId,
       title: title,
@@ -148,44 +150,25 @@ class Task with _$Task {
   /// If the task is recurring, the returned task has the due date updated to
   /// the next occurrence if the current due date is in the past.
   Task updateDueDate() {
-    if (repeatInterval == null) return this;
+    if (dueDate == null || recurrenceRule == null) return this;
 
     final now = DateTime.now();
-    if (dueDate == null || dueDate!.isAfter(now)) return this;
+    if (dueDate!.isAfter(now)) return this;
 
-    DateTime newDueDate = dueDate!;
-    switch (repeatInterval!.unit) {
-      case RepeatIntervalUnit.day:
-        while (newDueDate.isBefore(now)) {
-          newDueDate = newDueDate.add(const Duration(days: 1));
-        }
-        break;
-      case RepeatIntervalUnit.week:
-        while (newDueDate.isBefore(now)) {
-          newDueDate = newDueDate.add(const Duration(days: 7));
-        }
-        break;
-      case RepeatIntervalUnit.month:
-        while (newDueDate.isBefore(now)) {
-          // This is not perfect, but it's good enough for now.
-          newDueDate = newDueDate.add(const Duration(days: 30));
-        }
-        break;
-      case RepeatIntervalUnit.year:
-        while (newDueDate.isBefore(now)) {
-          newDueDate = newDueDate.add(const Duration(days: 365));
-        }
-        break;
-    }
+    final Iterable<DateTime> occurrences = recurrenceRule!.getInstances(start: dueDate!);
 
-    return copyWith(dueDate: newDueDate);
+    // If there are no more occurrences, return the task unchanged.
+    if (occurrences.isEmpty) return this;
+
+    // Return the task with the due date updated to the next occurrence.
+    return copyWith(dueDate: occurrences.first);
   }
 }
 
 /// Handles the fromJson for [Task.dueDate].
 DateTime? _dueDateFromJson(int? date) {
   if (date == null) return null;
-  return DateTime.fromMillisecondsSinceEpoch(date);
+  return DateTime.fromMillisecondsSinceEpoch(date, isUtc: true);
 }
 
 /// Handles the toJson for [Task.dueDate].
@@ -203,7 +186,7 @@ int _generateNotificationId() {
 
 /// Handles the fromJson for [Task.updated].
 DateTime _updatedFromJson(int date) {
-  return DateTime.fromMillisecondsSinceEpoch(date);
+  return DateTime.fromMillisecondsSinceEpoch(date, isUtc: true);
 }
 
 /// Handles the toJson for [Task.updated].

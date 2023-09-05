@@ -31,6 +31,7 @@ import 'src/window/window.dart';
 
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
+  await RecurrenceRuleService.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
   EasyLocalization.logger.enableLevels = [

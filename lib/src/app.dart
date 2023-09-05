@@ -120,8 +120,8 @@ class _AppState extends State<App> with TrayListener, WindowListener {
                         case SignInPage.routeName:
                           child = const SignInPage();
                           break;
-                        case TaskDetails.routeName:
-                          child = const TaskDetails();
+                        case TaskDetailsWidget.routeName:
+                          child = const TaskDetailsWidget();
                           break;
                         case SettingsPage.routeName:
                           child = const SettingsPage();
