@@ -5,6 +5,7 @@
     "confirm": "Bestätigen",
     "delete": "Löschen",
     "deleteCompleted": "Erledigte Aufgaben löschen",
+    "deleteCompletedSubtasks": "Erledigte Unteraufgaben löschen",
     "deleteTask": "Aufgabe löschen",
     "getStartedPrompt": "Wähle oder erstelle eine Liste um zu starten",
     "homeWidgetConfig": {
@@ -40,6 +41,11 @@
             "signOut": "Abmelden",
             "title": "Synchronisieren"
         },
+        "troubleshooting": {
+            "crashReporting": "Absturzberichte",
+            "crashReportingDescription": "Sende anonyme Absturzberichte an den Entwickler um Fehler zu beheben",
+            "title": "Fehlersuche"
+        },
         "version": {
             "currentVersion": "Aktuelle Version: {}",
             "title": "Version",
@@ -50,5 +56,9 @@
             "title": "Widget",
             "transparentBackground": "Transparenter Hintergrund"
         }
+    },
+    "subtasks": {
+        "addSubtask": "Unteraufgabe hinzufügen",
+        "title": "Unteraufgaben"
     }
 }
