@@ -1,14 +1,15 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
     localPropertiesFile.withReader('UTF-8') { reader ->
         localProperties.load(reader)
     }
-}
-
-def flutterRoot = localProperties.getProperty('flutter.sdk')
-if (flutterRoot == null) {
-    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
 }
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
@@ -21,12 +22,9 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
-apply plugin: 'com.android.application'
 // START: FlutterFire Configuration
 apply plugin: 'com.google.gms.google-services'
 // END: FlutterFire Configuration
-apply plugin: 'kotlin-android'
-apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
@@ -40,6 +38,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    namespace "codes.merritt.adventurelist"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -62,17 +61,14 @@ android {
     defaultConfig {
         applicationId "codes.merritt.adventurelist"
         // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
-        // minSdkVersion flutter.minSdkVersion
-        // Update minSdkVersion to 19 to support package_info_plus
-        minSdkVersion 19
+        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        multiDexEnabled true
     }
 
-    signingConfigs {
+        signingConfigs {
         release {
             keyAlias keystoreProperties['keyAlias']
             keyPassword keystoreProperties['keyPassword']
@@ -80,7 +76,7 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
-    
+
     buildTypes {
         release {
             signingConfig signingConfigs.release
@@ -91,7 +87,6 @@ android {
         }
     }
 
-    
     buildFeatures {
         viewBinding true
     }
@@ -102,10 +97,6 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'com.google.android.material:material:1.6.1'
-    implementation 'com.android.support:multidex:1.0.3'
-
     // flutter_local_notifications plugin requires desugaring
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
