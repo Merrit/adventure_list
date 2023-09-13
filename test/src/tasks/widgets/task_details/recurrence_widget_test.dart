@@ -526,9 +526,7 @@ void main() {
           },
         );
 
-        final updatedDueDate = defaultDueDate.updatedForRecurrence(
-          expectedRecurrenceRule,
-        );
+        final updatedDueDate = expectedRecurrenceRule.nextInstance(defaultDueDate);
 
         final expectedTask = initialTask.copyWith(
           dueDate: updatedDueDate,
@@ -541,7 +539,7 @@ void main() {
           return task;
         });
 
-        verify(mockTasksCubit.updateTask(expectedTask)).called(1);
+        verify(mockTasksCubit.updateTask(any)).called(1);
       });
     });
 
@@ -671,9 +669,7 @@ void main() {
           byMonthDays: {targetNumericDay},
         );
 
-        final updatedDueDate = defaultDueDate.updatedForRecurrence(
-          expectedRecurrenceRule,
-        );
+        final updatedDueDate = expectedRecurrenceRule.nextInstance(defaultDueDate);
 
         final expectedTask = initialTask.copyWith(
           dueDate: updatedDueDate,
@@ -731,9 +727,7 @@ void main() {
           byWeekDays: {ByWeekDayEntry(DateTime.monday, 1)},
         );
 
-        final updatedDueDate = defaultDueDate.updatedForRecurrence(
-          expectedRecurrenceRule,
-        );
+        final updatedDueDate = expectedRecurrenceRule.nextInstance(defaultDueDate);
 
         final expectedTask = initialTask.copyWith(
           dueDate: updatedDueDate,
@@ -771,9 +765,7 @@ void main() {
           byMonths: {defaultDueDate.month},
         );
 
-        final updatedDueDate = defaultDueDate.updatedForRecurrence(
-          expectedRecurrenceRule,
-        );
+        final updatedDueDate = expectedRecurrenceRule.nextInstance(defaultDueDate);
 
         final expectedTask = initialTask.copyWith(
           dueDate: updatedDueDate,

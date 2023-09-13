@@ -1,7 +1,12 @@
 import 'package:intl/intl.dart';
-import 'package:rrule/rrule.dart';
 
 extension DateTimeHelper on DateTime {
+  /// Returns a DateTime for today at 8:00 AM, in UTC.
+  static DateTime today() {
+    final now = DateTime.now().copyWith(hour: 8, minute: 0, second: 0, millisecond: 0);
+    return DateTime(now.year, now.month, now.day, now.hour).toUtc();
+  }
+
   /// Returns the given [DateTime] as a string representing the date of the recurrence.
   ///
   /// If in the current year, the string will be formatted like "August 18".
@@ -33,14 +38,5 @@ extension DateTimeHelper on DateTime {
     /// https://github.com/dart-lang/i18n/issues/711
     formatted = formatted.replaceAll('\u202F', ' ');
     return formatted;
-    // return formatter.format(this);
-  }
-
-  /// If the current date is in the past, then we need to update it to the next valid
-  /// date for the recurrence.
-  DateTime updatedForRecurrence(RecurrenceRule rrule) {
-    final Iterable<DateTime> instances = rrule.getInstances(start: this);
-    final DateTime nextDueDate = instances.first;
-    return nextDueDate;
   }
 }
