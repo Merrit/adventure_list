@@ -1014,10 +1014,10 @@ packages:
     dependency: "direct main"
     description:
       name: rrule
-      sha256: e441fc40006dfc0087e5bff07216dfa738cfab7c7b2e8255f8f62a49a07f625d
+      sha256: "535fec11dfe8882c89f14bb0a99ae08fb04d8cf1771db1e9ebb9869b1d414dd1"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.13"
+    version: "0.2.14"
   screen_retriever:
     dependency: transitive
     description:

@@ -60,7 +60,7 @@ class _RecurrenceCubit extends Cubit<Task> {
     // Due date should always be UTC, except when being displayed to the user.
     assert(task.dueDate!.isUtc);
 
-    final updatedDueDate = task.dueDate!.updatedForRecurrence(task.recurrenceRule!);
+    final updatedDueDate = task.recurrenceRule!.nextInstance(task.dueDate!);
     final updatedTask = task.copyWith(dueDate: updatedDueDate);
     emit(updatedTask);
   }
@@ -280,7 +280,8 @@ class _RecurrenceTypeWidget extends StatelessWidget {
     return Expanded(
       child: BlocBuilder<_RecurrenceCubit, Task>(
         builder: (context, task) {
-          final repeatsMultiple = task.recurrenceRule!.interval! > 1;
+          final int interval = task.recurrenceRule!.interval ?? 1;
+          final bool repeatsMultiple = interval > 1;
 
           return DropdownButtonFormField<Frequency>(
             value: task.recurrenceRule?.frequency,
@@ -291,17 +292,17 @@ class _RecurrenceTypeWidget extends StatelessWidget {
             onChanged: (value) {
               if (value == null) return;
 
-              Set<ByWeekDayEntry>? byWeekDays;
+              Set<ByWeekDayEntry> byWeekDays = {};
               if (value == Frequency.weekly) {
                 byWeekDays = {ByWeekDayEntry(DateTime.now().weekday)};
               }
 
-              Set<int>? byMonthDays;
+              Set<int> byMonthDays = {};
               if (value == Frequency.monthly || value == Frequency.yearly) {
                 byMonthDays = {DateTime.now().day};
               }
 
-              Set<int>? byMonths;
+              Set<int> byMonths = {};
               if (value == Frequency.yearly) {
                 byMonths = {DateTime.now().month};
               }
@@ -586,6 +587,7 @@ class _DayOfMonthWidgetState extends State<_DayOfMonthWidget> {
 
                         recurrenceCubit.updateTask(
                           task.copyWith(
+                            dueDate: DateTimeHelper.today(),
                             recurrenceRule: recurrenceRule.copyWith(
                               frequency: Frequency.monthly,
                               byMonthDays: {},
