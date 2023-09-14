@@ -8,7 +8,6 @@ import 'package:helpers/helpers.dart';
 
 import '../../../generated/locale_keys.g.dart';
 import '../../app/cubit/app_cubit.dart';
-import '../../core/helpers/helpers.dart';
 import '../../settings/widgets/settings_page.dart';
 import '../../window/window.dart';
 import '../tasks.dart';
