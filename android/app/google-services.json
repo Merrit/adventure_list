@@ -20,6 +20,22 @@
             "package_name": "codes.merritt.adventurelist",
             "certificate_hash": "8124b413662fe1254ce85357f68cae94eea91de2"
           }
+        },
+        {
+          "client_id": "478765689275-54bv4bf8lsbnjial5o39db2gaukjd9s9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "codes.merritt.adventurelist",
+            "certificate_hash": "a7ba2285590bdbb07f3b33dffd53ad2283266292"
+          }
+        },
+        {
+          "client_id": "478765689275-f5us0hu5mlu5s122dsrbc1kn1qb92sb1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "codes.merritt.adventurelist",
+            "certificate_hash": "e257f8738edcbbf1bc7ed4478ec1f83845380757"
+          }
         }
       ],
       "api_key": [

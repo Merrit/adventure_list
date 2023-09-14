@@ -20,16 +20,8 @@ dependencies:
   easy_logger: ^0.0.2
 
   extension_google_sign_in_as_googleapis_auth: ^2.0.9
-  firebase_auth: ^4.0.0
-  firebase_core: 2.10.0
-
-  # Temporary lock of firebase_core_platform_interface.
-  # To be removed when the fix for Windows in firebase_core has been released.
-  # See:
-  # https://github.com/firebase/flutterfire/issues/10931#event-9267220776
-  # https://github.com/firebase/flutterfire/pull/10972
-  firebase_core_platform_interface: 4.6.0
-
+  firebase_auth: ^4.9.0
+  firebase_core: ^2.15.1
   flutter:
     sdk: flutter
   flutter_adaptive_scaffold: ^0.1.2
