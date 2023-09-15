@@ -26,94 +26,110 @@ class TasksPage extends StatefulWidget {
 class _TasksPageState extends State<TasksPage> {
   Widget body = const SizedBox();
 
+  final focusNode = FocusNode(
+    debugLabel: 'Background node',
+    skipTraversal: true,
+  );
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
 
     return SafeArea(
-      child: BlocBuilder<AppCubit, AppState>(
-        builder: (context, state) {
-          SchedulerBinding.instance.addPostFrameCallback((_) {
-            if (state.releaseNotes != null) {
-              _showReleaseNotesDialog(context, state.releaseNotes!);
-            }
-          });
-
-          return BlocConsumer<TasksCubit, TasksState>(
-            listener: (context, state) {
-              // If there is an active task and we are on a small screen, we want to
-              // navigate to the task details page.
-              if (state.activeTask != null && mediaQuery.isSmallScreen) {
-                Navigator.pushNamed(context, TaskDetailsWidget.routeName);
-              }
-            },
-            builder: (context, state) {
-              if (state.loading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              final bool pinned;
-              if (defaultTargetPlatform.isDesktop) {
-                pinned = context.select<WindowCubit, bool>(
-                  (cubit) => cubit.state.pinned,
-                );
-              } else {
-                pinned = false;
-              }
-
-              final bool transparentBackgroundEnabled;
-              if (defaultTargetPlatform.isDesktop) {
-                transparentBackgroundEnabled = context.select<SettingsCubit, bool>(
-                  (cubit) => cubit.state.desktopWidgetSettings.transparentBackground,
-                );
-              } else {
-                transparentBackgroundEnabled = false;
-              }
-
-              final Color backgroundColor = (pinned && transparentBackgroundEnabled)
-                  ? Colors.transparent
-                  : Theme.of(context).scaffoldBackgroundColor;
-
-              final Widget bodyContainer = Row(
-                children: [
-                  if (!mediaQuery.isSmallScreen) const VerticalDivider(),
-                  const Flexible(
-                    flex: 1,
-                    child: TasksView(),
-                  ),
-                ],
-              );
-
-              return Scaffold(
-                appBar: const _TaskListAppBar(),
-                drawer: (mediaQuery.isSmallScreen)
-                    ? const CustomNavigationRail(breakpoint: Breakpoints.small)
-                    : null,
-                backgroundColor: backgroundColor,
-                body: AdaptiveLayout(
-                  primaryNavigation: SlotLayout(
-                    config: <Breakpoint, SlotLayoutConfig>{
-                      Breakpoints.mediumAndUp: SlotLayout.from(
-                        key: const Key('Primary Navigation Large'),
-                        builder: (_) => const CustomNavigationRail(
-                          breakpoint: Breakpoints.mediumAndUp,
-                        ),
-                      ),
-                    },
-                  ),
-                  body: SlotLayout(
-                    config: {
-                      Breakpoints.standard: SlotLayout.from(
-                        key: const Key('Body Standard'),
-                        builder: (_) => bodyContainer,
-                      ),
-                    },
-                  ),
-                ),
-              );
-            },
-          );
+      /// GestureDetector & FocusNode allow clicking outside input areas in
+      /// order to deselect them as expected on web & desktop platforms.
+      ///
+      /// In addition, if there is an active task and we are on a large screen,
+      /// the task will be collapsed when clicking outside of it.
+      child: GestureDetector(
+        onTap: () {
+          focusNode.requestFocus();
+          context.read<TasksCubit>().setActiveTask(null);
         },
+        child: BlocBuilder<AppCubit, AppState>(
+          builder: (context, state) {
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              if (state.releaseNotes != null) {
+                _showReleaseNotesDialog(context, state.releaseNotes!);
+              }
+            });
+
+            return BlocConsumer<TasksCubit, TasksState>(
+              listener: (context, state) {
+                // If there is an active task and we are on a small screen, we want to
+                // navigate to the task details page.
+                if (state.activeTask != null && mediaQuery.isSmallScreen) {
+                  Navigator.pushNamed(context, TaskDetailsWidget.routeName);
+                }
+              },
+              builder: (context, state) {
+                if (state.loading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final bool pinned;
+                if (defaultTargetPlatform.isDesktop) {
+                  pinned = context.select<WindowCubit, bool>(
+                    (cubit) => cubit.state.pinned,
+                  );
+                } else {
+                  pinned = false;
+                }
+
+                final bool transparentBackgroundEnabled;
+                if (defaultTargetPlatform.isDesktop) {
+                  transparentBackgroundEnabled = context.select<SettingsCubit, bool>(
+                    (cubit) => cubit.state.desktopWidgetSettings.transparentBackground,
+                  );
+                } else {
+                  transparentBackgroundEnabled = false;
+                }
+
+                final Color backgroundColor = (pinned && transparentBackgroundEnabled)
+                    ? Colors.transparent
+                    : Theme.of(context).scaffoldBackgroundColor;
+
+                final Widget bodyContainer = Row(
+                  children: [
+                    if (!mediaQuery.isSmallScreen) const VerticalDivider(),
+                    const Flexible(
+                      flex: 1,
+                      child: TasksView(),
+                    ),
+                  ],
+                );
+
+                return Scaffold(
+                  appBar: const _TaskListAppBar(),
+                  drawer: (mediaQuery.isSmallScreen)
+                      ? const CustomNavigationRail(breakpoint: Breakpoints.small)
+                      : null,
+                  backgroundColor: backgroundColor,
+                  body: AdaptiveLayout(
+                    primaryNavigation: SlotLayout(
+                      config: <Breakpoint, SlotLayoutConfig>{
+                        Breakpoints.mediumAndUp: SlotLayout.from(
+                          key: const Key('Primary Navigation Large'),
+                          builder: (_) => const CustomNavigationRail(
+                            breakpoint: Breakpoints.mediumAndUp,
+                          ),
+                        ),
+                      },
+                    ),
+                    body: SlotLayout(
+                      config: {
+                        Breakpoints.standard: SlotLayout.from(
+                          key: const Key('Body Standard'),
+                          builder: (_) => bodyContainer,
+                        ),
+                      },
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
