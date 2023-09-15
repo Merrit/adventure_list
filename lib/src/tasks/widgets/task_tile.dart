@@ -21,11 +21,16 @@ class TaskTileCubit extends Cubit<TaskTileState> {
             childTasks: childTasks,
             hasChildTasks: childTasks.isNotEmpty,
             index: index,
+            isExpanded: false,
             isHovered: false,
             isSelected: isSelected,
             task: task,
           ),
         );
+
+  void updateIsExpanded(bool value) {
+    emit(state.copyWith(isExpanded: value));
+  }
 
   void updateIsHovered(bool value) {
     emit(state.copyWith(isHovered: value));
@@ -42,6 +47,7 @@ class TaskTileState with _$TaskTileState {
     required List<Task> childTasks,
     required bool hasChildTasks,
     required int index,
+    required bool isExpanded,
     required bool isHovered,
     required bool isSelected,
     required Task task,
@@ -118,12 +124,14 @@ class _TaskTileContents extends StatefulWidget {
 class _TaskTileContentsState extends State<_TaskTileContents> {
   late String taskId;
   late final TasksCubit tasksCubit;
+  late final TaskTileCubit taskTileCubit;
 
   @override
   void initState() {
     super.initState();
     taskId = context.read<TaskTileCubit>().state.task.id;
     tasksCubit = context.read<TasksCubit>();
+    taskTileCubit = context.read<TaskTileCubit>();
   }
 
   final expansionTileController = ExpansionTileController();
@@ -139,7 +147,10 @@ class _TaskTileContentsState extends State<_TaskTileContents> {
           previous.activeTask?.id == taskId && current.activeTask?.id != taskId,
       listener: (context, state) {
         final controller = ExpansionTileController.of(context);
-        if (controller.isExpanded) controller.collapse();
+        if (controller.isExpanded) {
+          controller.collapse();
+          taskTileCubit.updateIsExpanded(false);
+        }
       },
       child: const SizedBox(),
     );
@@ -175,12 +186,14 @@ class _TaskTileContentsState extends State<_TaskTileContents> {
               collapsedBackgroundColor: Colors.transparent,
               controller: expansionTileController,
               initiallyExpanded: taskTileState.isSelected,
-              onExpansionChanged: (value) {
-                setState(() => expanded = value);
+              onExpansionChanged: (bool isExpanded) {
+                setState(() => expanded = isExpanded);
 
-                if (value) {
+                if (isExpanded) {
                   tasksCubit.setActiveTask(taskTileState.task.id);
+                  taskTileCubit.updateIsExpanded(true);
                 } else {
+                  taskTileCubit.updateIsExpanded(false);
                   final activeTask = context.read<TasksCubit>().state.activeTask;
                   // If the task is collapsed, set the active task to null.
                   //
@@ -256,6 +269,24 @@ class _TitleRow extends StatelessWidget {
               );
             }
 
+            final Widget collapsedTitle = Text(
+              tileState.task.title,
+              style: titleTextStyle,
+            );
+
+            final Widget expandedTitle = TextField(
+              controller: TextEditingController(text: tileState.task.title),
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+              ),
+              style: titleTextStyle,
+              onSubmitted: (value) => tasksCubit.updateTask(
+                tileState.task.copyWith(title: value),
+              ),
+            );
+
             return Row(
               children: [
                 dragHandle,
@@ -267,9 +298,17 @@ class _TitleRow extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: Text(
-                    tileState.task.title,
-                    style: titleTextStyle,
+                  child: BlocBuilder<TaskTileCubit, TaskTileState>(
+                    builder: (context, tileState) {
+                      return AnimatedCrossFade(
+                        duration: const Duration(milliseconds: 200),
+                        crossFadeState: tileState.isExpanded
+                            ? CrossFadeState.showSecond
+                            : CrossFadeState.showFirst,
+                        firstChild: collapsedTitle,
+                        secondChild: expandedTitle,
+                      );
+                    },
                   ),
                 ),
               ],
