@@ -12,7 +12,8 @@ import 'package:rrule/rrule.dart';
 ])
 import 'recurrence_widget_test.mocks.dart';
 
-final defaultDueDate = DateTime.now()
+/// Today's date at 8 AM.
+final DateTime today = DateTime.now()
     .copyWith(
       hour: 8,
       minute: 0,
@@ -21,6 +22,9 @@ final defaultDueDate = DateTime.now()
       microsecond: 0,
     )
     .toUtc();
+
+/// Tomorrow's date at 8 AM.
+final DateTime tomorrow = today.add(const Duration(days: 1));
 
 final initialTask = Task(
   id: '1',
@@ -119,7 +123,7 @@ void main() {
         await tester.pumpAndSettle();
 
         final expectedTask = initialTask.copyWith(
-          dueDate: defaultDueDate,
+          dueDate: tomorrow,
           recurrenceRule: RecurrenceRule(
             frequency: Frequency.daily,
             interval: 1,
@@ -128,11 +132,10 @@ void main() {
 
         when(mockTasksCubit.updateTask(any)).thenAnswer((invokation) async {
           final task = invokation.positionalArguments[0] as Task;
-          expect(task, expectedTask);
           return task;
         });
 
-        verify(mockTasksCubit.updateTask(expectedTask)).called(1);
+        expect(verify(mockTasksCubit.updateTask(captureAny)).captured, [expectedTask]);
       });
 
       testWidgets('every 2 days', (WidgetTester tester) async {
@@ -142,10 +145,16 @@ void main() {
         await tester.pumpAndSettle();
 
         await tester.enterText(find.text('1'), '2');
-        await tester.tap(find.text('Save'));
+
+        final DateTime expectedDueDate;
+        if (DateTime.now().isAfter(today)) {
+          expectedDueDate = today.add(const Duration(days: 1));
+        } else {
+          expectedDueDate = today;
+        }
 
         final expectedTask = initialTask.copyWith(
-          dueDate: defaultDueDate,
+          dueDate: expectedDueDate,
           recurrenceRule: RecurrenceRule(
             frequency: Frequency.daily,
             interval: 2,
@@ -154,11 +163,12 @@ void main() {
 
         when(mockTasksCubit.updateTask(any)).thenAnswer((invokation) async {
           final task = invokation.positionalArguments[0] as Task;
-          expect(task, expectedTask);
           return task;
         });
 
-        verify(mockTasksCubit.updateTask(expectedTask)).called(1);
+        await tester.tap(find.text('Save'));
+
+        expect(verify(mockTasksCubit.updateTask(captureAny)).captured, [expectedTask]);
       });
 
       testWidgets('custom time', (WidgetTester tester) async {
@@ -189,8 +199,10 @@ void main() {
 
         expect(find.text('9:00 AM'), findsOneWidget);
 
+        final DateTime expectedDate = tomorrow.add(const Duration(hours: 1));
+
         final expectedTask = initialTask.copyWith(
-          dueDate: defaultDueDate.toLocal().copyWith(hour: 9).toUtc(),
+          dueDate: expectedDate,
           recurrenceRule: RecurrenceRule(
             frequency: Frequency.daily,
             interval: 1,
@@ -199,13 +211,12 @@ void main() {
 
         when(mockTasksCubit.updateTask(captureAny)).thenAnswer((invokation) async {
           final task = invokation.positionalArguments[0] as Task;
-          expect(task, expectedTask);
           return task;
         });
 
         await tester.tap(find.text('Save'));
 
-        verify(mockTasksCubit.updateTask(expectedTask)).called(1);
+        expect(verify(mockTasksCubit.updateTask(captureAny)).captured, [expectedTask]);
       });
 
       testWidgets('custom start date', (WidgetTester tester) async {
@@ -214,7 +225,9 @@ void main() {
         await tester.tap(find.text('Repeat'));
         await tester.pumpAndSettle();
 
-        await tester.tap(find.text(defaultDueDate.toRecurrenceLabel()));
+        await tester.tap(
+          find.text(today.add(const Duration(days: 1)).toRecurrenceLabel()),
+        );
         await tester.pumpAndSettle();
 
         await tester.tap(nextMonthIcon);
@@ -232,7 +245,7 @@ void main() {
         expect(find.text('$nextMonthString 15'), findsOneWidget);
 
         final expectedTask = initialTask.copyWith(
-          dueDate: defaultDueDate.toLocal().copyWith(month: nextMonth, day: 15).toUtc(),
+          dueDate: today.toLocal().copyWith(month: nextMonth, day: 15).toUtc(),
           recurrenceRule: RecurrenceRule(
             frequency: Frequency.daily,
             interval: 1,
@@ -241,13 +254,12 @@ void main() {
 
         when(mockTasksCubit.updateTask(captureAny)).thenAnswer((invokation) async {
           final task = invokation.positionalArguments[0] as Task;
-          expect(task, expectedTask);
           return task;
         });
 
         await tester.tap(find.text('Save'));
 
-        verify(mockTasksCubit.updateTask(expectedTask)).called(1);
+        expect(verify(mockTasksCubit.updateTask(captureAny)).captured, [expectedTask]);
       });
 
       testWidgets('ends on', (WidgetTester tester) async {
@@ -274,26 +286,22 @@ void main() {
         expect(find.text('$twoMonthsFromNowString 15'), findsOneWidget);
 
         final expectedTask = initialTask.copyWith(
-          dueDate: defaultDueDate,
+          dueDate: tomorrow,
           recurrenceRule: RecurrenceRule(
             frequency: Frequency.daily,
             interval: 1,
-            until: defaultDueDate
-                .toLocal()
-                .copyWith(month: twoMonthsFromNow, day: 15)
-                .toUtc(),
+            until: today.toLocal().copyWith(month: twoMonthsFromNow, day: 15).toUtc(),
           ),
         );
 
         when(mockTasksCubit.updateTask(captureAny)).thenAnswer((invokation) async {
           final task = invokation.positionalArguments[0] as Task;
-          expect(task, expectedTask);
           return task;
         });
 
         await tester.tap(find.text('Save'));
 
-        verify(mockTasksCubit.updateTask(expectedTask)).called(1);
+        expect(verify(mockTasksCubit.updateTask(captureAny)).captured, [expectedTask]);
       });
 
       testWidgets('ends after', (WidgetTester tester) async {
@@ -331,7 +339,7 @@ void main() {
         expect(recurrenceEndsAfterTextField, findsOneWidget);
 
         final expectedTask = initialTask.copyWith(
-          dueDate: defaultDueDate,
+          dueDate: tomorrow,
           recurrenceRule: RecurrenceRule(
             frequency: Frequency.daily,
             interval: 1,
@@ -341,13 +349,12 @@ void main() {
 
         when(mockTasksCubit.updateTask(captureAny)).thenAnswer((invokation) async {
           final task = invokation.positionalArguments[0] as Task;
-          expect(task, expectedTask);
           return task;
         });
 
         await tester.tap(find.text('Save'));
 
-        verify(mockTasksCubit.updateTask(expectedTask)).called(1);
+        expect(verify(mockTasksCubit.updateTask(captureAny)).captured, [expectedTask]);
       });
     });
 
@@ -365,7 +372,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Only the current weekday should be selected by default.
-        final currentWeekday = defaultDueDate.weekday;
+        final currentWeekday = today.weekday;
 
         final sundayChip = find.byWidgetPredicate((widget) =>
             widget is FilterChip &&
@@ -426,21 +433,20 @@ void main() {
         await tester.pumpAndSettle();
 
         final expectedTask = initialTask.copyWith(
-          dueDate: defaultDueDate,
+          dueDate: tomorrow,
           recurrenceRule: RecurrenceRule(
             frequency: Frequency.weekly,
             interval: 1,
-            byWeekDays: {ByWeekDayEntry(defaultDueDate.weekday)},
+            byWeekDays: {ByWeekDayEntry(today.weekday)},
           ),
         );
 
         when(mockTasksCubit.updateTask(any)).thenAnswer((invokation) async {
           final task = invokation.positionalArguments[0] as Task;
-          expect(task, expectedTask);
           return task;
         });
 
-        verify(mockTasksCubit.updateTask(expectedTask)).called(1);
+        expect(verify(mockTasksCubit.updateTask(captureAny)).captured, [expectedTask]);
       });
 
       testWidgets('every 2 weeks', (WidgetTester tester) async {
@@ -459,21 +465,20 @@ void main() {
         await tester.tap(find.text('Save'));
 
         final expectedTask = initialTask.copyWith(
-          dueDate: defaultDueDate,
+          dueDate: tomorrow,
           recurrenceRule: RecurrenceRule(
             frequency: Frequency.weekly,
             interval: 2,
-            byWeekDays: {ByWeekDayEntry(defaultDueDate.weekday)},
+            byWeekDays: {ByWeekDayEntry(today.weekday)},
           ),
         );
 
         when(mockTasksCubit.updateTask(any)).thenAnswer((invokation) async {
           final task = invokation.positionalArguments[0] as Task;
-          expect(task, expectedTask);
           return task;
         });
 
-        verify(mockTasksCubit.updateTask(expectedTask)).called(1);
+        expect(verify(mockTasksCubit.updateTask(captureAny)).captured, [expectedTask]);
       });
 
       testWidgets('every monday and wednesday', (WidgetTester tester) async {
@@ -526,7 +531,7 @@ void main() {
           },
         );
 
-        final updatedDueDate = expectedRecurrenceRule.nextInstance(defaultDueDate);
+        final updatedDueDate = expectedRecurrenceRule.nextInstance(today);
 
         final expectedTask = initialTask.copyWith(
           dueDate: updatedDueDate,
@@ -535,11 +540,10 @@ void main() {
 
         when(mockTasksCubit.updateTask(any)).thenAnswer((invokation) async {
           final task = invokation.positionalArguments[0] as Task;
-          expect(task, expectedTask);
           return task;
         });
 
-        verify(mockTasksCubit.updateTask(any)).called(1);
+        expect(verify(mockTasksCubit.updateTask(captureAny)).captured, [expectedTask]);
       });
     });
 
@@ -556,8 +560,8 @@ void main() {
         await tester.tap(find.text('month'));
         await tester.pumpAndSettle();
 
-        final int currentNumericDay = defaultDueDate.day;
-        final String currentWeekday = numericToWeekdays[defaultDueDate.weekday]!;
+        final int currentNumericDay = today.day;
+        final String currentWeekday = numericToWeekdays[today.weekday]!;
 
         expect(find.text('Day $currentNumericDay'), findsOneWidget);
         expect(find.text('First'), findsOneWidget);
@@ -580,21 +584,20 @@ void main() {
         await tester.pumpAndSettle();
 
         final expectedTask = initialTask.copyWith(
-          dueDate: defaultDueDate,
+          dueDate: tomorrow,
           recurrenceRule: RecurrenceRule(
             frequency: Frequency.monthly,
             interval: 1,
-            byMonthDays: {defaultDueDate.day},
+            byMonthDays: {today.day},
           ),
         );
 
         when(mockTasksCubit.updateTask(any)).thenAnswer((invokation) async {
           final task = invokation.positionalArguments[0] as Task;
-          expect(task, expectedTask);
           return task;
         });
 
-        verify(mockTasksCubit.updateTask(expectedTask)).called(1);
+        expect(verify(mockTasksCubit.updateTask(captureAny)).captured, [expectedTask]);
       });
 
       testWidgets('every 2 months on the current day', (WidgetTester tester) async {
@@ -613,21 +616,20 @@ void main() {
         await tester.tap(find.text('Save'));
 
         final expectedTask = initialTask.copyWith(
-          dueDate: defaultDueDate,
+          dueDate: tomorrow,
           recurrenceRule: RecurrenceRule(
             frequency: Frequency.monthly,
             interval: 2,
-            byMonthDays: {defaultDueDate.day},
+            byMonthDays: {today.day},
           ),
         );
 
         when(mockTasksCubit.updateTask(any)).thenAnswer((invokation) async {
           final task = invokation.positionalArguments[0] as Task;
-          expect(task, expectedTask);
           return task;
         });
 
-        verify(mockTasksCubit.updateTask(expectedTask)).called(1);
+        expect(verify(mockTasksCubit.updateTask(captureAny)).captured, [expectedTask]);
       });
 
       testWidgets('every month on <day>', (WidgetTester tester) async {
@@ -641,7 +643,7 @@ void main() {
         await tester.pumpAndSettle();
 
         /// The default is the current day, so we need to change it to something else.
-        final int currentNumericDay = defaultDueDate.day;
+        final int currentNumericDay = today.day;
         final int targetNumericDay = (currentNumericDay == 5) ? 1 : 5;
 
         await tester.tap(find.text('Day $currentNumericDay'));
@@ -669,7 +671,7 @@ void main() {
           byMonthDays: {targetNumericDay},
         );
 
-        final updatedDueDate = expectedRecurrenceRule.nextInstance(defaultDueDate);
+        final updatedDueDate = expectedRecurrenceRule.nextInstance(today);
 
         final expectedTask = initialTask.copyWith(
           dueDate: updatedDueDate,
@@ -678,11 +680,10 @@ void main() {
 
         when(mockTasksCubit.updateTask(any)).thenAnswer((invokation) async {
           final task = invokation.positionalArguments[0] as Task;
-          expect(task, expectedTask);
           return task;
         });
 
-        verify(mockTasksCubit.updateTask(expectedTask)).called(1);
+        expect(verify(mockTasksCubit.updateTask(captureAny)).captured, [expectedTask]);
       });
 
       testWidgets('first Monday of every month', (WidgetTester tester) async {
@@ -707,7 +708,7 @@ void main() {
             .byWidgetPredicate(
               (widget) =>
                   widget is DropdownButtonFormField<int> &&
-                  widget.initialValue == defaultDueDate.weekday,
+                  widget.initialValue == today.weekday,
             )
             .first;
         await tester.tap(weekdayDropdown);
@@ -727,7 +728,7 @@ void main() {
           byWeekDays: {ByWeekDayEntry(DateTime.monday, 1)},
         );
 
-        final updatedDueDate = expectedRecurrenceRule.nextInstance(defaultDueDate);
+        final updatedDueDate = expectedRecurrenceRule.nextInstance(today);
 
         final expectedTask = initialTask.copyWith(
           dueDate: updatedDueDate,
@@ -736,11 +737,10 @@ void main() {
 
         when(mockTasksCubit.updateTask(any)).thenAnswer((invokation) async {
           final task = invokation.positionalArguments[0] as Task;
-          expect(task, expectedTask);
           return task;
         });
 
-        verify(mockTasksCubit.updateTask(expectedTask)).called(1);
+        expect(verify(mockTasksCubit.updateTask(captureAny)).captured, [expectedTask]);
       });
     });
 
@@ -761,11 +761,11 @@ void main() {
         final expectedRecurrenceRule = RecurrenceRule(
           frequency: Frequency.yearly,
           interval: 1,
-          byMonthDays: {defaultDueDate.day},
-          byMonths: {defaultDueDate.month},
+          byMonthDays: {today.day},
+          byMonths: {today.month},
         );
 
-        final updatedDueDate = expectedRecurrenceRule.nextInstance(defaultDueDate);
+        final updatedDueDate = expectedRecurrenceRule.nextInstance(today);
 
         final expectedTask = initialTask.copyWith(
           dueDate: updatedDueDate,
@@ -777,7 +777,7 @@ void main() {
           return task;
         });
 
-        verify(mockTasksCubit.updateTask(expectedTask)).called(1);
+        expect(verify(mockTasksCubit.updateTask(captureAny)).captured, [expectedTask]);
       });
     });
   });

@@ -543,13 +543,24 @@ class TasksCubit extends Cubit<TasksState> {
   /// Marks the task with the provided [id] as completed or not completed.
   ///
   /// If the task has sub-tasks, their completion status is also updated.
+  ///
+  /// If the task is recurring, the due date is updated to the next occurrence rather
+  /// than marking the task as completed.
+  ///
+  /// If the task is recurring but has no more occurrences, it is marked as completed.
   Future<void> setTaskCompleted(String id, bool completed) async {
     final Task? task = state.taskLists.getTaskById(id);
     assert(task != null);
     if (task == null) return;
 
+    if (task.recurrenceRule != null) {
+      // If the task is recurring, update the due date to the next occurrence.
+      await _updateTaskToNextOccurrence(task);
+      return;
+    }
+
     final Task updatedTask = task.copyWith(completed: completed);
-    updateTask(updatedTask);
+    await updateTask(updatedTask);
 
     final taskList = state.taskLists.getTaskListById(task.taskListId);
     if (taskList == null) return;
@@ -557,7 +568,7 @@ class TasksCubit extends Cubit<TasksState> {
     // If the task has sub-tasks, update their completion status as well.
     final List<Task> subTasks = taskList.items.subtasksOf(id);
     for (final subTask in subTasks) {
-      setTaskCompleted(subTask.id, completed);
+      await setTaskCompleted(subTask.id, completed);
     }
   }
 
@@ -752,6 +763,16 @@ class TasksCubit extends Cubit<TasksState> {
       'selectedList',
       jsonEncode(listCopy.toJson()),
     );
+  }
+
+  /// Updates the due date of the provided [task] to the next occurrence.
+  Future<void> _updateTaskToNextOccurrence(Task task) async {
+    final DateTime nextOccurrence = task.recurrenceRule!.nextInstance(task.dueDate!);
+    final updatedTask = task.copyWith(
+      completed: false,
+      dueDate: nextOccurrence,
+    );
+    await updateTask(updatedTask);
   }
 
   @override

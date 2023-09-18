@@ -60,9 +60,12 @@ class _RecurrenceCubit extends Cubit<Task> {
     // Due date should always be UTC, except when being displayed to the user.
     assert(task.dueDate!.isUtc);
 
-    final updatedDueDate = task.recurrenceRule!.nextInstance(task.dueDate!);
-    final updatedTask = task.copyWith(dueDate: updatedDueDate);
-    emit(updatedTask);
+    if (task.dueDate!.isBefore(DateTime.now().toUtc())) {
+      final updatedDueDate = task.recurrenceRule!.nextInstance(task.dueDate!);
+      task = task.copyWith(dueDate: updatedDueDate);
+    }
+
+    emit(task);
   }
 }
 
@@ -307,8 +310,18 @@ class _RecurrenceTypeWidget extends StatelessWidget {
                 byMonths = {DateTime.now().month};
               }
 
+              final DateTime dueDate;
+              if (value == Frequency.yearly) {
+                // Set the due date to yesterday so that the next instance will be
+                // calculated.
+                dueDate = DateTimeHelper.today().subtract(const Duration(days: 1));
+              } else {
+                dueDate = task.dueDate!;
+              }
+
               context.read<_RecurrenceCubit>().updateTask(
                     task.copyWith(
+                      dueDate: dueDate,
                       recurrenceRule: task.recurrenceRule!.copyWith(
                         frequency: value,
                         byWeekDays: byWeekDays,
@@ -371,9 +384,16 @@ class _DayOfWeekWidget extends StatelessWidget {
                     selected: selectedDaysOfWeek.contains(day),
                     showCheckmark: false,
                     onSelected: (selected) {
+                      // Set the due date to yesterday so that the next instance will be
+                      // calculated.
+                      final DateTime dueDate = DateTimeHelper.today().subtract(
+                        const Duration(days: 1),
+                      );
+
                       if (selected) {
                         recurrenceCubit.updateTask(
                           task.copyWith(
+                            dueDate: dueDate,
                             recurrenceRule: recurrenceRule.copyWith(
                               byWeekDays: selectedDaysOfWeek..add(day),
                             ),
@@ -382,6 +402,7 @@ class _DayOfWeekWidget extends StatelessWidget {
                       } else {
                         recurrenceCubit.updateTask(
                           task.copyWith(
+                            dueDate: dueDate,
                             recurrenceRule: recurrenceRule.copyWith(
                               byWeekDays: selectedDaysOfWeek..remove(day),
                             ),
@@ -482,6 +503,9 @@ class _DayOfMonthWidgetState extends State<_DayOfMonthWidget> {
 
                 recurrenceCubit.updateTask(
                   task.copyWith(
+                    // Set the due date to yesterday so that the next instance will be
+                    // calculated.
+                    dueDate: DateTimeHelper.today().subtract(const Duration(days: 1)),
                     recurrenceRule: recurrenceRule.copyWith(
                       frequency: Frequency.monthly,
                       byWeekDays: {},
@@ -499,6 +523,9 @@ class _DayOfMonthWidgetState extends State<_DayOfMonthWidget> {
 
                   recurrenceCubit.updateTask(
                     task.copyWith(
+                      // Set the due date to yesterday so that the next instance will be
+                      // calculated.
+                      dueDate: DateTimeHelper.today().subtract(const Duration(days: 1)),
                       recurrenceRule: recurrenceRule.copyWith(
                         frequency: Frequency.monthly,
                         byMonthDays: {value},
@@ -531,6 +558,9 @@ class _DayOfMonthWidgetState extends State<_DayOfMonthWidget> {
 
                 recurrenceCubit.updateTask(
                   task.copyWith(
+                    // Set the due date to yesterday so that the next instance will be
+                    // calculated.
+                    dueDate: DateTimeHelper.today().subtract(const Duration(days: 1)),
                     recurrenceRule: recurrenceRule.copyWith(
                       frequency: Frequency.monthly,
                       byMonthDays: {},
@@ -554,6 +584,10 @@ class _DayOfMonthWidgetState extends State<_DayOfMonthWidget> {
 
                         recurrenceCubit.updateTask(
                           task.copyWith(
+                            // Set the due date to yesterday so that the next instance
+                            // will be calculated.
+                            dueDate:
+                                DateTimeHelper.today().subtract(const Duration(days: 1)),
                             recurrenceRule: recurrenceRule.copyWith(
                               frequency: Frequency.monthly,
                               byMonthDays: {},
@@ -784,6 +818,14 @@ class _EndDateWidget extends StatelessWidget {
 
         final String endDateText = endDate.toRecurrenceLabel();
 
+        final endsAfterText = recurrenceRule.count?.toString() ?? '';
+
+        final TextEditingController endsAfterTextController = TextEditingController(
+          text: endsAfterText,
+        )..selection = TextSelection.fromPosition(
+            TextPosition(offset: endsAfterText.length),
+          );
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -891,9 +933,7 @@ class _EndDateWidget extends StatelessWidget {
                   Expanded(
                     child: TextField(
                       key: const Key('recurrenceEndsAfterTextField'),
-                      controller: TextEditingController(
-                        text: recurrenceRule.count?.toString(),
-                      ),
+                      controller: endsAfterTextController,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         suffixText: 'times',
