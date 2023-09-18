@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:googleapis_auth/googleapis_auth.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:rrule/rrule.dart';
 import 'package:uuid/uuid.dart';
 
 @GenerateNiceMocks([
@@ -49,6 +50,22 @@ final AuthenticationState defaultAuthState = AuthenticationState(
   ),
   signedIn: true,
 );
+
+final DateTime now = DateTime.now().toUtc();
+
+/// Today's date at 1 AM.
+///
+/// This is used as a default due date to reduce boilerplate. We set it for 1 AM so that
+/// it is today but in the past.
+final DateTime today = DateTime(
+  now.year,
+  now.month,
+  now.day,
+  1,
+).toUtc();
+
+/// Tomorrow's date at 1 AM.
+final DateTime tomorrow = today.add(const Duration(days: 1));
 
 void main() {
   setUpAll(() async {
@@ -898,10 +915,44 @@ void main() {
       expect(testCubit.state.activeList, taskList1);
     });
 
-    test('setTaskCompleted() works', () async {
-      // Seed state with tasks.
-      final taskList = testTaskList.copyWith(
-        items: [
+    group('setTaskCompleted:', () {
+      test('works', () async {
+        // Seed state with tasks.
+        final taskList = testTaskList.copyWith(
+          items: [
+            task1,
+            task2,
+            task3,
+            task4,
+            subTask1,
+            subTask2,
+            subTask3,
+            subTask4,
+          ],
+        );
+
+        testCubit.emit(TasksState(
+          activeList: taskList,
+          loading: false,
+          taskLists: [taskList],
+        ));
+
+        // Set task completed.
+        await testCubit.setTaskCompleted(task1.id, true);
+        expect(testCubit.state.activeList?.items, [
+          task1.copyWith(completed: true),
+          task2,
+          task3,
+          task4,
+          subTask1.copyWith(completed: true),
+          subTask2.copyWith(completed: true),
+          subTask3.copyWith(completed: true),
+          subTask4,
+        ]);
+
+        // Set task uncompleted.
+        await testCubit.setTaskCompleted(task1.id, false);
+        expect(testCubit.state.activeList?.items, [
           task1,
           task2,
           task3,
@@ -910,40 +961,65 @@ void main() {
           subTask2,
           subTask3,
           subTask4,
-        ],
-      );
+        ]);
+      });
 
-      testCubit.emit(TasksState(
-        activeList: taskList,
-        loading: false,
-        taskLists: [taskList],
-      ));
+      group('daily rrule:', () {
+        test('task with due date in the past updates task to next occurrence', () async {
+          final TaskList taskList = testTaskList.copyWith(
+            items: [
+              task1.copyWith(
+                dueDate: today,
+                recurrenceRule: RecurrenceRule(
+                  frequency: Frequency.daily,
+                  interval: 1,
+                ),
+              ),
+            ],
+          );
 
-      // Set task completed.
-      await testCubit.setTaskCompleted(task1.id, true);
-      expect(testCubit.state.activeList?.items, [
-        task1.copyWith(completed: true),
-        task2,
-        task3,
-        task4,
-        subTask1.copyWith(completed: true),
-        subTask2.copyWith(completed: true),
-        subTask3.copyWith(completed: true),
-        subTask4,
-      ]);
+          testCubit.emit(TasksState(
+            activeList: taskList,
+            loading: false,
+            taskLists: [taskList],
+          ));
 
-      // Set task uncompleted.
-      await testCubit.setTaskCompleted(task1.id, false);
-      expect(testCubit.state.activeList?.items, [
-        task1,
-        task2,
-        task3,
-        task4,
-        subTask1,
-        subTask2,
-        subTask3,
-        subTask4,
-      ]);
+          // Set task completed.
+          await testCubit.setTaskCompleted(task1.id, true);
+
+          // Verify that the task was updated to the next occurrence.
+          final Task? updatedTask = testCubit.state.activeList?.items.first;
+          expect(updatedTask?.dueDate, tomorrow);
+        });
+
+        test('task with due date in the future updates task to next occurrence',
+            () async {
+          final TaskList taskList = testTaskList.copyWith(
+            items: [
+              task1.copyWith(
+                dueDate: today.add(const Duration(days: 5)),
+                recurrenceRule: RecurrenceRule(
+                  frequency: Frequency.daily,
+                  interval: 1,
+                ),
+              ),
+            ],
+          );
+
+          testCubit.emit(TasksState(
+            activeList: taskList,
+            loading: false,
+            taskLists: [taskList],
+          ));
+
+          // Set task completed.
+          await testCubit.setTaskCompleted(task1.id, true);
+
+          // Verify that the task was updated to the next occurrence.
+          final Task? updatedTask = testCubit.state.activeList?.items.first;
+          expect(updatedTask?.dueDate, today.add(const Duration(days: 6)));
+        });
+      });
     });
 
     test('undoClearCompletedTasks works', () async {
