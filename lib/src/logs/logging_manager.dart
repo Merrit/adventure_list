@@ -52,7 +52,12 @@ class LoggingManager {
       level: (verbose) ? Level.trace : Level.warning,
       output: MultiOutput(outputs),
       // Colors false because it outputs ugly escape characters to log file.
-      printer: PrefixPrinter(PrettyPrinter(colors: false)),
+      printer: PrefixPrinter(
+        PrettyPrinter(
+          colors: false,
+          printTime: true,
+        ),
+      ),
     );
 
     log.i('Logger initialized.');
