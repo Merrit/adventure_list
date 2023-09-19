@@ -506,6 +506,11 @@ class TasksCubit extends Cubit<TasksState> {
       return task;
     }
 
+    // If the task has a due date, schedule a notification for it.
+    if (updatedTask.dueDate != null) {
+      await NotificationsCubit.instance.scheduleNotification(updatedTask);
+    }
+
     return updatedTask;
   }
 
@@ -731,8 +736,14 @@ class TasksCubit extends Cubit<TasksState> {
           // The user tapped on an action button on the notification.
           switch (response.actionId) {
             case 'complete':
-              await updateTask(task.copyWith(completed: true));
-              break;
+              if (task.recurrenceRule != null) {
+                // If the task is recurring, update the due date to the next occurrence.
+                await _updateTaskToNextOccurrence(task);
+                break;
+              } else {
+                await updateTask(task.copyWith(completed: true));
+                break;
+              }
             case 'snooze':
               await NotificationsCubit.instance.snoozeTask(task);
               break;
