@@ -1,6 +1,7 @@
 import 'package:adventure_list/src/authentication/authentication.dart';
 import 'package:adventure_list/src/home_widget/home_widget.dart';
 import 'package:adventure_list/src/logs/logging_manager.dart';
+import 'package:adventure_list/src/notifications/notifications.dart';
 import 'package:adventure_list/src/settings/settings.dart';
 import 'package:adventure_list/src/storage/storage_repository.dart';
 import 'package:adventure_list/src/tasks/tasks.dart';
@@ -17,6 +18,7 @@ import 'package:uuid/uuid.dart';
   MockSpec<AuthenticationCubit>(),
   MockSpec<GoogleAuth>(),
   MockSpec<HomeWidgetManager>(),
+  MockSpec<NotificationsCubit>(),
   MockSpec<SettingsCubit>(),
   MockSpec<StorageRepository>(),
   MockSpec<TasksRepository>(),
@@ -31,6 +33,7 @@ class FakeTask extends Fake implements Task {}
 MockAuthenticationCubit _authCubit = MockAuthenticationCubit();
 MockGoogleAuth _googleAuth = MockGoogleAuth();
 MockHomeWidgetManager _homeWidgetManager = MockHomeWidgetManager();
+MockNotificationsCubit _notificationsCubit = MockNotificationsCubit();
 MockSettingsCubit _settingsCubit = MockSettingsCubit();
 MockStorageRepository _storageRepository = MockStorageRepository();
 MockTasksRepository _tasksRepository = MockTasksRepository();
@@ -88,6 +91,15 @@ void main() {
       /* ----------------------------- HomeWidgetManager ---------------------------- */
       reset(_homeWidgetManager);
       when(_homeWidgetManager.updateHomeWidget(any, any)).thenAnswer((_) async {});
+
+      /* ----------------------------- NotificationsCubit ---------------------------- */
+      reset(_notificationsCubit);
+      NotificationsCubit.instance = _notificationsCubit;
+      when(_notificationsCubit.state).thenReturn(NotificationsState.initial());
+      when(_notificationsCubit.cancelNotification(any)).thenAnswer((_) async {});
+      when(_notificationsCubit.scheduleNotification(any)).thenAnswer((_) async {});
+      when(_notificationsCubit.setNotificationBadge(any)).thenAnswer((_) async {});
+      when(_notificationsCubit.snoozeTask(any)).thenAnswer((_) async {});
 
       /* ----------------------------- TasksRepository ---------------------------- */
       reset(_tasksRepository);
