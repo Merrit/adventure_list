@@ -306,53 +306,46 @@ class _TitleRowState extends State<_TitleRow> {
               ),
             );
 
+            final Checkbox checkbox = Checkbox(
+              value: completed,
+              onChanged: (bool? completed) {
+                if (completed == null) return;
+
+                if (completed) {
+                  setState(() {
+                    animationCompleted = true;
+
+                    animationTextStyle = titleTextStyle.copyWith(
+                      decoration: TextDecoration.lineThrough,
+                      fontStyle: FontStyle.italic,
+                    );
+                  });
+                }
+
+                final int? delay = completed ? animationDuration : null;
+
+                setTaskCompleted(
+                  context: context,
+                  delay: delay,
+                  tasksCubit: context.read<TasksCubit>(),
+                  task: tileState.task,
+                  completed: completed,
+                );
+              },
+            );
+
+            final Widget titleWidget = Expanded(
+              child: (tileState.isExpanded) ? expandedTitle : collapsedTitle,
+            );
+
             return AnimatedDefaultTextStyle(
               duration: Duration(milliseconds: animationDuration),
               style: titleTextStyle,
               child: Row(
                 children: [
                   dragHandle,
-                  Checkbox(
-                    value: completed,
-                    onChanged: (bool? completed) {
-                      if (completed == null) return;
-
-                      if (completed) {
-                        setState(() {
-                          animationCompleted = true;
-
-                          animationTextStyle = titleTextStyle.copyWith(
-                            decoration: TextDecoration.lineThrough,
-                            fontStyle: FontStyle.italic,
-                          );
-                        });
-                      }
-
-                      final int? delay = completed ? animationDuration : null;
-
-                      setTaskCompleted(
-                        context: context,
-                        delay: delay,
-                        tasksCubit: context.read<TasksCubit>(),
-                        task: tileState.task,
-                        completed: completed,
-                      );
-                    },
-                  ),
-                  Expanded(
-                    child: BlocBuilder<TaskTileCubit, TaskTileState>(
-                      builder: (context, tileState) {
-                        return AnimatedCrossFade(
-                          duration: const Duration(milliseconds: 200),
-                          crossFadeState: tileState.isExpanded
-                              ? CrossFadeState.showSecond
-                              : CrossFadeState.showFirst,
-                          firstChild: collapsedTitle,
-                          secondChild: expandedTitle,
-                        );
-                      },
-                    ),
-                  ),
+                  checkbox,
+                  titleWidget,
                 ],
               ),
             );
