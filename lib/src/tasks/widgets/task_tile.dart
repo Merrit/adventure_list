@@ -233,8 +233,30 @@ class _TaskTileContentsState extends State<_TaskTileContents> {
   }
 }
 
-class _TitleRow extends StatelessWidget {
+/// Row of widgets that make up the task tile.
+///
+/// Contains the Checkbox and task title.
+///
+/// This widget is wrapped in an [AnimatedDefaultTextStyle] to animate the
+/// text style when the task is completed.
+class _TitleRow extends StatefulWidget {
   const _TitleRow({Key? key}) : super(key: key);
+
+  @override
+  State<_TitleRow> createState() => _TitleRowState();
+}
+
+class _TitleRowState extends State<_TitleRow> {
+  /// The duration of the animation when the task is completed.
+  final int animationDuration = 1200;
+
+  /// Indicates the task has been completed via setState, because if we rely on
+  /// the value from the cubit the task will be moved to the completed list
+  /// before the animation completes.
+  bool? animationCompleted;
+
+  /// The text style to use when the task is completed.
+  TextStyle? animationTextStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -242,12 +264,13 @@ class _TitleRow extends StatelessWidget {
       builder: (context, tasksState) {
         return BlocBuilder<TaskTileCubit, TaskTileState>(
           builder: (context, tileState) {
-            final bool selected = tasksState.activeTask?.id == tileState.task.id;
+            final TextStyle titleTextStyle = animationTextStyle ??
+                Theme.of(context).textTheme.titleMedium!.copyWith(
+                      decoration:
+                          tileState.task.completed ? TextDecoration.lineThrough : null,
+                    );
 
-            final TextStyle titleTextStyle = TextStyle(
-              decoration: tileState.task.completed ? TextDecoration.lineThrough : null,
-              color: selected ? Theme.of(context).colorScheme.primary : null,
-            );
+            final bool completed = animationCompleted ?? tileState.task.completed;
 
             Widget dragHandle;
             if (defaultTargetPlatform == TargetPlatform.android ||
@@ -269,10 +292,7 @@ class _TitleRow extends StatelessWidget {
               );
             }
 
-            final Widget collapsedTitle = Text(
-              tileState.task.title,
-              style: titleTextStyle,
-            );
+            final Widget collapsedTitle = Text(tileState.task.title);
 
             final Widget expandedTitle = TextField(
               controller: TextEditingController(text: tileState.task.title),
@@ -281,25 +301,60 @@ class _TitleRow extends StatelessWidget {
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
               ),
-              style: titleTextStyle,
               onSubmitted: (value) => tasksCubit.updateTask(
                 tileState.task.copyWith(title: value),
               ),
             );
 
+            return AnimatedDefaultTextStyle(
+              duration: Duration(milliseconds: animationDuration),
+              style: titleTextStyle,
+              child: Row(
+                children: [
+                  dragHandle,
                   Checkbox(
-                    value: tileState.task.completed,
+                    value: completed,
                     onChanged: (bool? completed) {
                       if (completed == null) return;
 
+                      if (completed) {
+                        setState(() {
+                          animationCompleted = true;
+
+                          animationTextStyle = titleTextStyle.copyWith(
+                            decoration: TextDecoration.lineThrough,
+                            fontStyle: FontStyle.italic,
+                          );
+                        });
+                      }
+
+                      final int? delay = completed ? animationDuration : null;
+
                       setTaskCompleted(
                         context: context,
+                        delay: delay,
                         tasksCubit: context.read<TasksCubit>(),
                         task: tileState.task,
                         completed: completed,
                       );
                     },
                   ),
+                  Expanded(
+                    child: BlocBuilder<TaskTileCubit, TaskTileState>(
+                      builder: (context, tileState) {
+                        return AnimatedCrossFade(
+                          duration: const Duration(milliseconds: 200),
+                          crossFadeState: tileState.isExpanded
+                              ? CrossFadeState.showSecond
+                              : CrossFadeState.showFirst,
+                          firstChild: collapsedTitle,
+                          secondChild: expandedTitle,
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             );
           },
         );
@@ -366,13 +421,22 @@ class _ChildTasksIndicator extends StatelessWidget {
 /// Set the completed status of [task] to [completed].
 ///
 /// If [completed] is true, a snackbar will be displayed with an undo button.
-void setTaskCompleted({
+///
+/// If [delay] is not null, the action will be delay by [delay] milliseconds to allow
+/// animations to complete before the task is updated.
+Future<void> setTaskCompleted({
   required BuildContext context,
+  int? delay,
   required TasksCubit tasksCubit,
   required Task task,
   required bool completed,
-}) {
-  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+}) async {
+  final scaffoldMessenger = ScaffoldMessenger.of(context);
+  if (delay != null) {
+    await Future.delayed(Duration(milliseconds: delay));
+  }
+
+  scaffoldMessenger.hideCurrentSnackBar();
 
   final command = SetTaskCompletedCommand(
     cubit: tasksCubit,
@@ -388,7 +452,7 @@ void setTaskCompleted({
     tasksCubit.setActiveTask(null);
   }
 
-  ScaffoldMessenger.of(context).showSnackBar(
+  scaffoldMessenger.showSnackBar(
     SnackBar(
       content: const Text('Task completed'),
       duration: const Duration(seconds: 10),
