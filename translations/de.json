@@ -7,6 +7,10 @@
     "deleteCompleted": "Erledigte Aufgaben löschen",
     "deleteCompletedSubtasks": "Erledigte Unteraufgaben löschen",
     "deleteTask": "Aufgabe löschen",
+    "error": {
+        "error": "Fehler"
+    },
+    "exit": "Beenden",
     "getStartedPrompt": "Wähle oder erstelle eine Liste um zu starten",
     "homeWidgetConfig": {
         "listToDisplay": "Anzuzeigende Liste",
@@ -24,6 +28,7 @@
     "newList": "Neue Liste",
     "newTask": "Neue Aufgabe",
     "pinWindow": "Fenster anheften",
+    "retry": "Erneut versuchen",
     "settings": {
         "appearance": {
             "darkMode": "Dunkler Modus",

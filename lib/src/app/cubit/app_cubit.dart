@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -89,6 +91,11 @@ class AppCubit extends Cubit<AppState> {
       key: 'lastReleaseNotesVersionShown',
       value: state.runningVersion,
     );
+  }
+
+  /// Close the app.
+  Future<void> exitApp() async {
+    exit(0);
   }
 
   /// Launch the requested [url] in the default browser.

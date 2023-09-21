@@ -53,6 +53,9 @@ class GoogleCalendar implements TasksRepository {
         showHidden: true,
       );
     } on Exception catch (e) {
+      // This has previously thrown a "503 Service Unavailable" error.
+      // This is supposed to be temporary, and has only happened once.
+      // This should likely be updated to bubble up a custom error to the UI.
       log.e('Failed to get all lists', error: e);
       return null;
     }

@@ -110,16 +110,23 @@ class TasksCubit extends Cubit<TasksState> {
       return;
     }
 
-    assert(taskLists != null);
+    if (taskLists == null) {
+      emit(state.copyWith(
+        errorMessage:
+            'There was an error fetching tasks. Please try again in a few minutes.',
+        loading: false,
+      ));
+      return;
+    }
 
     final String? activeListId = await StorageRepository.instance.get(
       'activeList',
     );
 
     emit(state.copyWith(
-      activeList: taskLists?.singleWhereOrNull((e) => e.id == activeListId),
+      activeList: taskLists.singleWhereOrNull((e) => e.id == activeListId),
       loading: false,
-      taskLists: taskLists!.sortedByIndex(),
+      taskLists: taskLists.sortedByIndex(),
     ));
 
     await _scheduleNotifications(taskLists);
