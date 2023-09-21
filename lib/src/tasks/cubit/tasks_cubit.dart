@@ -513,8 +513,11 @@ class TasksCubit extends Cubit<TasksState> {
       return task;
     }
 
-    // If the task has a due date, schedule a notification for it.
-    if (updatedTask.dueDate != null) {
+    // Remove potentially outdated notification.
+    await NotificationsCubit.instance.cancelNotification(task.notificationId);
+
+    // If the task has a due date and is not completed, schedule a notification.
+    if (updatedTask.dueDate != null && !updatedTask.completed) {
       await NotificationsCubit.instance.scheduleNotification(updatedTask);
     }
 
@@ -552,38 +555,6 @@ class TasksCubit extends Cubit<TasksState> {
     emit(state.copyWith(activeTask: task));
   }
 
-  /// Marks the task with the provided [id] as completed or not completed.
-  ///
-  /// If the task has sub-tasks, their completion status is also updated.
-  ///
-  /// If the task is recurring, the due date is updated to the next occurrence rather
-  /// than marking the task as completed.
-  ///
-  /// If the task is recurring but has no more occurrences, it is marked as completed.
-  Future<void> setTaskCompleted(String id, bool completed) async {
-    final Task? task = state.taskLists.getTaskById(id);
-    assert(task != null);
-    if (task == null) return;
-
-    if (task.recurrenceRule != null) {
-      // If the task is recurring, update the due date to the next occurrence.
-      await _updateTaskToNextOccurrence(task);
-      return;
-    }
-
-    final Task updatedTask = task.copyWith(completed: completed);
-    await updateTask(updatedTask);
-
-    final taskList = state.taskLists.getTaskListById(task.taskListId);
-    if (taskList == null) return;
-
-    // If the task has sub-tasks, update their completion status as well.
-    final List<Task> subTasks = taskList.items.subtasksOf(id);
-    for (final subTask in subTasks) {
-      await setTaskCompleted(subTask.id, completed);
-    }
-  }
-
   /// Holds the `activeList` as it was before the tasks were cleared until the
   /// timer expires and they are deleted, or the user cancels the clear
   /// operation and this list is restored.
@@ -593,7 +564,7 @@ class TasksCubit extends Cubit<TasksState> {
   TaskList? _activeListBeforeClear;
 
   /// Timer giving the user time to cancel the clear operation.
-  Timer? _clearTimer;
+  Timer? _clearDeletedTasksTimer;
 
   /// Clears all completed tasks from the active list.
   ///
@@ -647,7 +618,7 @@ class TasksCubit extends Cubit<TasksState> {
     ));
 
     // Start the timer to clear the tasks.
-    _clearTimer = Timer(const Duration(seconds: 10), () async {
+    _clearDeletedTasksTimer = Timer(const Duration(seconds: 10), () async {
       emit(state.copyWith(awaitingClearTasksUndo: false));
 
       for (var task in tasksToBeCleared) {
@@ -658,7 +629,7 @@ class TasksCubit extends Cubit<TasksState> {
       }
 
       _activeListBeforeClear = null;
-      _clearTimer = null;
+      _clearDeletedTasksTimer = null;
     });
   }
 
@@ -680,8 +651,18 @@ class TasksCubit extends Cubit<TasksState> {
     ));
 
     _activeListBeforeClear = null;
-    _clearTimer?.cancel();
-    _clearTimer = null;
+    _clearDeletedTasksTimer?.cancel();
+    _clearDeletedTasksTimer = null;
+  }
+
+  /// Updates the due date of the provided [task] to the next occurrence.
+  Future<void> updateTaskToNextOccurrence(Task task) async {
+    final DateTime nextOccurrence = task.recurrenceRule!.nextInstance(task.dueDate!);
+    final updatedTask = task.copyWith(
+      completed: false,
+      dueDate: nextOccurrence,
+    );
+    await updateTask(updatedTask);
   }
 
   @override
@@ -745,7 +726,7 @@ class TasksCubit extends Cubit<TasksState> {
             case 'complete':
               if (task.recurrenceRule != null) {
                 // If the task is recurring, update the due date to the next occurrence.
-                await _updateTaskToNextOccurrence(task);
+                await updateTaskToNextOccurrence(task);
                 break;
               } else {
                 await updateTask(task.copyWith(completed: true));
@@ -783,20 +764,10 @@ class TasksCubit extends Cubit<TasksState> {
     );
   }
 
-  /// Updates the due date of the provided [task] to the next occurrence.
-  Future<void> _updateTaskToNextOccurrence(Task task) async {
-    final DateTime nextOccurrence = task.recurrenceRule!.nextInstance(task.dueDate!);
-    final updatedTask = task.copyWith(
-      completed: false,
-      dueDate: nextOccurrence,
-    );
-    await updateTask(updatedTask);
-  }
-
   @override
   Future<void> close() {
     _notificationResponseSubscription?.cancel();
-    _clearTimer?.cancel();
+    _clearDeletedTasksTimer?.cancel();
     return super.close();
   }
 }

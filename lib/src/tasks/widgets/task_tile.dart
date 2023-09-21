@@ -287,31 +287,19 @@ class _TitleRow extends StatelessWidget {
               ),
             );
 
-            return Row(
-              children: [
-                dragHandle,
-                Checkbox(
-                  value: tileState.task.completed,
-                  onChanged: (bool? value) => tasksCubit.setTaskCompleted(
-                    tileState.task.id,
-                    value!,
-                  ),
-                ),
-                Expanded(
-                  child: BlocBuilder<TaskTileCubit, TaskTileState>(
-                    builder: (context, tileState) {
-                      return AnimatedCrossFade(
-                        duration: const Duration(milliseconds: 200),
-                        crossFadeState: tileState.isExpanded
-                            ? CrossFadeState.showSecond
-                            : CrossFadeState.showFirst,
-                        firstChild: collapsedTitle,
-                        secondChild: expandedTitle,
+                  Checkbox(
+                    value: tileState.task.completed,
+                    onChanged: (bool? completed) {
+                      if (completed == null) return;
+
+                      setTaskCompleted(
+                        context: context,
+                        tasksCubit: context.read<TasksCubit>(),
+                        task: tileState.task,
+                        completed: completed,
                       );
                     },
                   ),
-                ),
-              ],
             );
           },
         );
@@ -373,4 +361,41 @@ class _ChildTasksIndicator extends StatelessWidget {
       },
     );
   }
+}
+
+/// Set the completed status of [task] to [completed].
+///
+/// If [completed] is true, a snackbar will be displayed with an undo button.
+void setTaskCompleted({
+  required BuildContext context,
+  required TasksCubit tasksCubit,
+  required Task task,
+  required bool completed,
+}) {
+  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+  final command = SetTaskCompletedCommand(
+    cubit: tasksCubit,
+    task: task,
+    completed: completed,
+  );
+
+  command.execute();
+
+  if (!completed) return;
+
+  if (tasksCubit.state.activeTask?.id == task.id) {
+    tasksCubit.setActiveTask(null);
+  }
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: const Text('Task completed'),
+      duration: const Duration(seconds: 10),
+      action: SnackBarAction(
+        label: 'Undo',
+        onPressed: () => command.undo(),
+      ),
+    ),
+  );
 }

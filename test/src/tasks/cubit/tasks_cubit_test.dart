@@ -950,7 +950,14 @@ void main() {
         ));
 
         // Set task completed.
-        await testCubit.setTaskCompleted(task1.id, true);
+        final command = SetTaskCompletedCommand(
+          cubit: testCubit,
+          task: task1,
+          completed: true,
+        );
+
+        await command.execute();
+
         expect(testCubit.state.activeList?.items, [
           task1.copyWith(completed: true),
           task2,
@@ -963,7 +970,8 @@ void main() {
         ]);
 
         // Set task uncompleted.
-        await testCubit.setTaskCompleted(task1.id, false);
+        await command.undo();
+
         expect(testCubit.state.activeList?.items, [
           task1,
           task2,
@@ -978,16 +986,16 @@ void main() {
 
       group('daily rrule:', () {
         test('task with due date in the past updates task to next occurrence', () async {
+          final task = task1.copyWith(
+            dueDate: today,
+            recurrenceRule: RecurrenceRule(
+              frequency: Frequency.daily,
+              interval: 1,
+            ),
+          );
+
           final TaskList taskList = testTaskList.copyWith(
-            items: [
-              task1.copyWith(
-                dueDate: today,
-                recurrenceRule: RecurrenceRule(
-                  frequency: Frequency.daily,
-                  interval: 1,
-                ),
-              ),
-            ],
+            items: [task],
           );
 
           testCubit.emit(TasksState.initial().copyWith(
@@ -997,7 +1005,13 @@ void main() {
           ));
 
           // Set task completed.
-          await testCubit.setTaskCompleted(task1.id, true);
+          final command = SetTaskCompletedCommand(
+            cubit: testCubit,
+            task: task,
+            completed: true,
+          );
+
+          await command.execute();
 
           // Verify that the task was updated to the next occurrence.
           final Task? updatedTask = testCubit.state.activeList?.items.first;
@@ -1006,16 +1020,16 @@ void main() {
 
         test('task with due date in the future updates task to next occurrence',
             () async {
+          final task = task1.copyWith(
+            dueDate: today.add(const Duration(days: 5)),
+            recurrenceRule: RecurrenceRule(
+              frequency: Frequency.daily,
+              interval: 1,
+            ),
+          );
+
           final TaskList taskList = testTaskList.copyWith(
-            items: [
-              task1.copyWith(
-                dueDate: today.add(const Duration(days: 5)),
-                recurrenceRule: RecurrenceRule(
-                  frequency: Frequency.daily,
-                  interval: 1,
-                ),
-              ),
-            ],
+            items: [task],
           );
 
           testCubit.emit(TasksState.initial().copyWith(
@@ -1025,7 +1039,13 @@ void main() {
           ));
 
           // Set task completed.
-          await testCubit.setTaskCompleted(task1.id, true);
+          final command = SetTaskCompletedCommand(
+            cubit: testCubit,
+            task: task,
+            completed: true,
+          );
+
+          await command.execute();
 
           // Verify that the task was updated to the next occurrence.
           final Task? updatedTask = testCubit.state.activeList?.items.first;
