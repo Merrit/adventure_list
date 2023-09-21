@@ -39,6 +39,16 @@ class TaskDetailsWidget extends StatelessWidget {
       builder: (context, state) {
         final Task? task = state.activeTask;
 
+        if (task == null) {
+          // If there is no active task, we want to go back to the TasksPage.
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          });
+          // We return an empty widget so futher code doesn't have to deal with
+          // nullability.
+          return const SizedBox();
+        }
+
         final smallScreenView = WillPopScope(
           onWillPop: () async {
             tasksCubit.setActiveTask(null);
@@ -53,6 +63,17 @@ class TaskDetailsWidget extends StatelessWidget {
               ],
             ),
             body: TaskDetailsView(key: ValueKey(task)),
+            persistentFooterButtons: [
+              TextButton(
+                onPressed: () => setTaskCompleted(
+                  context: context,
+                  tasksCubit: tasksCubit,
+                  task: task,
+                  completed: true,
+                ),
+                child: Text(LocaleKeys.markCompleted.tr()),
+              )
+            ],
           ),
         );
 
@@ -244,12 +265,6 @@ class _TitleWidget extends StatelessWidget {
           title: Text(
             task.title,
             style: textStyle,
-          ),
-          trailing: Checkbox(
-            value: task.completed,
-            onChanged: (value) {
-              tasksCubit.updateTask(task.copyWith(completed: value ?? false));
-            },
           ),
         );
       },

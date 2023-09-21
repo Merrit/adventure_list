@@ -24,6 +24,7 @@
         "renameList": "Rename list",
         "title": "List settings"
     },
+    "markCompleted": "Mark completed",
     "markUncompleted": "Mark uncompleted",
     "newList": "New list",
     "newTask": "New task",
