@@ -7,6 +7,10 @@
     "deleteCompleted": "Delete completed tasks",
     "deleteCompletedSubtasks": "Delete completed subtasks",
     "deleteTask": "Delete task",
+    "error": {
+        "error": "Error"
+    },
+    "exit": "Exit",
     "getStartedPrompt": "Select or create a list to get started",
     "homeWidgetConfig": {
         "listToDisplay": "List to display",
@@ -24,6 +28,7 @@
     "newList": "New list",
     "newTask": "New task",
     "pinWindow": "Pin window",
+    "retry": "Retry",
     "settings": {
         "appearance": {
             "darkMode": "Dark mode",

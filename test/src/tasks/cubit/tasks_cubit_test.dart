@@ -338,7 +338,7 @@ void main() {
             subTask4.copyWith(completed: false),
           ],
         );
-        testCubit.emit(TasksState(
+        testCubit.emit(TasksState.initial().copyWith(
           loading: false,
           activeList: taskList,
           taskLists: [taskList],
@@ -376,7 +376,7 @@ void main() {
             subTask4,
           ],
         );
-        testCubit.emit(TasksState(
+        testCubit.emit(TasksState.initial().copyWith(
           loading: false,
           activeList: taskList,
           taskLists: [taskList],
@@ -411,7 +411,7 @@ void main() {
         );
 
         // Seed the state with two task lists and tasks
-        testCubit.emit(TasksState(
+        testCubit.emit(TasksState.initial().copyWith(
           loading: false,
           activeList: taskList1,
           taskLists: [taskList1, taskList2],
@@ -446,7 +446,7 @@ void main() {
         );
 
         // Seed the state with a task list and tasks
-        testCubit.emit(TasksState(
+        testCubit.emit(TasksState.initial().copyWith(
           loading: false,
           activeList: taskList,
           taskLists: [taskList],
@@ -487,7 +487,7 @@ void main() {
         expect(cubit.state.taskLists.first.id, 'test-list-id-5');
       },
       expect: () => [
-        TasksState(
+        TasksState.initial().copyWith(
           activeList: TaskList(
             id: 'temp-test-list-id-5',
             title: 'New List',
@@ -504,7 +504,7 @@ void main() {
             ),
           ],
         ),
-        TasksState(
+        TasksState.initial().copyWith(
           activeList: TaskList(
             id: 'test-list-id-5',
             title: 'New List',
@@ -533,7 +533,7 @@ void main() {
         when(_uuid.v4()).thenReturn('test-list-id-2');
       },
       build: () => testCubit,
-      seed: () => TasksState(
+      seed: () => TasksState.initial().copyWith(
         activeList: TaskList(
           id: 'test-list-id-1',
           title: 'Chores',
@@ -557,7 +557,7 @@ void main() {
         expect(cubit.state.taskLists.first.id, 'test-list-id-1');
       },
       expect: () => [
-        TasksState(
+        TasksState.initial().copyWith(
           activeList: TaskList(
             id: 'test-list-id-2',
             title: 'New List',
@@ -580,7 +580,7 @@ void main() {
             ),
           ],
         ),
-        TasksState(
+        TasksState.initial().copyWith(
           activeList: TaskList(
             id: 'test-list-id-1',
             title: 'Chores',
@@ -613,7 +613,7 @@ void main() {
         );
       },
       build: () => testCubit,
-      seed: () => TasksState(
+      seed: () => TasksState.initial().copyWith(
         activeList: TaskList(
           id: 'test-list-id-5',
           title: 'New List',
@@ -645,7 +645,7 @@ void main() {
         expect(cubit.state.taskLists.first.title, 'Updated List');
       },
       expect: () => [
-        TasksState(
+        TasksState.initial().copyWith(
           activeList: TaskList(
             id: 'test-list-id-5',
             title: 'Updated List',
@@ -672,7 +672,7 @@ void main() {
             .thenAnswer((_) async => true);
       },
       build: () => testCubit,
-      seed: () => TasksState(
+      seed: () => TasksState.initial().copyWith(
         activeList: TaskList(
           id: 'test-list-id-5',
           title: 'New List',
@@ -695,7 +695,7 @@ void main() {
         expect(cubit.state.taskLists.length, 0);
       },
       expect: () => [
-        const TasksState(
+        TasksState.initial().copyWith(
           activeList: null,
           loading: false,
           taskLists: [],
@@ -722,7 +722,7 @@ void main() {
         when(_uuid.v4()).thenReturn('temp-test-task-id-5');
       },
       build: () => testCubit,
-      seed: () => TasksState(
+      seed: () => TasksState.initial().copyWith(
         activeList: TaskList(
           id: 'test-list-id-5',
           title: 'New List',
@@ -766,7 +766,7 @@ void main() {
         )).thenAnswer((_) async => null);
       },
       build: () => testCubit,
-      seed: () => TasksState(
+      seed: () => TasksState.initial().copyWith(
         activeList: TaskList(
           id: 'test-list-id-5',
           title: 'New List',
@@ -908,7 +908,7 @@ void main() {
         task2ForTaskList2,
       ]);
 
-      testCubit.emit(TasksState(
+      testCubit.emit(TasksState.initial().copyWith(
         activeList: taskList2,
         activeTask: task2ForTaskList2,
         loading: false,
@@ -943,7 +943,7 @@ void main() {
           ],
         );
 
-        testCubit.emit(TasksState(
+        testCubit.emit(TasksState.initial().copyWith(
           activeList: taskList,
           loading: false,
           taskLists: [taskList],
@@ -990,7 +990,7 @@ void main() {
             ],
           );
 
-          testCubit.emit(TasksState(
+          testCubit.emit(TasksState.initial().copyWith(
             activeList: taskList,
             loading: false,
             taskLists: [taskList],
@@ -1018,7 +1018,7 @@ void main() {
             ],
           );
 
-          testCubit.emit(TasksState(
+          testCubit.emit(TasksState.initial().copyWith(
             activeList: taskList,
             loading: false,
             taskLists: [taskList],
@@ -1049,7 +1049,7 @@ void main() {
         ],
       );
 
-      testCubit.emit(TasksState(
+      testCubit.emit(TasksState.initial().copyWith(
         activeList: taskList,
         awaitingClearTasksUndo: false,
         loading: false,
@@ -1084,7 +1084,7 @@ void main() {
         ],
       );
 
-      testCubit.emit(TasksState(
+      testCubit.emit(TasksState.initial().copyWith(
         activeList: taskList,
         activeTask: task1,
         loading: false,

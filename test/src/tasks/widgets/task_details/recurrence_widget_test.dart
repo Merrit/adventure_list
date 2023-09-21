@@ -47,7 +47,7 @@ final initialTaskList = TaskList(
   ],
 );
 
-final initialTasksState = TasksState(
+final initialTasksState = TasksState.initial().copyWith(
   loading: false,
   taskLists: [
     initialTaskList,

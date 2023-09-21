@@ -61,6 +61,24 @@ class _TasksPageState extends State<TasksPage> {
                 if (state.activeTask != null && mediaQuery.isSmallScreen) {
                   Navigator.pushNamed(context, TaskDetailsWidget.routeName);
                 }
+
+                // If there is an error message, show a dialog.
+                if (state.errorMessage != null) {
+                  showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text(LocaleKeys.error_error.tr()),
+                      content: Text(state.errorMessage!),
+                      actions: [
+                        TextButton(
+                          onPressed: () => context.read<AppCubit>().exitApp(),
+                          child: Text(LocaleKeys.exit.tr()),
+                        ),
+                      ],
+                    ),
+                  );
+                }
               },
               builder: (context, state) {
                 if (state.loading) {
