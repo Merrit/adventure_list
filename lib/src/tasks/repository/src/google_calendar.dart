@@ -183,10 +183,20 @@ class GoogleCalendar implements TasksRepository {
   }) async {
     final Event updatedEvent;
     try {
+      /// The API expects the iCalUID to have a suffix of `@google.com`, but we
+      /// don't store that in our model, so we need to add it here.
+      final iCalUID = '${updatedTask.id}@google.com';
+      final task = updatedTask.copyWith(id: iCalUID);
+      final events = await _api.events.list(taskListId, iCalUID: iCalUID);
+      if (events.items == null || events.items!.isEmpty) {
+        log.e('Failed to update task, no events found');
+        return null;
+      }
+
       updatedEvent = await _api.events.update(
-        updatedTask.toGoogleEvent(),
+        task.toGoogleEvent(),
         taskListId,
-        updatedTask.id,
+        events.items!.first.id!,
       );
     } on DetailedApiRequestError catch (e) {
       log.e('Failed to update task', error: e);
@@ -243,9 +253,17 @@ extension CalendarHelper on Calendar {
 
 extension EventHelper on Event {
   Task toModel() {
-    return Task.fromJson(jsonDecode(description!)) //
-        // The inital task didn't have id, so grab from Event.
-        .copyWith(id: id!);
+    Task task = Task.fromJson(jsonDecode(description!));
+
+    /// The API seems to alter the id we provide by adding `@google.com`, and we may need
+    /// to transition old tasks that didn't use the iCalUID to the new format.
+    if (iCalUID != null) {
+      // Remove the `@google` part of the id.
+      final iCalUID = this.iCalUID!.split('@').first;
+      task = task.copyWith(id: iCalUID);
+    }
+
+    return task;
   }
 }
 
@@ -267,6 +285,7 @@ extension GoogleTaskListHelper on TaskList {
 extension TaskHelper on Task {
   Event toGoogleEvent() {
     return Event(
+      iCalUID: id,
       description: jsonEncode(toJson()),
       end: EventDateTime(date: DateTime(2022, 06, 27)),
       start: EventDateTime(date: DateTime(2022, 06, 27)),

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:adventure_list/src/logs/logging_manager.dart';
 import 'package:adventure_list/src/tasks/tasks.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:googleapis/calendar/v3.dart';
 import 'package:mockito/annotations.dart';
@@ -213,12 +214,13 @@ void main() {
 
       test('returns Task if successful', () async {
         final fakeTask = Task(
+          id: UniqueKey().toString(),
           taskListId: 'fakeid',
           title: 'fake task',
         );
 
         when(eventsResource.insert(any, any)).thenAnswer((_) async => Event(
-              id: 'fakeid',
+              id: fakeTask.id,
               description: jsonEncode(fakeTask.toJson()),
               summary: 'fake task',
               start: EventDateTime(
@@ -234,13 +236,13 @@ void main() {
           newTask: fakeTask,
         );
 
-        expect(result, fakeTask.copyWith(id: 'fakeid'));
+        expect(result, fakeTask);
       });
     });
 
     group('updateTask:', () {
       test('returns null if api call fails', () async {
-        when(eventsResource.update(any, any, any))
+        when(eventsResource.list(any, iCalUID: anyNamed('iCalUID')))
             .thenThrow(DetailedApiRequestError(404, 'Not Found'));
         final result = await calendar.updateTask(
           taskListId: 'fakeid',
@@ -256,6 +258,23 @@ void main() {
           title: 'fake task',
           completed: true,
         );
+
+        when(eventsResource.list(any, iCalUID: anyNamed('iCalUID')))
+            .thenAnswer((_) async => Events(
+                  items: [
+                    Event(
+                      id: 'fakeid',
+                      description: jsonEncode(fakeTask.toJson()),
+                      summary: 'fake task',
+                      start: EventDateTime(
+                        dateTime: DateTime.now(),
+                      ),
+                      end: EventDateTime(
+                        dateTime: DateTime.now(),
+                      ),
+                    ),
+                  ],
+                ));
 
         when(eventsResource.update(any, any, any)).thenAnswer((_) async => Event(
               id: 'fakeid',
