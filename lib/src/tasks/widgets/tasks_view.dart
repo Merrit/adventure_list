@@ -86,10 +86,8 @@ class _TasksListWidget extends StatelessWidget {
                 return TaskTile(key: ValueKey(task), index: index, task: task);
               },
               itemCount: tasks.length,
-              onReorder: (oldIndex, newIndex) {
-                if (oldIndex < newIndex) newIndex -= 1;
-                tasksCubit.reorderTasks(oldIndex, newIndex);
-              },
+              onReorder: (oldIndex, newIndex) =>
+                  tasksCubit.reorderTasks(oldIndex, newIndex),
             );
           },
         ),
