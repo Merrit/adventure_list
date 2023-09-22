@@ -272,26 +272,6 @@ class _TitleRowState extends State<_TitleRow> {
 
             final bool completed = animationCompleted ?? tileState.task.completed;
 
-            Widget dragHandle;
-            if (defaultTargetPlatform == TargetPlatform.android ||
-                defaultTargetPlatform == TargetPlatform.iOS) {
-              dragHandle = const SizedBox();
-            } else {
-              dragHandle = Opacity(
-                opacity: tileState.isHovered ? 0.5 : 0.0,
-                child: tileState.task.parent == null
-                    // Disable for sub-tasks until reordering them is implemented.
-                    ? ReorderableDragStartListener(
-                        index: tileState.index,
-                        child: const Icon(Icons.drag_indicator),
-                      )
-                    : const Icon(
-                        Icons.hot_tub,
-                        color: Colors.transparent,
-                      ),
-              );
-            }
-
             final Widget collapsedTitle = Text(tileState.task.title);
 
             final Widget expandedTitle = TextField(
@@ -306,47 +286,54 @@ class _TitleRowState extends State<_TitleRow> {
               ),
             );
 
-            final Checkbox checkbox = Checkbox(
-              value: completed,
-              onChanged: (bool? completed) {
-                if (completed == null) return;
+            final Widget checkbox = SizedBox(
+              // SizedBox removes the padding from the Checkbox so that it aligns
+              // with the children of the ExpansionTile.
+              height: 24,
+              width: 24,
+              child: Checkbox(
+                value: completed,
+                onChanged: (bool? completed) {
+                  if (completed == null) return;
 
-                if (completed) {
-                  setState(() {
-                    animationCompleted = true;
+                  if (completed) {
+                    setState(() {
+                      animationCompleted = true;
 
-                    animationTextStyle = titleTextStyle.copyWith(
-                      decoration: TextDecoration.lineThrough,
-                      fontStyle: FontStyle.italic,
-                    );
-                  });
-                }
+                      animationTextStyle = titleTextStyle.copyWith(
+                        decoration: TextDecoration.lineThrough,
+                        fontStyle: FontStyle.italic,
+                      );
+                    });
+                  }
 
-                final int? delay = completed ? animationDuration : null;
+                  final int? delay = completed ? animationDuration : null;
 
-                setTaskCompleted(
-                  context: context,
-                  delay: delay,
-                  tasksCubit: context.read<TasksCubit>(),
-                  task: tileState.task,
-                  completed: completed,
-                );
-              },
+                  setTaskCompleted(
+                    context: context,
+                    delay: delay,
+                    tasksCubit: context.read<TasksCubit>(),
+                    task: tileState.task,
+                    completed: completed,
+                  );
+                },
+              ),
             );
 
-            final Widget titleWidget = Expanded(
-              child: (tileState.isExpanded) ? expandedTitle : collapsedTitle,
-            );
+            final Widget titleWidget =
+                (tileState.isExpanded) ? expandedTitle : collapsedTitle;
 
-            return AnimatedDefaultTextStyle(
-              duration: Duration(milliseconds: animationDuration),
-              style: titleTextStyle,
-              child: Row(
-                children: [
-                  dragHandle,
-                  checkbox,
-                  titleWidget,
-                ],
+            return ReorderableDragStartListener(
+              index: tileState.index,
+              // Disable for sub-tasks until reordering them is implemented.
+              enabled: tileState.task.parent == null,
+              child: AnimatedDefaultTextStyle(
+                duration: Duration(milliseconds: animationDuration),
+                style: titleTextStyle,
+                child: ListTile(
+                  leading: checkbox,
+                  title: titleWidget,
+                ),
               ),
             );
           },
