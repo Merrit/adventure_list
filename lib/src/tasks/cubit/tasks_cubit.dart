@@ -232,14 +232,18 @@ class TasksCubit extends Cubit<TasksState> {
   ///
   /// The task is created in memory first, then synced with the repository to
   /// ensure the process feels fast to the user.
-  Future<Task?> createTask(Task newTask) async {
+  ///
+  /// If [assignNewId] is true, the task will be assigned a randomized id. Otherwise
+  /// the task will be created with the provided id. This is primarily useful when
+  /// undoing a task deletion, so the task can be recreated with the same id.
+  Future<Task?> createTask(Task newTask, {bool assignNewId = false}) async {
     assert(state.activeList != null);
 
     final TaskList activeList = state.activeList!;
     final List<TaskList> taskLists = state.taskLists;
-    final tempId = _uuid.v4();
+    final String id = assignNewId ? _uuid.v4() : newTask.id;
     final index = _calculateNewTaskIndex(newTask);
-    newTask = newTask.copyWith(id: tempId, index: index);
+    newTask = newTask.copyWith(id: id, index: index);
     List<Task> updatedTasks = activeList.items.addTask(newTask);
     TaskList updatedTaskList = activeList.copyWith(items: updatedTasks);
     List<TaskList> updatedTaskLists = taskLists.updateTaskList(updatedTaskList);
@@ -250,7 +254,7 @@ class TasksCubit extends Cubit<TasksState> {
       taskLists: updatedTaskLists,
     ));
 
-    // Create task with repository to get final id.
+    // Create task with repository.
     final newTaskFromRepo = await _tasksRepository.createTask(
       taskListId: state.activeList!.id,
       newTask: newTask,
@@ -302,17 +306,6 @@ class TasksCubit extends Cubit<TasksState> {
     return index;
   }
 
-  /// Holds the `activeList` as it was before the tasks were cleared until the
-  /// timer expires and they are deleted, or the user cancels the clear
-  /// operation and this list is restored.
-  ///
-  /// If the user takes any other actions aside from canceling the clear
-  /// operation, this list is discarded.
-  TaskList? _activeListBeforeClear;
-
-  /// Timer giving the user time to cancel the clear operation.
-  Timer? _clearDeletedTasksTimer;
-
   /// Clears all completed tasks from the active list.
   ///
   /// If [parentId] is provided, only sub-tasks of the parent will be cleared.
@@ -328,78 +321,33 @@ class TasksCubit extends Cubit<TasksState> {
     final activeList = state.activeList;
     if (activeList == null) return;
 
-    final List<Task> tasksToBeCleared = [];
-
-    if (parentId != null) {
-      final subtasks = activeList.items.subtasksOf(parentId);
-      final completedSubtasks = subtasks.completedTasks();
-      tasksToBeCleared.addAll(completedSubtasks);
-    } else {
-      tasksToBeCleared.addAll(activeList.items.completedTasks());
-    }
+    final List<Task> tasksToBeCleared = parentId != null
+        ? activeList.items.subtasksOf(parentId).completedTasks()
+        : activeList.items.completedTasks();
 
     // If there are no tasks to be cleared, don't do anything.
     if (tasksToBeCleared.isEmpty) return;
 
-    // Save state before clearing tasks so that it can be restored if the user
-    // cancels the clear operation.
-    _activeListBeforeClear = activeList;
-
     // Remove the tasks from the list.
-    final List<Task> updatedTasks = activeList //
-        .items
-        .removeTasks(tasksToBeCleared);
+    final List<Task> updatedTasks = activeList.items.removeTasks(tasksToBeCleared);
 
     // Update the active list.
-    final int index = state.taskLists.indexWhere(
-      (element) => element.id == activeList.id,
-    );
+    final int index = state.taskLists.indexWhere((e) => e.id == activeList.id);
     final TaskList updatedTaskList = activeList.copyWith(items: updatedTasks);
     final List<TaskList> updatedAllTaskLists = state.taskLists.copy()
       ..[index] = updatedTaskList;
 
     emit(state.copyWith(
       activeList: updatedTaskList,
-      awaitingClearTasksUndo: true,
       taskLists: updatedAllTaskLists,
     ));
 
-    // Start the timer to clear the tasks.
-    _clearDeletedTasksTimer = Timer(const Duration(seconds: 10), () async {
-      emit(state.copyWith(awaitingClearTasksUndo: false));
-
-      for (var task in tasksToBeCleared) {
-        await _tasksRepository.deleteTask(
-          taskListId: activeList.id,
-          taskId: task.id,
-        );
-      }
-
-      _activeListBeforeClear = null;
-      _clearDeletedTasksTimer = null;
-    });
-  }
-
-  /// Cancels the clear operation and restores the tasks that were cleared.
-  void undoClearCompletedTasks() {
-    if (_activeListBeforeClear == null) return;
-
-    final activeListBeforeClear = _activeListBeforeClear!;
-    final int index = state.taskLists.indexWhere(
-      (element) => element.id == activeListBeforeClear.id,
-    );
-    final List<TaskList> updatedAllTaskLists = state.taskLists.copy()
-      ..[index] = activeListBeforeClear;
-
-    emit(state.copyWith(
-      activeList: activeListBeforeClear,
-      awaitingClearTasksUndo: false,
-      taskLists: updatedAllTaskLists,
-    ));
-
-    _activeListBeforeClear = null;
-    _clearDeletedTasksTimer?.cancel();
-    _clearDeletedTasksTimer = null;
+    for (var task in tasksToBeCleared) {
+      await _tasksRepository.deleteTask(
+        taskListId: activeList.id,
+        taskId: task.id,
+      );
+    }
   }
 
   /// Deletes the active list.
@@ -708,20 +656,11 @@ class TasksCubit extends Cubit<TasksState> {
 
   @override
   void onChange(Change<TasksState> change) {
-    // If the user has taken an action while the clear timer is active, consider
-    // the clear operation committed.
-    if (change.currentState.awaitingClearTasksUndo &&
-        change.nextState.awaitingClearTasksUndo) {
-      _activeListBeforeClear = null;
-      change = Change(
-        currentState: change.currentState,
-        nextState: change.nextState.copyWith(awaitingClearTasksUndo: false),
-      );
-    }
-
     super.onChange(change);
 
-    if (Platform.isAndroid) _updateAndroidWidget(change.nextState);
+    if (Platform.isAndroid) {
+      _updateAndroidWidget(change.nextState);
+    }
 
     _updateNotificationBadge(change.nextState);
   }
@@ -768,7 +707,6 @@ class TasksCubit extends Cubit<TasksState> {
   @override
   Future<void> close() {
     _notificationResponseSubscription?.cancel();
-    _clearDeletedTasksTimer?.cancel();
     return super.close();
   }
 }

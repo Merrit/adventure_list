@@ -5,7 +5,9 @@
     "confirm": "Confirm",
     "delete": "Delete",
     "deleteCompleted": "Delete completed tasks",
+    "deleteCompletedConfirmation": "Are you sure you want to delete all completed tasks?",
     "deleteCompletedSubtasks": "Delete completed subtasks",
+    "deleteCompletedSuccess": "Deleted completed tasks",
     "deleteTask": "Delete task",
     "error": {
         "error": "Error"
@@ -66,5 +68,6 @@
     "subtasks": {
         "addSubtask": "Add subtask",
         "title": "Subtasks"
-    }
+    },
+    "undo": "Undo"
 }

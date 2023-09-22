@@ -252,16 +252,66 @@ class _ListOptionsButtonState extends State<_ListOptionsButton> {
           ),
         ];
       },
-      onSelected: (value) {
+      onSelected: (value) async {
         switch (value) {
           case LocaleKeys.listSettings_renameList:
             _showRenameListDialog(context);
           case LocaleKeys.listSettings_deleteList:
             _showDeleteListDialog(context);
           case LocaleKeys.deleteCompleted:
-            tasksCubit.deleteCompletedTasks();
+            final bool confirmed = await _confirmDeleteCompletedTasks();
+            if (confirmed) {
+              await _deleteCompletedTasks();
+            }
         }
       },
+    );
+  }
+
+  /// Shows a dialog to confirm deleting all completed tasks.
+  Future<bool> _confirmDeleteCompletedTasks() async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(LocaleKeys.deleteCompleted.tr()),
+            content: Text(LocaleKeys.deleteCompletedConfirmation.tr()),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(LocaleKeys.cancel.tr()),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(
+                  LocaleKeys.delete.tr(),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
+  /// Deletes all completed tasks in the active task list.
+  Future<void> _deleteCompletedTasks() async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    final command = DeleteCompletedTasksCommand(
+      cubit: tasksCubit,
+      taskList: tasksCubit.state.activeList!,
+    );
+
+    await command.execute();
+
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        content: Text(LocaleKeys.deleteCompletedSuccess.tr()),
+        action: SnackBarAction(
+          label: LocaleKeys.undo.tr(),
+          onPressed: () => command.undo(),
+        ),
+      ),
     );
   }
 

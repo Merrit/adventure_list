@@ -5,7 +5,9 @@
     "confirm": "Bestätigen",
     "delete": "Löschen",
     "deleteCompleted": "Erledigte Aufgaben löschen",
+    "deleteCompletedConfirmation": "Willst du wirklich alle erledigten Aufgaben löschen?",
     "deleteCompletedSubtasks": "Erledigte Unteraufgaben löschen",
+    "deleteCompletedSuccess": "Alle erledigten Aufgaben wurden gelöscht",
     "deleteTask": "Aufgabe löschen",
     "error": {
         "error": "Fehler"
@@ -66,5 +68,6 @@
     "subtasks": {
         "addSubtask": "Unteraufgabe hinzufügen",
         "title": "Unteraufgaben"
-    }
+    },
+    "undo": "Rückgängig"
 }
