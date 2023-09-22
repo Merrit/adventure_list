@@ -76,6 +76,9 @@ class TasksCubit extends Cubit<TasksState> {
     });
   }
 
+  /// The repository that manages the tasks.
+  late TasksRepository _tasksRepository;
+
   /// Initializes the tasks repository.
   Future<void> _getTasksRepo({
     required AccessCredentials credentials,
@@ -90,8 +93,6 @@ class TasksCubit extends Cubit<TasksState> {
 
     initialize(tasksRepository);
   }
-
-  late TasksRepository _tasksRepository;
 
   /// Initializes the [TasksCubit].
   Future<void> initialize(TasksRepository tasksRepository) async {
@@ -145,6 +146,46 @@ class TasksCubit extends Cubit<TasksState> {
     }
   }
 
+  /// Stream subscription for listening for when the user taps on a notification.
+  StreamSubscription<NotificationResponse>? _notificationResponseSubscription;
+
+  /// Listens for when the user taps on a notification.
+  void _listenForNotificationResponse() {
+    _notificationResponseSubscription =
+        notificationResponseStream.stream.listen((NotificationResponse response) async {
+      if (response.payload == null) return;
+
+      final task = Task.fromJson(
+        jsonDecode(response.payload!) as Map<String, dynamic>,
+      );
+
+      switch (response.notificationResponseType) {
+        case NotificationResponseType.selectedNotification:
+          // The user tapped on the notification.
+          setActiveList(task.taskListId);
+          setActiveTask(task.id);
+          break;
+        case NotificationResponseType.selectedNotificationAction:
+          // The user tapped on an action button on the notification.
+          switch (response.actionId) {
+            case 'complete':
+              if (task.recurrenceRule != null) {
+                // If the task is recurring, update the due date to the next occurrence.
+                await updateTaskToNextOccurrence(task);
+                break;
+              } else {
+                await updateTask(task.copyWith(completed: true));
+                break;
+              }
+            case 'snooze':
+              await NotificationsCubit.instance.snoozeTask(task);
+              break;
+          }
+          break;
+      }
+    });
+  }
+
   /// Creates a new Todo list.
   ///
   /// The list is created in memory first, then synced with the repository.
@@ -185,6 +226,180 @@ class TasksCubit extends Cubit<TasksState> {
       activeList: newList,
       taskLists: taskLists,
     ));
+  }
+
+  /// Creates a new [Task] in the active list.
+  ///
+  /// The task is created in memory first, then synced with the repository to
+  /// ensure the process feels fast to the user.
+  Future<Task?> createTask(Task newTask) async {
+    assert(state.activeList != null);
+
+    final TaskList activeList = state.activeList!;
+    final List<TaskList> taskLists = state.taskLists;
+    final tempId = _uuid.v4();
+    final index = _calculateNewTaskIndex(newTask);
+    newTask = newTask.copyWith(id: tempId, index: index);
+    List<Task> updatedTasks = activeList.items.addTask(newTask);
+    TaskList updatedTaskList = activeList.copyWith(items: updatedTasks);
+    List<TaskList> updatedTaskLists = taskLists.updateTaskList(updatedTaskList);
+
+    // Emit local cached task immediately.
+    emit(state.copyWith(
+      activeList: updatedTaskList,
+      taskLists: updatedTaskLists,
+    ));
+
+    // Create task with repository to get final id.
+    final newTaskFromRepo = await _tasksRepository.createTask(
+      taskListId: state.activeList!.id,
+      newTask: newTask,
+    );
+
+    // If creating the remote task failed, revert the changes.
+    if (newTaskFromRepo == null) {
+      emit(state.copyWith(
+        activeList: activeList,
+        taskLists: taskLists,
+      ));
+      return null;
+    }
+
+    updatedTasks = updatedTaskList.items //
+        .removeTask(newTask)
+        .addTask(newTaskFromRepo);
+    updatedTaskList = updatedTaskList.copyWith(items: updatedTasks);
+    updatedTaskLists = updatedTaskLists.updateTaskList(updatedTaskList);
+
+    emit(state.copyWith(
+      activeList: updatedTaskList,
+      taskLists: updatedTaskLists,
+    ));
+
+    return newTaskFromRepo;
+  }
+
+  /// Calculate the index of a new task.
+  ///
+  /// If the task is a subtask, the index is the number of subtasks of the
+  /// parent task.
+  ///
+  /// If the task is not a subtask, the index is the number of tasks without
+  /// a parent.
+  int _calculateNewTaskIndex(Task newTask) {
+    final bool isSubTask = newTask.parent != null;
+    final Task? parentTask = state.activeList!.items
+        .singleWhereOrNull((element) => element.id == newTask.parent);
+
+    int index;
+    if (isSubTask) {
+      index = state.activeList!.items
+          .where((element) => element.parent == parentTask!.id)
+          .length;
+    } else {
+      index = state.activeList!.items.where((element) => element.parent == null).length;
+    }
+    return index;
+  }
+
+  /// Holds the `activeList` as it was before the tasks were cleared until the
+  /// timer expires and they are deleted, or the user cancels the clear
+  /// operation and this list is restored.
+  ///
+  /// If the user takes any other actions aside from canceling the clear
+  /// operation, this list is discarded.
+  TaskList? _activeListBeforeClear;
+
+  /// Timer giving the user time to cancel the clear operation.
+  Timer? _clearDeletedTasksTimer;
+
+  /// Clears all completed tasks from the active list.
+  ///
+  /// If [parentId] is provided, only sub-tasks of the parent will be cleared.
+  ///
+  /// A task is marked "completed" when it is checked, but this does not remove
+  /// it from the list, rather it is displayed differently; for example crossed
+  /// out, hidden in a dropdown, etc. By "clearing" we are actually deleting the
+  /// task.
+  ///
+  /// The user can cancel the clear operation by calling
+  /// [undoClearCompletedTasks].
+  Future<void> deleteCompletedTasks({String? parentId}) async {
+    final activeList = state.activeList;
+    if (activeList == null) return;
+
+    final List<Task> tasksToBeCleared = [];
+
+    if (parentId != null) {
+      final subtasks = activeList.items.subtasksOf(parentId);
+      final completedSubtasks = subtasks.completedTasks();
+      tasksToBeCleared.addAll(completedSubtasks);
+    } else {
+      tasksToBeCleared.addAll(activeList.items.completedTasks());
+    }
+
+    // If there are no tasks to be cleared, don't do anything.
+    if (tasksToBeCleared.isEmpty) return;
+
+    // Save state before clearing tasks so that it can be restored if the user
+    // cancels the clear operation.
+    _activeListBeforeClear = activeList;
+
+    // Remove the tasks from the list.
+    final List<Task> updatedTasks = activeList //
+        .items
+        .removeTasks(tasksToBeCleared);
+
+    // Update the active list.
+    final int index = state.taskLists.indexWhere(
+      (element) => element.id == activeList.id,
+    );
+    final TaskList updatedTaskList = activeList.copyWith(items: updatedTasks);
+    final List<TaskList> updatedAllTaskLists = state.taskLists.copy()
+      ..[index] = updatedTaskList;
+
+    emit(state.copyWith(
+      activeList: updatedTaskList,
+      awaitingClearTasksUndo: true,
+      taskLists: updatedAllTaskLists,
+    ));
+
+    // Start the timer to clear the tasks.
+    _clearDeletedTasksTimer = Timer(const Duration(seconds: 10), () async {
+      emit(state.copyWith(awaitingClearTasksUndo: false));
+
+      for (var task in tasksToBeCleared) {
+        await _tasksRepository.deleteTask(
+          taskListId: activeList.id,
+          taskId: task.id,
+        );
+      }
+
+      _activeListBeforeClear = null;
+      _clearDeletedTasksTimer = null;
+    });
+  }
+
+  /// Cancels the clear operation and restores the tasks that were cleared.
+  void undoClearCompletedTasks() {
+    if (_activeListBeforeClear == null) return;
+
+    final activeListBeforeClear = _activeListBeforeClear!;
+    final int index = state.taskLists.indexWhere(
+      (element) => element.id == activeListBeforeClear.id,
+    );
+    final List<TaskList> updatedAllTaskLists = state.taskLists.copy()
+      ..[index] = activeListBeforeClear;
+
+    emit(state.copyWith(
+      activeList: activeListBeforeClear,
+      awaitingClearTasksUndo: false,
+      taskLists: updatedAllTaskLists,
+    ));
+
+    _activeListBeforeClear = null;
+    _clearDeletedTasksTimer?.cancel();
+    _clearDeletedTasksTimer = null;
   }
 
   /// Deletes the active list.
@@ -325,114 +540,6 @@ class TasksCubit extends Cubit<TasksState> {
     }
   }
 
-  /// Sets the active list to the list with the provided [id].
-  ///
-  /// If the list with the provided [id] doesn't exist, the active list is set
-  /// to null.
-  ///
-  /// The active list id is saved to storage so it can be retrieved on app
-  /// restart.
-  void setActiveList(String id) {
-    final TaskList? taskList = state.taskLists.getTaskListById(id);
-    emit(state.copyWith(
-      activeList: taskList,
-      activeTask: null,
-    ));
-    StorageRepository.instance.save(key: 'activeList', value: taskList?.id);
-  }
-
-  /// Updates the provided [TaskList].
-  ///
-  /// The list is updated in memory first, then synced with the repository to
-  /// ensure the process feels fast to the user.
-  ///
-  /// If the list is the active list, it is also updated in memory.
-  Future<void> updateList(TaskList list) async {
-    final updatedLists = state.taskLists.updateTaskList(list);
-    final TaskList? activeList = (list.id == state.activeList?.id) //
-        ? list
-        : null;
-    emit(state.copyWith(
-      activeList: activeList,
-      taskLists: updatedLists,
-    ));
-    await _tasksRepository.updateList(list: list);
-  }
-
-  /// Creates a new [Task] in the active list.
-  ///
-  /// The task is created in memory first, then synced with the repository to
-  /// ensure the process feels fast to the user.
-  Future<Task?> createTask(Task newTask) async {
-    assert(state.activeList != null);
-
-    final TaskList activeList = state.activeList!;
-    final List<TaskList> taskLists = state.taskLists;
-    final tempId = _uuid.v4();
-    final index = _calculateNewTaskIndex(newTask);
-    newTask = newTask.copyWith(id: tempId, index: index);
-    List<Task> updatedTasks = activeList.items.addTask(newTask);
-    TaskList updatedTaskList = activeList.copyWith(items: updatedTasks);
-    List<TaskList> updatedTaskLists = taskLists.updateTaskList(updatedTaskList);
-
-    // Emit local cached task immediately.
-    emit(state.copyWith(
-      activeList: updatedTaskList,
-      taskLists: updatedTaskLists,
-    ));
-
-    // Create task with repository to get final id.
-    final newTaskFromRepo = await _tasksRepository.createTask(
-      taskListId: state.activeList!.id,
-      newTask: newTask,
-    );
-
-    // If creating the remote task failed, revert the changes.
-    if (newTaskFromRepo == null) {
-      emit(state.copyWith(
-        activeList: activeList,
-        taskLists: taskLists,
-      ));
-      return null;
-    }
-
-    updatedTasks = updatedTaskList.items //
-        .removeTask(newTask)
-        .addTask(newTaskFromRepo);
-    updatedTaskList = updatedTaskList.copyWith(items: updatedTasks);
-    updatedTaskLists = updatedTaskLists.updateTaskList(updatedTaskList);
-
-    emit(state.copyWith(
-      activeList: updatedTaskList,
-      taskLists: updatedTaskLists,
-    ));
-
-    return newTaskFromRepo;
-  }
-
-  /// Calculate the index of a new task.
-  ///
-  /// If the task is a subtask, the index is the number of subtasks of the
-  /// parent task.
-  ///
-  /// If the task is not a subtask, the index is the number of tasks without
-  /// a parent.
-  int _calculateNewTaskIndex(Task newTask) {
-    final bool isSubTask = newTask.parent != null;
-    final Task? parentTask = state.activeList!.items
-        .singleWhereOrNull((element) => element.id == newTask.parent);
-
-    int index;
-    if (isSubTask) {
-      index = state.activeList!.items
-          .where((element) => element.parent == parentTask!.id)
-          .length;
-    } else {
-      index = state.activeList!.items.where((element) => element.parent == null).length;
-    }
-    return index;
-  }
-
   /// Called when the user is reordering Tasks.
   Future<void> reorderTasks(int oldIndex, int newIndex) async {
     if (oldIndex < newIndex) newIndex -= 1;
@@ -464,6 +571,71 @@ class TasksCubit extends Cubit<TasksState> {
         );
       }
     }
+  }
+
+  /// Sets the active list to the list with the provided [id].
+  ///
+  /// If the list with the provided [id] doesn't exist, the active list is set
+  /// to null.
+  ///
+  /// The active list id is saved to storage so it can be retrieved on app
+  /// restart.
+  void setActiveList(String id) {
+    final TaskList? taskList = state.taskLists.getTaskListById(id);
+    emit(state.copyWith(
+      activeList: taskList,
+      activeTask: null,
+    ));
+    StorageRepository.instance.save(key: 'activeList', value: taskList?.id);
+  }
+
+  /// Sets the [Task] with the provided [id] as the active task.
+  ///
+  /// If the [id] is null, no task with that [id] exists, or is already the
+  /// active task, the active task is set to null.
+  ///
+  /// If the task belongs to a different list than the active list, the active
+  /// list is set to the list that contains the task.
+  void setActiveTask(String? id) {
+    final Task? task = state.taskLists
+        .expand((element) => element.items)
+        .firstWhereOrNull((element) => element.id == id);
+
+    if (task == null || task.id == state.activeTask?.id) {
+      emit(state.copyWith(activeTask: null));
+      return;
+    }
+
+    final TaskList? taskList =
+        state.taskLists.firstWhereOrNull((element) => element.items.contains(task));
+    if (taskList == null) {
+      emit(state.copyWith(activeTask: null));
+      return;
+    }
+
+    if (taskList.id != state.activeList?.id) {
+      setActiveList(taskList.id);
+    }
+
+    emit(state.copyWith(activeTask: task));
+  }
+
+  /// Updates the provided [TaskList].
+  ///
+  /// The list is updated in memory first, then synced with the repository to
+  /// ensure the process feels fast to the user.
+  ///
+  /// If the list is the active list, it is also updated in memory.
+  Future<void> updateList(TaskList list) async {
+    final updatedLists = state.taskLists.updateTaskList(list);
+    final TaskList? activeList = (list.id == state.activeList?.id) //
+        ? list
+        : null;
+    emit(state.copyWith(
+      activeList: activeList,
+      taskLists: updatedLists,
+    ));
+    await _tasksRepository.updateList(list: list);
   }
 
   /// Updates the provided [Task].
@@ -524,137 +696,6 @@ class TasksCubit extends Cubit<TasksState> {
     return updatedTask;
   }
 
-  /// Sets the [Task] with the provided [id] as the active task.
-  ///
-  /// If the [id] is null, no task with that [id] exists, or is already the
-  /// active task, the active task is set to null.
-  ///
-  /// If the task belongs to a different list than the active list, the active
-  /// list is set to the list that contains the task.
-  void setActiveTask(String? id) {
-    final Task? task = state.taskLists
-        .expand((element) => element.items)
-        .firstWhereOrNull((element) => element.id == id);
-
-    if (task == null || task.id == state.activeTask?.id) {
-      emit(state.copyWith(activeTask: null));
-      return;
-    }
-
-    final TaskList? taskList =
-        state.taskLists.firstWhereOrNull((element) => element.items.contains(task));
-    if (taskList == null) {
-      emit(state.copyWith(activeTask: null));
-      return;
-    }
-
-    if (taskList.id != state.activeList?.id) {
-      setActiveList(taskList.id);
-    }
-
-    emit(state.copyWith(activeTask: task));
-  }
-
-  /// Holds the `activeList` as it was before the tasks were cleared until the
-  /// timer expires and they are deleted, or the user cancels the clear
-  /// operation and this list is restored.
-  ///
-  /// If the user takes any other actions aside from canceling the clear
-  /// operation, this list is discarded.
-  TaskList? _activeListBeforeClear;
-
-  /// Timer giving the user time to cancel the clear operation.
-  Timer? _clearDeletedTasksTimer;
-
-  /// Clears all completed tasks from the active list.
-  ///
-  /// If [parentId] is provided, only sub-tasks of the parent will be cleared.
-  ///
-  /// A task is marked "completed" when it is checked, but this does not remove
-  /// it from the list, rather it is displayed differently; for example crossed
-  /// out, hidden in a dropdown, etc. By "clearing" we are actually deleting the
-  /// task.
-  ///
-  /// The user can cancel the clear operation by calling
-  /// [undoClearCompletedTasks].
-  Future<void> deleteCompletedTasks({String? parentId}) async {
-    final activeList = state.activeList;
-    if (activeList == null) return;
-
-    final List<Task> tasksToBeCleared = [];
-
-    if (parentId != null) {
-      final subtasks = activeList.items.subtasksOf(parentId);
-      final completedSubtasks = subtasks.completedTasks();
-      tasksToBeCleared.addAll(completedSubtasks);
-    } else {
-      tasksToBeCleared.addAll(activeList.items.completedTasks());
-    }
-
-    // If there are no tasks to be cleared, don't do anything.
-    if (tasksToBeCleared.isEmpty) return;
-
-    // Save state before clearing tasks so that it can be restored if the user
-    // cancels the clear operation.
-    _activeListBeforeClear = activeList;
-
-    // Remove the tasks from the list.
-    final List<Task> updatedTasks = activeList //
-        .items
-        .removeTasks(tasksToBeCleared);
-
-    // Update the active list.
-    final int index = state.taskLists.indexWhere(
-      (element) => element.id == activeList.id,
-    );
-    final TaskList updatedTaskList = activeList.copyWith(items: updatedTasks);
-    final List<TaskList> updatedAllTaskLists = state.taskLists.copy()
-      ..[index] = updatedTaskList;
-
-    emit(state.copyWith(
-      activeList: updatedTaskList,
-      awaitingClearTasksUndo: true,
-      taskLists: updatedAllTaskLists,
-    ));
-
-    // Start the timer to clear the tasks.
-    _clearDeletedTasksTimer = Timer(const Duration(seconds: 10), () async {
-      emit(state.copyWith(awaitingClearTasksUndo: false));
-
-      for (var task in tasksToBeCleared) {
-        await _tasksRepository.deleteTask(
-          taskListId: activeList.id,
-          taskId: task.id,
-        );
-      }
-
-      _activeListBeforeClear = null;
-      _clearDeletedTasksTimer = null;
-    });
-  }
-
-  /// Cancels the clear operation and restores the tasks that were cleared.
-  void undoClearCompletedTasks() {
-    if (_activeListBeforeClear == null) return;
-
-    final activeListBeforeClear = _activeListBeforeClear!;
-    final int index = state.taskLists.indexWhere(
-      (element) => element.id == activeListBeforeClear.id,
-    );
-    final List<TaskList> updatedAllTaskLists = state.taskLists.copy()
-      ..[index] = activeListBeforeClear;
-
-    emit(state.copyWith(
-      activeList: activeListBeforeClear,
-      awaitingClearTasksUndo: false,
-      taskLists: updatedAllTaskLists,
-    ));
-
-    _activeListBeforeClear = null;
-    _clearDeletedTasksTimer?.cancel();
-    _clearDeletedTasksTimer = null;
-  }
-
   /// Updates the due date of the provided [task] to the next occurrence.
   Future<void> updateTaskToNextOccurrence(Task task) async {
     final DateTime nextOccurrence = task.recurrenceRule!.nextInstance(task.dueDate!);
@@ -699,46 +740,6 @@ class TasksCubit extends Cubit<TasksState> {
     }
 
     await NotificationsCubit.instance.setNotificationBadge(overdueTaskCount);
-  }
-
-  /// Stream subscription for listening for when the user taps on a notification.
-  StreamSubscription<NotificationResponse>? _notificationResponseSubscription;
-
-  /// Listens for when the user taps on a notification.
-  void _listenForNotificationResponse() {
-    _notificationResponseSubscription =
-        notificationResponseStream.stream.listen((NotificationResponse response) async {
-      if (response.payload == null) return;
-
-      final task = Task.fromJson(
-        jsonDecode(response.payload!) as Map<String, dynamic>,
-      );
-
-      switch (response.notificationResponseType) {
-        case NotificationResponseType.selectedNotification:
-          // The user tapped on the notification.
-          setActiveList(task.taskListId);
-          setActiveTask(task.id);
-          break;
-        case NotificationResponseType.selectedNotificationAction:
-          // The user tapped on an action button on the notification.
-          switch (response.actionId) {
-            case 'complete':
-              if (task.recurrenceRule != null) {
-                // If the task is recurring, update the due date to the next occurrence.
-                await updateTaskToNextOccurrence(task);
-                break;
-              } else {
-                await updateTask(task.copyWith(completed: true));
-                break;
-              }
-            case 'snooze':
-              await NotificationsCubit.instance.snoozeTask(task);
-              break;
-          }
-          break;
-      }
-    });
   }
 
   /// Updates the Android home screen widget.
