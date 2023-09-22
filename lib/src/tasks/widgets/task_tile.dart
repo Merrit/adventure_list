@@ -90,6 +90,7 @@ class TaskTile extends StatelessWidget {
               return BlocBuilder<TaskTileCubit, TaskTileState>(
                 builder: (context, tileState) {
                   return Card(
+                    margin: const EdgeInsets.all(0),
                     elevation: (tileState.isHovered || selected) ? 1 : 0,
                     child: InkWell(
                       hoverColor: Colors.transparent,
@@ -183,6 +184,7 @@ class _TaskTileContentsState extends State<_TaskTileContents> {
                 : const SizedBox();
 
             final expansionTile = ExpansionTile(
+              tilePadding: const EdgeInsets.all(0),
               collapsedBackgroundColor: Colors.transparent,
               controller: expansionTileController,
               initiallyExpanded: taskTileState.isSelected,
