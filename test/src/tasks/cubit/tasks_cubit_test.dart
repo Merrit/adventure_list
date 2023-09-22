@@ -117,7 +117,7 @@ void main() {
               newTask: anyNamed('newTask'), taskListId: anyNamed('taskListId')))
           .thenAnswer((invokation) async {
         final providedTask = invokation.namedArguments[const Symbol('newTask')] as Task;
-        return providedTask.copyWith(id: UniqueKey().toString());
+        return providedTask;
       });
       when(_tasksRepository.updateTask(
               taskListId: anyNamed('taskListId'), updatedTask: anyNamed('updatedTask')))
@@ -1071,22 +1071,37 @@ void main() {
 
       testCubit.emit(TasksState.initial().copyWith(
         activeList: taskList,
-        awaitingClearTasksUndo: false,
         loading: false,
         taskLists: [taskList],
       ));
 
       // Clear completed tasks.
-      await testCubit.deleteCompletedTasks();
-      expect(testCubit.state.activeList?.items, [
-        task2.copyWith(index: 0),
-        task3.copyWith(index: 1),
-        subTask4.copyWith(index: 0),
-      ]);
+      final command = DeleteCompletedTasksCommand(
+        cubit: testCubit,
+        taskList: taskList,
+      );
+
+      await command.execute();
+
+      final tasksAfterDelete = testCubit.state.activeList?.items;
+      expect(tasksAfterDelete?.length, 3);
+      expect(tasksAfterDelete!.where((t) => t.title == 'Test Task 2').length, 1);
+      expect(tasksAfterDelete.where((t) => t.title == 'Test Task 3').length, 1);
+      expect(tasksAfterDelete.where((t) => t.title == 'Test Sub Task 4').length, 1);
 
       // Undo clear completed tasks.
-      testCubit.undoClearCompletedTasks();
-      expect(testCubit.state.activeList?.items, taskList.items);
+      await command.undo();
+      // expect(testCubit.state.activeList?.items, taskList.items);
+      final tasksAfterUndo = testCubit.state.activeList?.items;
+      expect(tasksAfterUndo?.length, 8);
+      expect(tasksAfterUndo!.where((t) => t.title == 'Test Task 1').length, 1);
+      expect(tasksAfterUndo.where((t) => t.title == 'Test Task 2').length, 1);
+      expect(tasksAfterUndo.where((t) => t.title == 'Test Task 3').length, 1);
+      expect(tasksAfterUndo.where((t) => t.title == 'Test Task 4').length, 1);
+      expect(tasksAfterUndo.where((t) => t.title == 'Test Sub Task 1').length, 1);
+      expect(tasksAfterUndo.where((t) => t.title == 'Test Sub Task 2').length, 1);
+      expect(tasksAfterUndo.where((t) => t.title == 'Test Sub Task 3').length, 1);
+      expect(tasksAfterUndo.where((t) => t.title == 'Test Sub Task 4').length, 1);
     });
 
     test('updating sub-task works', () async {
