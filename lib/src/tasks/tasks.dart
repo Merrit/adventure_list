@@ -1,5 +1,5 @@
 export 'commands/commands.dart';
-export 'cubit/cubit.dart';
+export 'cubit/tasks_cubit.dart';
 export 'helpers/helpers.dart';
 export 'models/models.dart';
 export 'repository/repository.dart';
