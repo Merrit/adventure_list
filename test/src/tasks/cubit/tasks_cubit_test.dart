@@ -303,10 +303,6 @@ void main() {
       parent: null,
     );
 
-    test('singleton instance is accessible', () {
-      expect(tasksCubit, isNotNull);
-    });
-
     blocTest<TasksCubit, TasksState>(
       'initial state is correct',
       build: () => TasksCubit(

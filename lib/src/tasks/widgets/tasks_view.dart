@@ -38,6 +38,7 @@ class _TasksListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+    final tasksCubit = context.read<TasksCubit>();
 
     return Expanded(
       child: SizedBox(
@@ -112,6 +113,8 @@ class _NewTaskButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tasksCubit = context.read<TasksCubit>();
+
     return TextInputListTile(
       debugLabel: 'NewTaskButton FocusNode',
       leading: const Icon(Icons.add),
