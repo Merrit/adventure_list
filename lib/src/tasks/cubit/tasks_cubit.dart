@@ -28,7 +28,7 @@ part 'tasks_cubit.g.dart';
 /// Global instance of the [TasksCubit].
 ///
 /// Allows access without a [BuildContext].
-late TasksCubit tasksCubit;
+// late TasksCubit tasksCubit;
 
 /// Cubit that manages the state of the tasks.
 class TasksCubit extends Cubit<TasksState> {
@@ -55,8 +55,6 @@ class TasksCubit extends Cubit<TasksState> {
     Uuid? uuid,
   })  : _uuid = uuid ?? const Uuid(),
         super(TasksState.initial()) {
-    tasksCubit = this;
-
     // If already signed in, initialize the tasks.
     if (authCubit.state.signedIn) {
       _getTasksRepo(

@@ -25,6 +25,7 @@ class HomeScreenWidget extends StatefulWidget {
 class _HomeScreenWidgetState extends State<HomeScreenWidget> {
   StreamSubscription? homeWidgetListener;
   late SettingsCubit settingsCubit;
+  late TasksCubit tasksCubit;
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
     );
 
     settingsCubit = context.read<SettingsCubit>();
+    tasksCubit = context.read<TasksCubit>();
   }
 
   @override

@@ -84,6 +84,8 @@ class _CreateListButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tasksCubit = context.read<TasksCubit>();
+
     return TextInputListTile(
       leading: const Icon(Icons.add),
       placeholderText: LocaleKeys.newList.tr(),
@@ -121,6 +123,8 @@ class _ScrollingListTiles extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tasksCubit = context.read<TasksCubit>();
+
     return Expanded(
       child: BlocBuilder<TasksCubit, TasksState>(
         builder: (context, state) {
@@ -159,6 +163,7 @@ class __TaskListTileState extends State<_TaskListTile> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+    final tasksCubit = context.read<TasksCubit>();
 
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {

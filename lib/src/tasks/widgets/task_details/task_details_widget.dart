@@ -10,10 +10,23 @@ import '../../../core/helpers/helpers.dart';
 import '../../tasks.dart';
 import 'task_details.dart';
 
-class TaskDetailsWidget extends StatelessWidget {
+class TaskDetailsWidget extends StatefulWidget {
   static const routeName = '/task_details';
 
   const TaskDetailsWidget({Key? key}) : super(key: key);
+
+  @override
+  State<TaskDetailsWidget> createState() => _TaskDetailsWidgetState();
+}
+
+class _TaskDetailsWidgetState extends State<TaskDetailsWidget> {
+  late TasksCubit tasksCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    tasksCubit = context.read<TasksCubit>();
+  }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -213,6 +226,8 @@ class _TitleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tasksCubit = context.read<TasksCubit>();
+
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
         final task = state.activeTask;
@@ -280,6 +295,8 @@ class DueDateWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tasksCubit = context.read<TasksCubit>();
+
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
         final Task? task = state.activeTask;
@@ -345,6 +362,8 @@ class DueTimeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tasksCubit = context.read<TasksCubit>();
+
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
         final task = state.activeTask;
@@ -396,6 +415,8 @@ class DescriptionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tasksCubit = context.read<TasksCubit>();
+
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
         final task = state.activeTask;
@@ -459,6 +480,8 @@ class ParentSelectionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tasksCubit = context.read<TasksCubit>();
+
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, state) {
         final task = state.activeTask;
@@ -548,6 +571,8 @@ class AddSubTaskWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tasksCubit = context.read<TasksCubit>();
+
     return ListTile(
       leading: const Icon(Icons.add),
       title: TextField(

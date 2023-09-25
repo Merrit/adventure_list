@@ -66,6 +66,8 @@ class TaskTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tasksCubit = context.read<TasksCubit>();
+
     return BlocBuilder<TasksCubit, TasksState>(
       builder: (context, tasksState) {
         final TaskList? activeList = tasksState.activeList;
@@ -249,6 +251,14 @@ class _TitleRow extends StatefulWidget {
 }
 
 class _TitleRowState extends State<_TitleRow> {
+  late final TasksCubit tasksCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    tasksCubit = context.read<TasksCubit>();
+  }
+
   /// The duration of the animation when the task is completed.
   final int animationDuration = 1200;
 
