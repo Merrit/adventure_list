@@ -132,10 +132,20 @@ class GoogleCalendar implements TasksRepository {
     required String taskId,
   }) async {
     try {
-      await _api.events.delete(taskListId, taskId);
+      // Get the events associated with the iCalUID.
+      final events = await _api.events.list(taskListId, iCalUID: taskId);
+      if (events.items == null || events.items!.isEmpty) {
+        throw Exception('Failed to delete task, no events found');
+      }
+
+      // Is it always sufficient to only delete the first event?
+      // There __should__ only be one event per task.
+      // Are there ever multiple?
+      // Would trying to delete multiple throw an error?
+      await _api.events.delete(taskListId, events.items!.first.id!);
     } on Exception catch (e) {
-      log.e('Failed to delete task', error: e);
-      return false;
+      log.e('Failed to delete task from Google Calendar', error: e);
+      rethrow;
     }
 
     return true;
@@ -183,18 +193,14 @@ class GoogleCalendar implements TasksRepository {
   }) async {
     final Event updatedEvent;
     try {
-      /// The API expects the iCalUID to have a suffix of `@google.com`, but we
-      /// don't store that in our model, so we need to add it here.
-      final iCalUID = '${updatedTask.id}@google.com';
-      final task = updatedTask.copyWith(id: iCalUID);
-      final events = await _api.events.list(taskListId, iCalUID: iCalUID);
+      final Events events = await _api.events.list(taskListId, iCalUID: updatedTask.id);
       if (events.items == null || events.items!.isEmpty) {
         log.e('Failed to update task, no events found');
         return null;
       }
 
       updatedEvent = await _api.events.update(
-        task.toGoogleEvent(),
+        updatedTask.toGoogleEvent(),
         taskListId,
         events.items!.first.id!,
       );
@@ -255,12 +261,9 @@ extension EventHelper on Event {
   Task toModel() {
     Task task = Task.fromJson(jsonDecode(description!));
 
-    /// The API seems to alter the id we provide by adding `@google.com`, and we may need
-    /// to transition old tasks that didn't use the iCalUID to the new format.
-    if (iCalUID != null) {
-      // Remove the `@google` part of the id.
-      final iCalUID = this.iCalUID!.split('@').first;
-      task = task.copyWith(id: iCalUID);
+    /// We may need to transition old tasks that didn't use the iCalUID.
+    if (iCalUID != null && task.id != iCalUID) {
+      task = task.copyWith(id: iCalUID!);
     }
 
     return task;

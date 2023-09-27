@@ -228,13 +228,13 @@ class TasksCubit extends Cubit<TasksState> {
 
   /// Creates a new [Task] in the active list.
   ///
-  /// The task is created in memory first, then synced with the repository to
-  /// ensure the process feels fast to the user.
+  /// The task is created in memory first, then synced with the repository to ensure the
+  /// process feels fast to the user.
   ///
-  /// If [assignNewId] is true, the task will be assigned a randomized id. Otherwise
-  /// the task will be created with the provided id. This is primarily useful when
-  /// undoing a task deletion, so the task can be recreated with the same id.
-  Future<Task?> createTask(Task newTask, {bool assignNewId = false}) async {
+  /// If [assignNewId] is true (the default), the task will be assigned a randomized id.
+  /// Otherwise the task will be created with the provided id. This is primarily useful
+  /// when undoing a task deletion, so the task can be recreated with the same id.
+  Future<Task?> createTask(Task newTask, {bool assignNewId = true}) async {
     assert(state.activeList != null);
 
     final TaskList activeList = state.activeList!;
@@ -364,7 +364,8 @@ class TasksCubit extends Cubit<TasksState> {
 
   /// Deletes the provided [Task].
   Future<void> deleteTask(Task task) async {
-    final taskList = state.taskLists.getTaskListById(task.taskListId);
+    final taskLists = state.taskLists;
+    final taskList = taskLists.getTaskListById(task.taskListId);
     if (taskList == null) {
       log.w('Task list not found');
       return;
@@ -381,10 +382,22 @@ class TasksCubit extends Cubit<TasksState> {
       taskLists: updatedTaskLists,
     ));
 
-    await _tasksRepository.deleteTask(
-      taskListId: task.taskListId,
-      taskId: task.id,
-    );
+    try {
+      await _tasksRepository.deleteTask(
+        taskListId: task.taskListId,
+        taskId: task.id,
+      );
+    } on Exception catch (e) {
+      log.e('Unable to delete task', error: e);
+      emit(state.copyWith(
+        activeList: taskList,
+        taskLists: taskLists,
+        errorMessage: 'Unable to delete task\n\n$e',
+      ));
+      emit(state.copyWith(
+        errorMessage: null,
+      ));
+    }
   }
 
   /// Moves the provided [task] to the list with the provided [newListId].

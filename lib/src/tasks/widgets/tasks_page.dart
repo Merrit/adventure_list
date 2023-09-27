@@ -72,8 +72,8 @@ class _TasksPageState extends State<TasksPage> {
                       content: Text(state.errorMessage!),
                       actions: [
                         TextButton(
-                          onPressed: () => context.read<AppCubit>().exitApp(),
-                          child: Text(LocaleKeys.exit.tr()),
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('OK'),
                         ),
                       ],
                     ),

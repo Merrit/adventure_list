@@ -211,10 +211,51 @@ class ContextMenuButton extends StatelessWidget {
             );
           },
           menuChildren: [
+            const _DeleteTaskButton(),
             deleteCompletedSubtasksButton,
             const PopupMenuDivider(),
             ...listChoiceButtons,
           ],
+        );
+      },
+    );
+  }
+}
+
+/// Button in the context menu to delete the task.
+class _DeleteTaskButton extends StatelessWidget {
+  const _DeleteTaskButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final tasksCubit = context.read<TasksCubit>();
+
+    return BlocBuilder<TasksCubit, TasksState>(
+      builder: (context, state) {
+        final task = state.activeTask;
+        if (task == null) return const SizedBox.shrink();
+
+        return MenuItemButton(
+          leadingIcon: const Icon(Icons.delete),
+          onPressed: () async {
+            final scaffoldMessenger = ScaffoldMessenger.of(context);
+            final command = DeleteTaskCommand(cubit: tasksCubit, task: task);
+
+            await command.execute();
+
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text(LocaleKeys.deleteTaskSuccessful.tr()),
+                action: SnackBarAction(
+                  label: LocaleKeys.undo.tr(),
+                  onPressed: () async => await command.undo(),
+                ),
+              ),
+            );
+          },
+          child: Text(
+            LocaleKeys.delete.tr(),
+          ),
         );
       },
     );
