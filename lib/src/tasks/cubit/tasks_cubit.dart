@@ -353,13 +353,32 @@ class TasksCubit extends Cubit<TasksState> {
     final TaskList? activeList = state.activeList;
     if (activeList == null) return;
 
-    final updatedLists = state.taskLists.removeTaskList(activeList.id);
+    final taskLists = [...state.taskLists];
+
+    final updatedLists = taskLists.removeTaskList(activeList.id);
     emit(state.copyWith(
       activeList: null,
       activeTask: null,
       taskLists: updatedLists,
     ));
-    await _tasksRepository.deleteList(id: activeList.id);
+
+    try {
+      await _tasksRepository.deleteList(id: activeList.id);
+      final tasks = activeList.items;
+      for (final task in tasks) {
+        await NotificationsCubit.instance.cancelNotification(task.notificationId);
+      }
+    } on Exception catch (e) {
+      log.e('Failed to delete list', error: e);
+      emit(state.copyWith(
+        activeList: activeList,
+        taskLists: taskLists,
+        errorMessage: 'Failed to delete list\n\n$e',
+      ));
+      emit(state.copyWith(
+        errorMessage: null,
+      ));
+    }
   }
 
   /// Deletes the provided [Task].
@@ -387,6 +406,7 @@ class TasksCubit extends Cubit<TasksState> {
         taskListId: task.taskListId,
         taskId: task.id,
       );
+      await NotificationsCubit.instance.cancelNotification(task.notificationId);
     } on Exception catch (e) {
       log.e('Unable to delete task', error: e);
       emit(state.copyWith(
