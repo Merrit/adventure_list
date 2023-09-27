@@ -9,6 +9,7 @@
     "deleteCompletedSubtasks": "Erledigte Unteraufgaben löschen",
     "deleteCompletedSuccess": "Alle erledigten Aufgaben wurden gelöscht",
     "deleteTask": "Aufgabe löschen",
+    "deleteTaskSuccessful": "Aufgabe wurde gelöscht",
     "error": {
         "error": "Fehler"
     },

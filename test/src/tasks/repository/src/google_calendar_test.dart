@@ -146,21 +146,43 @@ void main() {
     });
 
     group('deleteTask:', () {
-      test('returns false if api call fails', () async {
+      test('throws exception if api call fails', () async {
+        when(eventsResource.list(any, iCalUID: anyNamed('iCalUID')))
+            .thenThrow(DetailedApiRequestError(404, 'Not Found'));
         when(eventsResource.delete(any, any))
             .thenThrow(Exception('Failed to delete task'));
-        final result = await calendar.deleteTask(
-          taskListId: 'fakeid',
-          taskId: 'fakeid',
+        expect(
+          () async => await calendar.deleteTask(
+            taskListId: 'fakeid',
+            taskId: 'fakeid',
+          ),
+          throwsException,
         );
-        expect(result, isFalse);
       });
 
       test('returns true if successful', () async {
+        when(eventsResource.list(any, iCalUID: anyNamed('iCalUID')))
+            .thenAnswer((_) async => Events(
+                  items: [
+                    Event(
+                      id: 'fakeid',
+                      description: jsonEncode(Task.empty().toJson()),
+                      summary: 'fake task',
+                      start: EventDateTime(
+                        dateTime: DateTime.now(),
+                      ),
+                      end: EventDateTime(
+                        dateTime: DateTime.now(),
+                      ),
+                    ),
+                  ],
+                ));
+
         final result = await calendar.deleteTask(
           taskListId: 'fakeid',
           taskId: 'fakeid',
         );
+
         expect(result, isTrue);
       });
     });

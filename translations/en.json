@@ -9,6 +9,7 @@
     "deleteCompletedSubtasks": "Delete completed subtasks",
     "deleteCompletedSuccess": "Deleted completed tasks",
     "deleteTask": "Delete task",
+    "deleteTaskSuccessful": "Deleted task",
     "error": {
         "error": "Error"
     },
