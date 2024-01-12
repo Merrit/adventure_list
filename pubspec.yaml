@@ -34,12 +34,12 @@ dependencies:
   flutter_local_notifications:
     git:
       url: https://github.com/Merrit/flutter_local_notifications.git
-      ref: 310ea54cf3fafeea087a60608d6f9f4c3b6080b7
+      ref: 868f15213458bcb65a70508691f091e9a37aa480
       path: flutter_local_notifications
   flutter_local_notifications_linux:
     git:
       url: https://github.com/Merrit/flutter_local_notifications.git
-      ref: 03b9104dfa284eff2d43f04250ef8e3aa8c7161e
+      ref: afd8cb7a740e8bec638803867c1cee4c92b60967
       path: flutter_local_notifications_linux
   # ----------------- End flutter_local_notifications override --------------- #
 
@@ -113,11 +113,11 @@ dev_dependencies:
   msix: ^3.6.2
 
 flutter:
-  uses-material-design: true
   assets:
     - assets/icons/
     - packaging/linux/codes.merritt.adventurelist.desktop
     - translations/
+  uses-material-design: true
 
 flutter_icons:
   android: true
