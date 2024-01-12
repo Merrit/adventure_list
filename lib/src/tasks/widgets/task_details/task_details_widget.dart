@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:helpers/helpers.dart';
 import 'package:rrule/rrule.dart';
@@ -62,11 +63,13 @@ class _TaskDetailsWidgetState extends State<TaskDetailsWidget> {
           return const SizedBox();
         }
 
-        final smallScreenView = WillPopScope(
-          onWillPop: () async {
+        final smallScreenView = PopScope(
+          canPop: false,
+          onPopInvoked: (didPop) {
             tasksCubit.setActiveTask(null);
-            Navigator.of(context).popUntil((route) => route.isFirst);
-            return false;
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            });
           },
           child: Scaffold(
             appBar: AppBar(
