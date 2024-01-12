@@ -26,7 +26,10 @@ Future<void> initializeBackgroundTasks() async {
 
   await Workmanager().initialize(
     _callbackDispatcher,
-    isInDebugMode: kDebugMode,
+    // Set to true to debug background tasks.
+    // Defaulting to false because it sends constant notifications to the
+    // device that the app is running in debug mode.
+    isInDebugMode: false,
   );
 
   await Workmanager().registerPeriodicTask(
