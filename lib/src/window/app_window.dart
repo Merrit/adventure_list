@@ -143,7 +143,7 @@ class AppWindow {
       targetWindowFrame = rectFromJson(targetWindowFrameJson);
     }
 
-    targetWindowFrame ??= const Rect.fromLTWH(0, 0, 1100, 660);
+    targetWindowFrame ??= const Rect.fromLTWH(0, 0, 1000, 700);
 
     if (targetWindowFrame == currentWindowFrame) {
       log.t('Target matches current window frame, nothing to do.');
