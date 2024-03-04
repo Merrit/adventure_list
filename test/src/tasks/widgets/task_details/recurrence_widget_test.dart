@@ -437,7 +437,7 @@ void main() {
           recurrenceRule: RecurrenceRule(
             frequency: Frequency.weekly,
             interval: 1,
-            byWeekDays: {ByWeekDayEntry(today.weekday)},
+            byWeekDays: {ByWeekDayEntry(today.weekday)}.toList(),
           ),
         );
 
@@ -469,7 +469,7 @@ void main() {
           recurrenceRule: RecurrenceRule(
             frequency: Frequency.weekly,
             interval: 2,
-            byWeekDays: {ByWeekDayEntry(today.weekday)},
+            byWeekDays: {ByWeekDayEntry(today.weekday)}.toList(),
           ),
         );
 
@@ -528,7 +528,7 @@ void main() {
           byWeekDays: {
             ByWeekDayEntry(DateTime.monday),
             ByWeekDayEntry(DateTime.wednesday),
-          },
+          }.toList(),
         );
 
         final updatedDueDate = expectedRecurrenceRule.nextInstance(today);
@@ -588,7 +588,7 @@ void main() {
           recurrenceRule: RecurrenceRule(
             frequency: Frequency.monthly,
             interval: 1,
-            byMonthDays: {today.day},
+            byMonthDays: {today.day}.toList(),
           ),
         );
 
@@ -620,7 +620,7 @@ void main() {
           recurrenceRule: RecurrenceRule(
             frequency: Frequency.monthly,
             interval: 2,
-            byMonthDays: {today.day},
+            byMonthDays: {today.day}.toList(),
           ),
         );
 
@@ -668,7 +668,7 @@ void main() {
         final expectedRecurrenceRule = RecurrenceRule(
           frequency: Frequency.monthly,
           interval: 1,
-          byMonthDays: {targetNumericDay},
+          byMonthDays: {targetNumericDay}.toList(),
         );
 
         final updatedDueDate = expectedRecurrenceRule.nextInstance(today);
@@ -725,7 +725,7 @@ void main() {
         final expectedRecurrenceRule = RecurrenceRule(
           frequency: Frequency.monthly,
           interval: 1,
-          byWeekDays: {ByWeekDayEntry(DateTime.monday, 1)},
+          byWeekDays: {ByWeekDayEntry(DateTime.monday, 1)}.toList(),
         );
 
         final updatedDueDate = expectedRecurrenceRule.nextInstance(today);
@@ -761,8 +761,8 @@ void main() {
         final expectedRecurrenceRule = RecurrenceRule(
           frequency: Frequency.yearly,
           interval: 1,
-          byMonthDays: {today.day},
-          byMonths: {today.month},
+          byMonthDays: {today.day}.toList(),
+          byMonths: {today.month}.toList(),
         );
 
         final updatedDueDate = expectedRecurrenceRule.nextInstance(today);

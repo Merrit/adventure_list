@@ -120,7 +120,7 @@ class GoogleCalendar implements TasksRepository {
       await _api.calendars.delete(id);
     } on Exception catch (e) {
       log.e('Failed to delete list from Google Calendar', error: e);
-      rethrow;
+      return false;
     }
 
     return true;
