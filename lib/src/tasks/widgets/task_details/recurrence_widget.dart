@@ -324,9 +324,9 @@ class _RecurrenceTypeWidget extends StatelessWidget {
                       dueDate: dueDate,
                       recurrenceRule: task.recurrenceRule!.copyWith(
                         frequency: value,
-                        byWeekDays: byWeekDays,
-                        byMonthDays: byMonthDays,
-                        byMonths: byMonths,
+                        byWeekDays: byWeekDays.toList(),
+                        byMonthDays: byMonthDays.toList(),
+                        byMonths: byMonths.toList(),
                       ),
                     ),
                   );
@@ -395,7 +395,7 @@ class _DayOfWeekWidget extends StatelessWidget {
                           task.copyWith(
                             dueDate: dueDate,
                             recurrenceRule: recurrenceRule.copyWith(
-                              byWeekDays: selectedDaysOfWeek..add(day),
+                              byWeekDays: selectedDaysOfWeek.toList()..add(day),
                             ),
                           ),
                         );
@@ -404,7 +404,7 @@ class _DayOfWeekWidget extends StatelessWidget {
                           task.copyWith(
                             dueDate: dueDate,
                             recurrenceRule: recurrenceRule.copyWith(
-                              byWeekDays: selectedDaysOfWeek..remove(day),
+                              byWeekDays: selectedDaysOfWeek.toList()..remove(day),
                             ),
                           ),
                         );
@@ -508,7 +508,7 @@ class _DayOfMonthWidgetState extends State<_DayOfMonthWidget> {
                     dueDate: DateTimeHelper.today().subtract(const Duration(days: 1)),
                     recurrenceRule: recurrenceRule.copyWith(
                       frequency: Frequency.monthly,
-                      byWeekDays: {},
+                      byWeekDays: [],
                     ),
                   ),
                 );
@@ -528,8 +528,8 @@ class _DayOfMonthWidgetState extends State<_DayOfMonthWidget> {
                       dueDate: DateTimeHelper.today().subtract(const Duration(days: 1)),
                       recurrenceRule: recurrenceRule.copyWith(
                         frequency: Frequency.monthly,
-                        byMonthDays: {value},
-                        byWeekDays: {},
+                        byMonthDays: {value}.toList(),
+                        byWeekDays: [],
                       ),
                     ),
                   );
@@ -563,10 +563,10 @@ class _DayOfMonthWidgetState extends State<_DayOfMonthWidget> {
                     dueDate: DateTimeHelper.today().subtract(const Duration(days: 1)),
                     recurrenceRule: recurrenceRule.copyWith(
                       frequency: Frequency.monthly,
-                      byMonthDays: {},
+                      byMonthDays: [],
                       byWeekDays: {
                         ByWeekDayEntry(selectedWeekday, selectedWeekdayOccurrence)
-                      },
+                      }.toList(),
                     ),
                   ),
                 );
@@ -590,8 +590,9 @@ class _DayOfMonthWidgetState extends State<_DayOfMonthWidget> {
                                 DateTimeHelper.today().subtract(const Duration(days: 1)),
                             recurrenceRule: recurrenceRule.copyWith(
                               frequency: Frequency.monthly,
-                              byMonthDays: {},
-                              byWeekDays: {ByWeekDayEntry(selectedWeekday, value)},
+                              byMonthDays: [],
+                              byWeekDays:
+                                  {ByWeekDayEntry(selectedWeekday, value)}.toList(),
                             ),
                           ),
                         );
@@ -624,10 +625,10 @@ class _DayOfMonthWidgetState extends State<_DayOfMonthWidget> {
                             dueDate: DateTimeHelper.today(),
                             recurrenceRule: recurrenceRule.copyWith(
                               frequency: Frequency.monthly,
-                              byMonthDays: {},
+                              byMonthDays: [],
                               byWeekDays: {
                                 ByWeekDayEntry(value, selectedWeekdayOccurrence)
-                              },
+                              }.toList(),
                             ),
                           ),
                         );

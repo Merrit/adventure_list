@@ -102,9 +102,10 @@ class InputDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RawKeyboardListener(
-      focusNode: hotkeyFocusNode,
-      onKey: (RawKeyEvent event) => hotkey(event),
+    return CallbackShortcuts(
+      bindings: {
+        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.enter): _onSubmitted,
+      },
       child: AlertDialog(
         title: (title != null) ? Text(title!) : null,
         content: TextFormField(
@@ -134,15 +135,6 @@ class InputDialog extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  void hotkey(RawKeyEvent event) {
-    // Ctrl + Enter submits for multiline.
-    if (event.data.isModifierPressed(ModifierKey.controlModifier)) {
-      if (event.isKeyPressed(LogicalKeyboardKey.enter)) {
-        Navigator.pop(context!, controller.text);
-      }
-    }
   }
 
   void _onSubmitted() {
