@@ -46,19 +46,19 @@
   <screenshots>
     <screenshot type="default">
       <caption>The main screen of Adventure List</caption>
-      <image xml:lang="en">https://raw.githubusercontent.com/Merrit/adventure_list_assets/main/images/screenshots/screenshot1.png</image>
+      <image>https://raw.githubusercontent.com/Merrit/adventure_list_assets/main/images/screenshots/screenshot1.png</image>
     </screenshot>
     <screenshot>
       <caption>Showing task details</caption>
-      <image xml:lang="en">https://raw.githubusercontent.com/Merrit/adventure_list_assets/main/images/screenshots/screenshot2.png</image>
+      <image>https://raw.githubusercontent.com/Merrit/adventure_list_assets/main/images/screenshots/screenshot2.png</image>
     </screenshot>
     <screenshot>
       <caption>The main screen of Adventure List, in light mode</caption>
-      <image xml:lang="en">https://raw.githubusercontent.com/Merrit/adventure_list_assets/main/images/screenshots/screenshot3.png</image>
+      <image>https://raw.githubusercontent.com/Merrit/adventure_list_assets/main/images/screenshots/screenshot3.png</image>
     </screenshot>
     <screenshot>
       <caption>Showing task details, in light mode</caption>
-      <image xml:lang="en">https://raw.githubusercontent.com/Merrit/adventure_list_assets/main/images/screenshots/screenshot4.png</image>
+      <image>https://raw.githubusercontent.com/Merrit/adventure_list_assets/main/images/screenshots/screenshot4.png</image>
     </screenshot>
   </screenshots>
   <content_rating type="oars-1.1"/>
