@@ -6,7 +6,7 @@
 <component type="desktop-application">
   <id>codes.merritt.adventurelist</id>
   <name>Adventure List</name>
-  <summary>Todo list that syncs to all your devices</summary>
+  <summary>Todo list that syncs</summary>
   <developer_name>Merritt Codes</developer_name>
   <url type="homepage">https://merritt.codes/adventurelist/</url>
   <url type="donation">https://merritt.codes/support/</url>
