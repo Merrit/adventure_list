@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:tray_manager/tray_manager.dart';
 
 import '../core/core.dart';
+import '../logs/logging_manager.dart';
 import '../window/window.dart';
 
 /// Manages the system tray icon.
@@ -16,10 +17,18 @@ class SystemTrayManager {
   }
 
   Future<void> initialize() async {
-    final String iconPath = (defaultTargetPlatform.isWindows) //
-        ? AppIcons.windowsSymbolic
-        : AppIcons.linuxSymbolic;
+    final String iconPath;
 
+    if (runningInFlatpak() || runningInSnap()) {
+      // When running in Flatpak the icon must be specified by the icon's name, not the path.
+      iconPath = kPackageId;
+    } else {
+      iconPath = (defaultTargetPlatform.isWindows) //
+          ? AppIcons.windowsSymbolic
+          : AppIcons.linuxSymbolic;
+    }
+
+    log.t('Setting system tray icon to $iconPath');
     await trayManager.setIcon(iconPath);
 
     final Menu menu = Menu(
