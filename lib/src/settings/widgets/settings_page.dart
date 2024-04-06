@@ -11,7 +11,6 @@ import '../../app/cubit/app_cubit.dart';
 import '../../authentication/cubit/authentication_cubit.dart';
 import '../../authentication/sign_in_page.dart';
 import '../../core/core.dart';
-import '../../core/helpers/helpers.dart';
 import '../../home_widget/home_widget.dart';
 import '../../logs/logging_manager.dart';
 import '../../theme/theme.dart';
@@ -348,7 +347,7 @@ class _CurrentVersionTile extends StatelessWidget {
           args: [state.runningVersion],
         );
 
-        if (runningInFlatpak) {
+        if (runningInFlatpak()) {
           text += ' (Flatpak)';
         }
 
