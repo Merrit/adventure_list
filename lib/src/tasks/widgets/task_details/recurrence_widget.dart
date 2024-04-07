@@ -613,6 +613,7 @@ class _DayOfMonthWidgetState extends State<_DayOfMonthWidget> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: DropdownButtonFormField<int>(
+                      key: const Key('weekdayDropdown'),
                       value: selectedWeekday,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
