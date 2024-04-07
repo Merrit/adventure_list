@@ -704,13 +704,8 @@ void main() {
 
         expect(find.text('First'), findsOneWidget);
 
-        final Finder weekdayDropdown = find
-            .byWidgetPredicate(
-              (widget) =>
-                  widget is DropdownButtonFormField<int> &&
-                  widget.initialValue == today.weekday,
-            )
-            .first;
+        final Finder weekdayDropdown = find.byKey(const Key('weekdayDropdown'));
+
         await tester.tap(weekdayDropdown);
         await tester.pumpAndSettle();
 
