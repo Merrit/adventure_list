@@ -706,11 +706,17 @@ void main() {
 
         final Finder weekdayDropdown = find.byKey(const Key('weekdayDropdown'));
 
-        await tester.tap(weekdayDropdown);
-        await tester.pumpAndSettle();
+        final Finder mondayFinder = find.text('Monday');
 
-        await tester.tap(find.text('Monday'));
-        await tester.pumpAndSettle();
+        // If Monday is already selected, we don't need to tap it.
+        // This is because the default is the current day, which may be a Monday.
+        if (mondayFinder.evaluate().isEmpty) {
+          // If Monday is not selected, we need to tap the dropdown and then tap Monday.
+          await tester.tap(weekdayDropdown);
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Monday'));
+          await tester.pumpAndSettle();
+        }
 
         expect(find.text('Monday'), findsOneWidget);
 
