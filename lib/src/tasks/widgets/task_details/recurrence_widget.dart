@@ -89,15 +89,30 @@ class RecurrenceWidget extends StatelessWidget {
         return ListTile(
           leading: const Icon(Icons.repeat),
           onTap: () {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return BlocProvider.value(
-                  value: recurrenceCubit,
-                  child: const _RecurrenceDialog(),
-                );
-              },
-            );
+            if (MediaQuery.of(context).size.width < 600) {
+              // If on small screen, navigate to a new page.
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) {
+                    return BlocProvider.value(
+                      value: recurrenceCubit,
+                      child: const _RecurrencePage(),
+                    );
+                  },
+                ),
+              );
+            } else {
+              // If on large screen, show dialog.
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return BlocProvider.value(
+                    value: recurrenceCubit,
+                    child: const _RecurrenceDialog(),
+                  );
+                },
+              );
+            }
           },
           title: const Text('Repeat'),
           subtitle: subtitle,
@@ -122,7 +137,32 @@ class RecurrenceWidget extends StatelessWidget {
   }
 }
 
-/// The dialog that allows the user to change the recurrence of the task.
+/// Page that wraps the [RecurrenceWidget] and allows the user to change the
+/// recurrence of the task.
+class _RecurrencePage extends StatelessWidget {
+  const _RecurrencePage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget bottomAppBar = BottomAppBar(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: _buildActionButtons(context),
+      ),
+    );
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Recurrence')),
+      body: const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: _RecurranceWidgetContents(),
+      ),
+      bottomNavigationBar: bottomAppBar,
+    );
+  }
+}
+
+/// A dialog that allows the user to change the recurrence of the task.
 class _RecurrenceDialog extends StatefulWidget {
   const _RecurrenceDialog();
 
@@ -131,6 +171,68 @@ class _RecurrenceDialog extends StatefulWidget {
 }
 
 class _RecurrenceDialogState extends State<_RecurrenceDialog> {
+  late _RecurrenceCubit recurrenceCubit;
+  late TasksCubit tasksCubit;
+
+  @override
+  void initState() {
+    tasksCubit = context.read<TasksCubit>();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Repeats every'),
+      content: const _RecurranceWidgetContents(),
+      actions: _buildActionButtons(context),
+    );
+  }
+}
+
+/// Returns the action buttons for the dialog and page that wraps the
+/// [RecurrenceWidget].
+List<Widget> _buildActionButtons(BuildContext context) {
+  final recurrenceCubit = context.read<_RecurrenceCubit>();
+  final tasksCubit = context.read<TasksCubit>();
+
+  return [
+    IconButton(
+      onPressed: () {
+        tasksCubit.updateTask(
+          recurrenceCubit.state.copyWith(recurrenceRule: null),
+        );
+        Navigator.of(context).pop();
+      },
+      icon: const Icon(Icons.delete),
+    ),
+    TextButton(
+      onPressed: () => Navigator.of(context).pop(),
+      child: const Text('Cancel'),
+    ),
+    TextButton(
+      onPressed: () {
+        // Save the changes to the task.
+        final tasksCubit = context.read<TasksCubit>();
+        final Task task = context.read<_RecurrenceCubit>().state;
+        tasksCubit.updateTask(task);
+        Navigator.of(context).pop();
+      },
+      child: const Text('Save'),
+    ),
+  ];
+}
+
+/// The contents of the [RecurrenceWidget], to be wrapped by the
+/// [RecurrencePage] or [RecurrenceDialog].
+class _RecurranceWidgetContents extends StatefulWidget {
+  const _RecurranceWidgetContents();
+
+  @override
+  State<_RecurranceWidgetContents> createState() => _RecurranceWidgetContentsState();
+}
+
+class _RecurranceWidgetContentsState extends State<_RecurranceWidgetContents> {
   late _RecurrenceCubit recurrenceCubit;
   late TasksCubit tasksCubit;
 
@@ -171,57 +273,28 @@ class _RecurrenceDialogState extends State<_RecurrenceDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Repeats every'),
-      content: SingleChildScrollView(
-        /// Key needed for widget tests.
-        key: const Key('singleChildScrollView'),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                const _RecurrenceIntervalWidget(),
-                const SizedBox(width: 10),
-                _RecurrenceTypeWidget(),
-              ],
-            ),
-            const _DayOfWeekWidget(),
-            const _DayOfMonthWidget(),
-            const _RecurrenceTimeWidget(),
-            const _StartsOnWidget(),
-            const _EndDateWidget(),
-          ],
-        ),
+    return SingleChildScrollView(
+      /// Key needed for widget tests.
+      key: const Key('singleChildScrollView'),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              const _RecurrenceIntervalWidget(),
+              const SizedBox(width: 10),
+              _RecurrenceTypeWidget(),
+            ],
+          ),
+          const _DayOfWeekWidget(),
+          const _DayOfMonthWidget(),
+          const _RecurrenceTimeWidget(),
+          const _StartsOnWidget(),
+          const _EndDateWidget(),
+        ],
       ),
-      actions: [
-        IconButton(
-          onPressed: () {
-            tasksCubit.updateTask(
-              recurrenceCubit.state.copyWith(recurrenceRule: null),
-            );
-            Navigator.of(context).pop();
-          },
-          icon: const Icon(Icons.delete),
-        ),
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () => saveChanges(context),
-          child: const Text('Save'),
-        ),
-      ],
     );
-  }
-
-  /// Saves the changes to this task.
-  void saveChanges(BuildContext context) {
-    final Task task = context.read<_RecurrenceCubit>().state;
-    tasksCubit.updateTask(task);
-    Navigator.of(context).pop();
   }
 }
 
@@ -611,7 +684,7 @@ class _DayOfMonthWidgetState extends State<_DayOfMonthWidget> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  Expanded(
+                  Flexible(
                     child: DropdownButtonFormField<int>(
                       key: const Key('weekdayDropdown'),
                       value: selectedWeekday,
