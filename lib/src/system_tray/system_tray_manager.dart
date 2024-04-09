@@ -17,18 +17,11 @@ class SystemTrayManager {
   }
 
   Future<void> initialize() async {
-    final String iconPath;
+    final String iconPath = AppIcons.platformSpecific(
+      symbolic: true,
+      withNotificationBadge: false,
+    );
 
-    if (runningInFlatpak() || runningInSnap()) {
-      // When running in Flatpak the icon must be specified by the icon's name, not the path.
-      iconPath = kPackageId;
-    } else {
-      iconPath = (defaultTargetPlatform.isWindows) //
-          ? AppIcons.windowsSymbolic
-          : AppIcons.linuxSymbolic;
-    }
-
-    log.t('Setting system tray icon to $iconPath');
     await trayManager.setIcon(iconPath);
 
     final Menu menu = Menu(
@@ -45,6 +38,7 @@ class SystemTrayManager {
 
   /// Sets the system tray icon.
   Future<void> setIcon(String iconPath) async {
+    log.t('Setting system tray icon to $iconPath');
     await trayManager.setIcon(iconPath);
   }
 

@@ -537,11 +537,16 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
   /// Set the notification badge on the Linux system tray.
   Future<void> _setNotificationBadgeLinuxSystemTray(int count) async {
-    final icon = (count > 0)
-        ? AppIcons.linuxSymbolicWithNotificationBadge
-        : AppIcons.linuxSymbolic;
+    // TODO: This is now identical to the Windows method. Refactor to share code.
 
-    await SystemTrayManager.instance.setIcon(icon);
+    final bool withNotificationBadge = count > 0;
+
+    final String iconPath = AppIcons.platformSpecific(
+      symbolic: true,
+      withNotificationBadge: withNotificationBadge,
+    );
+
+    await SystemTrayManager.instance.setIcon(iconPath);
   }
 
   /// Set the notification badge on Windows.
@@ -560,11 +565,16 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
   /// Set the notification badge on the Windows system tray.
   Future<void> _setNotificationBadgeWindowsSystemTray(int count) async {
-    final icon = (count > 0)
-        ? AppIcons.windowsSymbolicWithNotificationBadge
-        : AppIcons.windowsSymbolic;
+    // TODO: This is now identical to the Linux method. Refactor to share code.
 
-    await SystemTrayManager.instance.setIcon(icon);
+    final bool withNotificationBadge = count > 0;
+
+    final String iconPath = AppIcons.platformSpecific(
+      symbolic: true,
+      withNotificationBadge: withNotificationBadge,
+    );
+
+    await SystemTrayManager.instance.setIcon(iconPath);
   }
 }
 
