@@ -26,23 +26,7 @@ dependencies:
     sdk: flutter
   flutter_adaptive_scaffold: ^0.1.2
   flutter_bloc: ^8.0.1
-
-  # ---------------- Begin flutter_local_notifications override -------------- #
-  # Override flutter_local_notifications to use the fork with the fix for
-  # Flatpak until the fix is merged.
-  # See: https://github.com/MaikuB/flutter_local_notifications/issues/1757
-  flutter_local_notifications:
-    git:
-      url: https://github.com/Merrit/flutter_local_notifications.git
-      ref: 868f15213458bcb65a70508691f091e9a37aa480
-      path: flutter_local_notifications
-  flutter_local_notifications_linux:
-    git:
-      url: https://github.com/Merrit/flutter_local_notifications.git
-      ref: afd8cb7a740e8bec638803867c1cee4c92b60967
-      path: flutter_local_notifications_linux
-  # ----------------- End flutter_local_notifications override --------------- #
-
+  flutter_local_notifications: ^17.0.0
   flutter_signin_button: ^2.0.0
   flutter_slidable: ^3.0.0
   flutter_window_close: ^0.2.2
