@@ -1,3 +1,6 @@
+import 'package:flutter/foundation.dart';
+import 'package:helpers/helpers.dart';
+
 const String kDonateUrl = 'https://merritt.codes/support/';
 const String kPackageId = 'codes.merritt.adventurelist';
 const String kRepoUrl = 'https://github.com/Merrit/adventure_list';
@@ -35,4 +38,38 @@ abstract class AppIcons {
   /// Symbolic icon with a red dot indicating a notification, as an ICO.
   static const String windowsSymbolicWithNotificationBadge =
       '$path/$kPackageId-symbolic-with-notification-badge.ico';
+
+  /// Returns the appropriate icon path (or icon name) based on the current platform.
+  static String platformSpecific({
+    required bool symbolic,
+    bool withNotificationBadge = false,
+  }) {
+    if (runningInFlatpak() || runningInSnap()) {
+      // When running in a sandboxed environment the icon must be specified by
+      // the icon's name, not the path.
+      return kPackageId;
+    }
+
+    return defaultTargetPlatform.isWindows
+        ? getWindowsIcon(symbolic, withNotificationBadge)
+        : getLinuxIcon(symbolic, withNotificationBadge);
+  }
+
+  static String getWindowsIcon(bool symbolic, bool withNotificationBadge) {
+    if (symbolic) {
+      return withNotificationBadge
+          ? windowsSymbolicWithNotificationBadge
+          : windowsSymbolic;
+    } else {
+      return withNotificationBadge ? windowsWithNotificationBadge : windows;
+    }
+  }
+
+  static String getLinuxIcon(bool symbolic, bool withNotificationBadge) {
+    if (symbolic) {
+      return withNotificationBadge ? linuxSymbolicWithNotificationBadge : linuxSymbolic;
+    } else {
+      return withNotificationBadge ? linuxWithNotificationBadge : linux;
+    }
+  }
 }
