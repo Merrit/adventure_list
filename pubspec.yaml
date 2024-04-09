@@ -64,7 +64,7 @@ dependencies:
   rrule: ^0.2.14
   system_theme: ^2.1.0
   timezone: ^0.9.1
-  tray_manager: ^0.2.0
+  tray_manager: ^0.2.2
   url_launcher: ^6.1.4
   uuid: ^3.0.6
   window_manager: ^0.3.0
