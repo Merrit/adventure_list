@@ -163,9 +163,9 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       return;
     }
 
-    if (!state.permissionGranted) {
+    if (!state.notificationPermissionGranted) {
       await _requestPermission();
-      if (!state.permissionGranted) {
+      if (!state.notificationPermissionGranted) {
         log.t(
           'Notifications permission not granted. Not scheduling notification.',
         );
@@ -213,9 +213,9 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       return;
     }
 
-    if (!state.permissionGranted) {
+    if (!state.notificationPermissionGranted) {
       await _requestPermission();
-      if (!state.permissionGranted) {
+      if (!state.notificationPermissionGranted) {
         log.t(
           'Notifications permission not granted. Not showing notification.',
         );
@@ -287,7 +287,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   Future<void> _requestPermission() async {
     // Currently only Android requires permission.
     if (defaultTargetPlatform != TargetPlatform.android) {
-      emit(state.copyWith(permissionGranted: true));
+      emit(state.copyWith(notificationPermissionGranted: true));
       return;
     }
 
@@ -297,16 +297,38 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
     if (androidPlugin == null) return;
 
-    final bool? permissionGranted = await androidPlugin.requestPermission();
-    if (permissionGranted == null) return;
+    // final bool? notificationsPermissionGranted =
+    //     await androidPlugin.requestNotificationsPermission();
+    // if (notificationsPermissionGranted == null) return;
 
-    if (permissionGranted) {
+    // if (notificationsPermissionGranted) {
+    //   log.i('Notifications permission granted');
+    // } else {
+    //   log.i('Notifications permission denied');
+    // }
+
+    // emit(state.copyWith(permissionGranted: notificationsPermissionGranted));
+
+    final bool notificationsPermissionGranted =
+        await androidPlugin.requestNotificationsPermission() ?? false;
+    final bool exactNotificationsPermissionGranted =
+        await androidPlugin.requestExactAlarmsPermission() ?? false;
+
+    if (notificationsPermissionGranted) {
       log.i('Notifications permission granted');
     } else {
       log.i('Notifications permission denied');
     }
 
-    emit(state.copyWith(permissionGranted: permissionGranted));
+    if (exactNotificationsPermissionGranted) {
+      log.i('Exact notifications permission granted');
+    } else {
+      log.i('Exact notifications permission denied');
+    }
+
+    emit(state.copyWith(
+      notificationPermissionGranted: notificationsPermissionGranted,
+    ));
   }
 
   /// Schedule a notification on desktop.

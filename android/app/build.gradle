@@ -94,7 +94,7 @@ flutter {
 
 dependencies {
     // flutter_local_notifications plugin requires desugaring
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
 
     // Desugaring causes crashes on Android 12+, adding these `window` 
     // dependencies fixes the issue until it is resolved in Flutter.
