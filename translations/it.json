@@ -1,0 +1,74 @@
+{
+    "appName": "Adventure List",
+    "cancel": "Annulla",
+    "completed": "Completato",
+    "confirm": "Conferma",
+    "delete": "Elimina",
+    "deleteCompleted": "Elimina le attività completate",
+    "deleteCompletedConfirmation": "Sei sicuro di voler eliminare tutte le attività completate?",
+    "deleteCompletedSubtasks": "Elimina le attività secondarie completate",
+    "deleteCompletedSuccess": "Attività completate eliminate",
+    "deleteTask": "Elimina attività",
+    "deleteTaskSuccessful": "Attività eliminata",
+    "error": {
+        "error": "Errore"
+    },
+    "exit": "Uscita",
+    "getStartedPrompt": "Seleziona o crea un elenco per iniziare",
+    "homeWidgetConfig": {
+        "listToDisplay": "Elenco da visualizzare",
+        "title": "Configura il widget Home"
+    },
+    "listSettings": {
+        "confirmDelete": "Sei sicuro di voler eliminare questo elenco?",
+        "deleteList": "Elimina elenco",
+        "deleteListName": "Elimina {}",
+        "listName": "Nome elenco",
+        "renameList": "Rinomina elenco",
+        "title": "Impostazioni dell'elenco"
+    },
+    "markCompleted": "Segna completato",
+    "markUncompleted": "Segna come non completato",
+    "newList": "Nuovo elenco",
+    "newTask": "Nuova attività",
+    "pinWindow": "Pin finestra",
+    "retry": "Riprova",
+    "settings": {
+        "appearance": {
+            "darkMode": "modalità scura",
+            "title": "Aspetto"
+        },
+        "integration": {
+            "autostart": "Avvio automatico",
+            "autostartDescription": "Avvia l'app quando accedi al tuo computer",
+            "closeToTray": "Chiudi nella barra applicazioni",
+            "title": "Integrazione"
+        },
+        "settings": "Impostazioni",
+        "sync": {
+            "confirmSignOut": "Sei sicuro di voler uscire?",
+            "signOut": "Esci",
+            "title": "Sincronizzazione"
+        },
+        "troubleshooting": {
+            "crashReporting": "Segnalazione degli arresti anomali",
+            "crashReportingDescription": "Invia automaticamente rapporti sugli arresti anomali allo sviluppatore",
+            "title": "Risoluzione dei problemi"
+        },
+        "version": {
+            "currentVersion": "Versione attuale: {}",
+            "title": "Versione",
+            "updateAvailable": "Aggiornamento disponibile: {}",
+            "upToDate": "Aggiornato"
+        },
+        "widget": {
+            "title": "Widget",
+            "transparentBackground": "Sfondo trasparente"
+        }
+    },
+    "subtasks": {
+        "addSubtask": "Aggiungi attività secondaria",
+        "title": "Attività secondarie"
+    },
+    "undo": "Annulla"
+}
