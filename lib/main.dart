@@ -99,6 +99,7 @@ Future<void> main(List<String> args) async {
       supportedLocales: const [
         Locale('de'),
         Locale('en'),
+        Locale('it'),
       ],
       child: MultiRepositoryProvider(
         providers: [
