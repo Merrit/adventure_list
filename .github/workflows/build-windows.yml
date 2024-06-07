@@ -31,6 +31,10 @@ jobs:
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2.10.0
+        # Specify the Flutter version to work around bug in new version:
+        # https://github.com/flutter/flutter/issues/144873
+        with:
+          flutter-version: '3.19.6'
 
       - name: Checkout code
         uses: actions/checkout@v3
@@ -41,7 +45,6 @@ jobs:
           git config --system core.longpaths true
           # Setup Flutter
           flutter config --enable-windows-desktop
-          flutter upgrade --force
           flutter pub get
 
       # ----------------------------------- Build ---------------------------- #
