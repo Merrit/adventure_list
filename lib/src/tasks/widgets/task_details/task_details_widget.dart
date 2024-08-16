@@ -65,7 +65,7 @@ class _TaskDetailsWidgetState extends State<TaskDetailsWidget> {
 
         final smallScreenView = PopScope(
           canPop: false,
-          onPopInvoked: (didPop) {
+          onPopInvokedWithResult: (bool didPop, Object? result) {
             tasksCubit.setActiveTask(null);
             SchedulerBinding.instance.addPostFrameCallback((_) {
               Navigator.of(context).popUntil((route) => route.isFirst);
