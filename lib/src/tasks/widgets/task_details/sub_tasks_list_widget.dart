@@ -35,7 +35,7 @@ class SubTasksListWidget extends StatelessWidget {
         );
 
         return Card(
-          color: Theme.of(context).colorScheme.surfaceVariant,
+          color: Theme.of(context).colorScheme.surfaceContainerHighest,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

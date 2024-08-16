@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:tray_manager/tray_manager.dart';
 
 import '../core/core.dart';
