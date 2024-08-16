@@ -28,10 +28,10 @@ jobs:
         uses: subosito/flutter-action@v2
 
       - name: Install Android dependencies
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          distribution: "zulu"
-          java-version: "12.x"
+          distribution: 'zulu'
+          java-version: '17'
 
       - name: Checkout code
         uses: actions/checkout@v3
