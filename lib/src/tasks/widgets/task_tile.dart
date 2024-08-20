@@ -59,10 +59,10 @@ class TaskTile extends StatelessWidget {
   final Task task;
 
   const TaskTile({
-    required Key? key,
+    required super.key,
     required this.index,
     required this.task,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -244,7 +244,7 @@ class _TaskTileContentsState extends State<_TaskTileContents> {
 /// This widget is wrapped in an [AnimatedDefaultTextStyle] to animate the
 /// text style when the task is completed.
 class _TitleRow extends StatefulWidget {
-  const _TitleRow({Key? key}) : super(key: key);
+  const _TitleRow();
 
   @override
   State<_TitleRow> createState() => _TitleRowState();
@@ -357,7 +357,7 @@ class _TitleRowState extends State<_TitleRow> {
 
 /// Displays a chip indicating when the task is due.
 class _DueDateChip extends StatelessWidget {
-  const _DueDateChip({Key? key}) : super(key: key);
+  const _DueDateChip();
 
   @override
   Widget build(BuildContext context) {

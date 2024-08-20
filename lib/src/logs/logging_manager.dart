@@ -55,7 +55,7 @@ class LoggingManager {
       printer: PrefixPrinter(
         PrettyPrinter(
           colors: false,
-          printTime: true,
+          dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
         ),
       ),
     );

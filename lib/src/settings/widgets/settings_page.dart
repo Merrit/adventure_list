@@ -19,7 +19,7 @@ import '../settings.dart';
 class SettingsPage extends StatelessWidget {
   static const String routeName = '/settings';
 
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class SettingsPage extends StatelessWidget {
 }
 
 class _SettingsView extends StatelessWidget {
-  const _SettingsView({Key? key}) : super(key: key);
+  const _SettingsView();
 
   @override
   Widget build(BuildContext context) {
@@ -116,10 +116,9 @@ class _SectionCard extends StatelessWidget {
   final List<Widget> children;
 
   const _SectionCard({
-    Key? key,
     required this.title,
     required this.children,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

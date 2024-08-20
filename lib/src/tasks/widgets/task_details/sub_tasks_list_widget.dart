@@ -42,7 +42,7 @@ class SubTasksListWidget extends StatelessWidget {
               subtasksHeader,
 
               /// Subtasks list
-              ...subtasks.map((e) => _SubTaskWidget(e)).toList(),
+              ...subtasks.map((e) => _SubTaskWidget(e)),
             ],
           ),
         );

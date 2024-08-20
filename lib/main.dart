@@ -5,6 +5,7 @@ import 'package:easy_logger/easy_logger.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -78,7 +79,7 @@ Future<void> main(List<String> args) async {
   }
 
   if (Platform.isAndroid) {
-    HomeWidget.registerBackgroundCallback(backgroundCallback);
+    HomeWidget.registerInteractivityCallback(backgroundCallback);
   }
 
   final googleAuth = GoogleAuth(storageRepository);

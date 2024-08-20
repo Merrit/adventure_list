@@ -24,14 +24,14 @@ dependencies:
   firebase_core: ^2.15.1
   flutter:
     sdk: flutter
-  flutter_adaptive_scaffold: ^0.1.2
+  flutter_adaptive_scaffold: ^0.2.1
   flutter_bloc: ^8.0.1
   flutter_local_notifications: ^17.0.0
   flutter_signin_button: ^2.0.0
   flutter_slidable: ^3.0.0
-  flutter_window_close: ^0.2.2
+  flutter_window_close: ^1.0.0
   freezed_annotation: ^2.2.0
-  google_fonts: ^5.1.0
+  google_fonts: ^6.2.1
   google_sign_in: ^6.1.0
   googleapis: ^13.0.0
   googleapis_auth: ^1.3.1
@@ -40,34 +40,24 @@ dependencies:
       url: https://github.com/Merrit/helpers.git
       ref: 792c63d8dddaf89a3ead5a0c44e40f3a3e5ffae5
   hive_flutter: ^1.1.0
-  home_widget: ^0.2.0+1
+  home_widget: ^0.6.0
   http: ^1.1.0
   intl: ^0.19.0
   json_annotation: ^4.8.0
-  launch_at_startup: ^0.2.2
+  launch_at_startup: ^0.3.1
   launcher_entry: ^0.1.1
   local_notifier: ^0.1.5
   logger: ^2.0.1
-  # move_to_background sends the Android app to background when user exits
-  # instead of the app closing entirely.
-  #
-  # Specifying a git fork with fixes because the PR for it hasn't been accepted.
-  # https://github.com/Sayegh7/move_to_background/pull/11
-  #
-  # Project dead?
-  move_to_background:
-    git:
-      url: https://github.com/ViliusP/move_to_background.git
-  package_info_plus: ^4.0.0
+  package_info_plus: ^8.0.2
   path_provider: ^2.0.11
   pub_semver: ^2.1.3
   rrule: ^0.2.14
-  system_theme: ^2.1.0
+  system_theme: ^3.0.0
   timezone: ^0.9.1
   tray_manager: ^0.2.2
   url_launcher: ^6.1.4
-  uuid: ^3.0.6
-  window_manager: ^0.3.0
+  uuid: ^4.4.2
+  window_manager: ^0.4.0
   window_size:
     git:
       url: https://github.com/google/flutter-desktop-embedding.git
@@ -88,7 +78,7 @@ dev_dependencies:
       url: https://github.com/Merrit/flutter_app_builder.git
       ref: a70df0728d9d7d8fd528553ff7d88be01a789a38
   flutter_launcher_icons: ^0.13.1
-  flutter_lints: ^2.0.0
+  flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter
   freezed: ^2.3.2

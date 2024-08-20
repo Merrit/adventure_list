@@ -17,7 +17,7 @@ import '../tasks.dart';
 class TasksPage extends StatefulWidget {
   static const routeName = '/';
 
-  const TasksPage({Key? key}) : super(key: key);
+  const TasksPage({super.key});
 
   @override
   State<TasksPage> createState() => _TasksPageState();
@@ -188,9 +188,7 @@ class _TaskListAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   final preferredSize = const Size.fromHeight(kToolbarHeight);
 
-  const _TaskListAppBar({
-    Key? key,
-  }) : super(key: key);
+  const _TaskListAppBar();
 
   @override
   Widget build(BuildContext context) {

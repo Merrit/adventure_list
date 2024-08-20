@@ -14,7 +14,7 @@ import 'task_details.dart';
 class TaskDetailsWidget extends StatefulWidget {
   static const routeName = '/task_details';
 
-  const TaskDetailsWidget({Key? key}) : super(key: key);
+  const TaskDetailsWidget({super.key});
 
   @override
   State<TaskDetailsWidget> createState() => _TaskDetailsWidgetState();
@@ -102,7 +102,7 @@ class _TaskDetailsWidgetState extends State<TaskDetailsWidget> {
 }
 
 class TaskDetailsView extends StatelessWidget {
-  const TaskDetailsView({Key? key}) : super(key: key);
+  const TaskDetailsView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -266,7 +266,7 @@ class _DeleteTaskButton extends StatelessWidget {
 }
 
 class _TitleWidget extends StatelessWidget {
-  const _TitleWidget({Key? key}) : super(key: key);
+  const _TitleWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -335,7 +335,7 @@ class _TitleWidget extends StatelessWidget {
 ///
 /// Displays the due date of the task and allows the user to change it.
 class DueDateWidget extends StatelessWidget {
-  const DueDateWidget({Key? key}) : super(key: key);
+  const DueDateWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -402,7 +402,7 @@ class DueDateWidget extends StatelessWidget {
 ///
 /// This widget is only visible if the task has a due date.
 class DueTimeWidget extends StatelessWidget {
-  const DueTimeWidget({Key? key}) : super(key: key);
+  const DueTimeWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -455,7 +455,7 @@ class DueTimeWidget extends StatelessWidget {
 
 /// Displays the description of the task and allows the user to change it.
 class DescriptionWidget extends StatelessWidget {
-  const DescriptionWidget({Key? key}) : super(key: key);
+  const DescriptionWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -520,7 +520,7 @@ class DescriptionWidget extends StatelessWidget {
 /// Displays the parent task of the active task and allows the user to change
 /// it.
 class ParentSelectionWidget extends StatelessWidget {
-  const ParentSelectionWidget({Key? key}) : super(key: key);
+  const ParentSelectionWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -606,9 +606,9 @@ class AddSubTaskWidget extends StatelessWidget {
   final Task parentTask;
 
   AddSubTaskWidget({
-    Key? key,
+    super.key,
     required this.parentTask,
-  }) : super(key: key);
+  });
 
   final addSubTaskFocusNode = FocusNode(debugLabel: 'AddSubTaskFocusNode');
   final controller = TextEditingController();

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,7 +12,7 @@ import '../home_widget.dart';
 class HomeWidgetConfigPage extends StatelessWidget {
   static const routeName = '/home_widget_config_page';
 
-  const HomeWidgetConfigPage({Key? key}) : super(key: key);
+  const HomeWidgetConfigPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,39 +27,37 @@ class HomeWidgetConfigPage extends StatelessWidget {
                   ListTile(
                     title: Text(LocaleKeys.homeWidgetConfig_listToDisplay.tr()),
                   ),
-                  ...tasksState.taskLists
-                      .map((e) => RadioListTile(
-                            value: e.id,
-                            groupValue: settingsState.homeWidgetSelectedListId,
-                            onChanged: (String? value) async {
-                              if (value == null) return;
+                  ...tasksState.taskLists.map((e) => RadioListTile(
+                        value: e.id,
+                        groupValue: settingsState.homeWidgetSelectedListId,
+                        onChanged: (String? value) async {
+                          if (value == null) return;
 
-                              context
-                                  .read<SettingsCubit>()
-                                  .updateHomeWidgetSelectedListId(value);
+                          context
+                              .read<SettingsCubit>()
+                              .updateHomeWidgetSelectedListId(value);
 
-                              TaskList selectedList = tasksState //
-                                  .taskLists
-                                  .singleWhere(
-                                (taskList) => taskList.id == value,
+                          TaskList selectedList = tasksState //
+                              .taskLists
+                              .singleWhere(
+                            (taskList) => taskList.id == value,
+                          );
+
+                          final selectedListItems = selectedList.items
+                              .where((e) => !e.completed && e.parent == null)
+                              .toList();
+
+                          selectedList = selectedList.copyWith(
+                            items: selectedListItems,
+                          );
+
+                          await context.read<HomeWidgetManager>().updateHomeWidget(
+                                'selectedList',
+                                jsonEncode(selectedList.toJson()),
                               );
-
-                              final selectedListItems = selectedList.items
-                                  .where((e) => !e.completed && e.parent == null)
-                                  .toList();
-
-                              selectedList = selectedList.copyWith(
-                                items: selectedListItems,
-                              );
-
-                              await context.read<HomeWidgetManager>().updateHomeWidget(
-                                    'selectedList',
-                                    selectedList.toJson(),
-                                  );
-                            },
-                            title: Text(e.title),
-                          ))
-                      .toList(),
+                        },
+                        title: Text(e.title),
+                      )),
                 ],
               );
             },
