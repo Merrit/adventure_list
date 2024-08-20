@@ -87,7 +87,7 @@ class InputDialog extends StatelessWidget {
     this.keyboardType,
     this.formatter,
     required String initialValue,
-  })  : maxLines = (type == InputDialogs.multiLine) ? 5 : 1 {
+  }) : maxLines = (type == InputDialogs.multiLine) ? 5 : 1 {
     controller.text = initialValue;
     controller.selection = TextSelection(
       baseOffset: 0,
