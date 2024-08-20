@@ -99,6 +99,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/icons/
+    - assets/fonts/
     - packaging/linux/codes.merritt.adventurelist.desktop
     - translations/
   uses-material-design: true
