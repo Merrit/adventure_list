@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:helpers/helpers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:home_widget/home_widget.dart';
@@ -30,6 +31,14 @@ import 'src/updates/updates.dart';
 import 'src/window/window.dart';
 
 Future<void> main(List<String> args) async {
+  GoogleFonts.config.allowRuntimeFetching = false;
+
+  // Add the Google Fonts license to the LicenseRegistry.
+  LicenseRegistry.addLicense(() async* {
+    final license = await rootBundle.loadString('fonts/OFL.txt');
+    yield LicenseEntryWithLineBreaks(['google_fonts'], license);
+  });
+
   WidgetsFlutterBinding.ensureInitialized();
   await RecurrenceRuleService.ensureInitialized();
   await EasyLocalization.ensureInitialized();
