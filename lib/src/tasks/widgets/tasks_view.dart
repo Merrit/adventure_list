@@ -10,7 +10,7 @@ import '../../core/core.dart';
 import '../tasks.dart';
 
 class TasksView extends StatelessWidget {
-  const TasksView({Key? key}) : super(key: key);
+  const TasksView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +109,7 @@ class _CreateSelectListPrompt extends StatelessWidget {
 
 /// Button for creating new tasks.
 class _NewTaskButton extends StatelessWidget {
-  const _NewTaskButton({Key? key}) : super(key: key);
+  const _NewTaskButton();
 
   @override
   Widget build(BuildContext context) {

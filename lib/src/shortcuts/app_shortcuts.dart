@@ -13,9 +13,9 @@ class AppShortcuts extends StatelessWidget {
   final Widget child;
 
   AppShortcuts({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   final _shortcuts = <ShortcutActivator, Intent>{
     const SingleActivator(

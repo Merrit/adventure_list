@@ -5,7 +5,7 @@ import '../widgets/custom_app_bar.dart';
 class PrivacyPolicyPage extends StatelessWidget {
   static const routeName = '/privacy';
 
-  const PrivacyPolicyPage({Key? key}) : super(key: key);
+  const PrivacyPolicyPage({super.key});
 
   @override
   Widget build(BuildContext context) {

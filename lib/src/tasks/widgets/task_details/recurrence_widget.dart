@@ -54,7 +54,7 @@ extension _WeekdayHelper on int {
 
 /// Cubit that manages the state of the task for the [RecurrenceWidget].
 class _RecurrenceCubit extends Cubit<Task> {
-  _RecurrenceCubit(Task task) : super(task);
+  _RecurrenceCubit(super.task);
 
   void updateTask(Task task) {
     // Due date should always be UTC, except when being displayed to the user.
@@ -71,7 +71,7 @@ class _RecurrenceCubit extends Cubit<Task> {
 
 /// Displays the recurrence of the task and allows the user to change it.
 class RecurrenceWidget extends StatelessWidget {
-  const RecurrenceWidget({Key? key}) : super(key: key);
+  const RecurrenceWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +140,7 @@ class RecurrenceWidget extends StatelessWidget {
 /// Page that wraps the [RecurrenceWidget] and allows the user to change the
 /// recurrence of the task.
 class _RecurrencePage extends StatelessWidget {
-  const _RecurrencePage({Key? key}) : super(key: key);
+  const _RecurrencePage();
 
   @override
   Widget build(BuildContext context) {
@@ -303,7 +303,7 @@ class _RecurranceWidgetContentsState extends State<_RecurranceWidgetContents> {
 /// The recurrence interval is the number of days, weeks, months, or years
 /// between each recurrence of the task.
 class _RecurrenceIntervalWidget extends StatelessWidget {
-  const _RecurrenceIntervalWidget({Key? key}) : super(key: key);
+  const _RecurrenceIntervalWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -340,7 +340,7 @@ class _RecurrenceIntervalWidget extends StatelessWidget {
 
 /// Widget that displays the recurrence type (day, week, month, year).
 class _RecurrenceTypeWidget extends StatelessWidget {
-  _RecurrenceTypeWidget({Key? key}) : super(key: key);
+  _RecurrenceTypeWidget();
 
   static final List<Frequency> frequencyOptions = [
     Frequency.daily,
@@ -426,7 +426,7 @@ class _RecurrenceTypeWidget extends StatelessWidget {
 ///
 /// The user can select multiple days of the week, defaults to the current day.
 class _DayOfWeekWidget extends StatelessWidget {
-  const _DayOfWeekWidget({Key? key}) : super(key: key);
+  const _DayOfWeekWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -500,7 +500,7 @@ class _DayOfWeekWidget extends StatelessWidget {
 ///
 /// The user can select from Day 1 to Day 31, or "Last day".
 class _DayOfMonthWidget extends StatefulWidget {
-  const _DayOfMonthWidget({Key? key}) : super(key: key);
+  const _DayOfMonthWidget();
 
   @override
   State<_DayOfMonthWidget> createState() => _DayOfMonthWidgetState();
@@ -743,7 +743,7 @@ class _DayOfMonthWidgetState extends State<_DayOfMonthWidget> {
 
 /// Widget that displays the time the recurrence occurs at.
 class _RecurrenceTimeWidget extends StatelessWidget {
-  const _RecurrenceTimeWidget({Key? key}) : super(key: key);
+  const _RecurrenceTimeWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -792,7 +792,7 @@ class _RecurrenceTimeWidget extends StatelessWidget {
 
 /// Widget that displays the date the recurrence starts on.
 class _StartsOnWidget extends StatelessWidget {
-  const _StartsOnWidget({Key? key}) : super(key: key);
+  const _StartsOnWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -860,7 +860,7 @@ class _StartsOnWidget extends StatelessWidget {
 /// If the recurrence is set to end after a number of recurrences, the number
 /// will default to 30 for days, 13 for weeks, 12 for months, and 5 for years.
 class _EndDateWidget extends StatelessWidget {
-  const _EndDateWidget({Key? key}) : super(key: key);
+  const _EndDateWidget();
 
   @override
   Widget build(BuildContext context) {

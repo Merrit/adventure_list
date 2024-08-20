@@ -16,9 +16,9 @@ class CustomNavigationRail extends StatelessWidget {
   final Breakpoint breakpoint;
 
   const CustomNavigationRail({
-    Key? key,
+    super.key,
     required this.breakpoint,
-  }) : super(key: key);
+  });
 
   static const double width = 192;
 
@@ -42,7 +42,7 @@ class CustomNavigationRail extends StatelessWidget {
 }
 
 class _NavContents extends StatelessWidget {
-  const _NavContents({Key? key}) : super(key: key);
+  const _NavContents();
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +57,7 @@ class _NavContents extends StatelessWidget {
 }
 
 class _SettingsTile extends StatelessWidget {
-  const _SettingsTile({Key? key}) : super(key: key);
+  const _SettingsTile();
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +80,7 @@ class _SettingsTile extends StatelessWidget {
 }
 
 class _CreateListButton extends StatelessWidget {
-  const _CreateListButton({Key? key}) : super(key: key);
+  const _CreateListButton();
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +96,7 @@ class _CreateListButton extends StatelessWidget {
 
 /// Button to pin the window to the desktop as a widget.
 class _PinWindowButton extends StatelessWidget {
-  const _PinWindowButton({Key? key}) : super(key: key);
+  const _PinWindowButton();
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +119,7 @@ class _PinWindowButton extends StatelessWidget {
 }
 
 class _ScrollingListTiles extends StatelessWidget {
-  const _ScrollingListTiles({Key? key}) : super(key: key);
+  const _ScrollingListTiles();
 
   @override
   Widget build(BuildContext context) {
@@ -151,9 +151,9 @@ class _TaskListTile extends StatefulWidget {
   final TaskList taskList;
 
   const _TaskListTile({
-    Key? key,
+    super.key,
     required this.taskList,
-  }) : super(key: key);
+  });
 
   @override
   State<_TaskListTile> createState() => __TaskListTileState();
