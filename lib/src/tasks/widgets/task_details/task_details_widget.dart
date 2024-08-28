@@ -485,6 +485,9 @@ class DescriptionWidget extends StatelessWidget {
                   content: TextField(
                     controller: controller,
                     autofocus: true,
+                    minLines: 3,
+                    maxLines: 10,
+                    keyboardType: TextInputType.multiline,
                     onSubmitted: (value) {
                       tasksCubit.updateTask(task.copyWith(description: value));
                       Navigator.of(context).pop();
