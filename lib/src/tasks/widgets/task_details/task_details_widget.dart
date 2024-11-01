@@ -7,7 +7,9 @@ import 'package:helpers/helpers.dart';
 import 'package:rrule/rrule.dart';
 
 import '../../../../generated/locale_keys.g.dart';
+import '../../../app.dart';
 import '../../../core/helpers/helpers.dart';
+import '../../../logs/logging_manager.dart';
 import '../../tasks.dart';
 import 'task_details.dart';
 
@@ -241,7 +243,13 @@ class _DeleteTaskButton extends StatelessWidget {
         return MenuItemButton(
           leadingIcon: const Icon(Icons.delete),
           onPressed: () async {
-            final scaffoldMessenger = ScaffoldMessenger.of(context);
+            final scaffoldMessenger = scaffoldMessengerKey.currentState;
+
+            if (scaffoldMessenger == null) {
+              log.w('ScaffoldMessenger is null, cannot show snackbar');
+              return;
+            }
+
             final command = DeleteTaskCommand(cubit: tasksCubit, task: task);
 
             await command.execute();

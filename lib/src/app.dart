@@ -19,6 +19,13 @@ import 'shortcuts/app_shortcuts.dart';
 import 'tasks/tasks.dart';
 import 'window/app_window.dart';
 
+/// This key is used to show snackbars from anywhere in the app.
+///
+/// This had to be added because it was not possible to use the context in the onPressed
+/// for a [MenuItemButton].
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
+
 class App extends StatefulWidget {
   const App({
     super.key,
@@ -105,6 +112,7 @@ class _AppState extends State<App> with TrayListener, WindowListener {
                 locale: context.locale,
                 onGenerateTitle: (BuildContext context) => LocaleKeys.appName,
                 theme: settingsState.theme,
+                scaffoldMessengerKey: scaffoldMessengerKey,
                 onGenerateRoute: (RouteSettings routeSettings) {
                   return MaterialPageRoute<void>(
                     settings: routeSettings,
