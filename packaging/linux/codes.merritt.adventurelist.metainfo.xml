@@ -63,6 +63,16 @@
   </screenshots>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.14.1" date="2024-11-05">
+      <url type="details">https://github.com/Merrit/adventure_list/releases/tag/v0.14.1</url>
+      <description>
+        <p>Bug Fixes</p>
+        <ul>
+          <li>Fixed an issue where the delete task button was failing silently.</li>
+          <li>Fixed an issue to show the app icon for Linux Wayland sessions.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.14.0" date="2024-08-28">
       <description/>
     </release>
