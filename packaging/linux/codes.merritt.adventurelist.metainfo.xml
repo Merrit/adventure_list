@@ -9,7 +9,11 @@
   <summary>Todo list that syncs</summary>
   <developer_name>Merritt Codes</developer_name>
   <url type="homepage">https://merritt.codes/adventurelist</url>
+  <url type="bugtracker">https://github.com/Merrit/adventure_list/issues</url>
+  <url type="contact">https://merritt.codes/contact</url>
   <url type="donation">https://merritt.codes/support</url>
+  <!-- vcs-browser is the link to the source code repository -->
+  <url type="vcs-browser">https://github.com/Merrit/adventure_list</url>
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
   <supports>
