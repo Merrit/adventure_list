@@ -8,8 +8,8 @@
   <name>Adventure List</name>
   <summary>Todo list that syncs</summary>
   <developer_name>Merritt Codes</developer_name>
-  <url type="homepage">https://merritt.codes/adventurelist/</url>
-  <url type="donation">https://merritt.codes/support/</url>
+  <url type="homepage">https://merritt.codes/adventurelist</url>
+  <url type="donation">https://merritt.codes/support</url>
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
   <supports>
