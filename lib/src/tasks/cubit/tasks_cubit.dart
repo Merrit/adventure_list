@@ -529,16 +529,24 @@ class TasksCubit extends Cubit<TasksState> {
         .topLevelTasks()
         .uncompletedTasks();
 
+    final completedTasks = state.activeList!.items.topLevelTasks().completedTasks();
+
     final updatedTasks = oldTasks.reorderTasks(
       oldTasks[oldIndex],
       newIndex,
     );
 
     // Emit the active list again because its index might have changed.
-    final activeList = state.activeList!.copyWith(items: updatedTasks);
+    final activeList = state.activeList!.copyWith(
+      // Move completed tasks to the end of the list.
+      // There's probably a better way to reorder tasks mixed with completed
+      // tasks, but this works for now.
+      items: updatedTasks + completedTasks,
+    );
 
     emit(state.copyWith(
       activeList: activeList,
+      taskLists: state.taskLists.updateTaskList(activeList),
     ));
 
     for (final task in updatedTasks) {
