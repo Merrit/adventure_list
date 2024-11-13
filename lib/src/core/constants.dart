@@ -4,7 +4,7 @@ import 'package:helpers/helpers.dart';
 const String kDonateUrl = 'https://merritt.codes/support/';
 const String kPackageId = 'codes.merritt.adventurelist';
 const String kRepoUrl = 'https://github.com/Merrit/adventure_list';
-const String kWebsiteUrl = 'https://merritt.codes/bargain/';
+const String kWebsiteUrl = 'https://github.com/Merrit/adventure_list';
 
 /// The paths to the app's icons.
 abstract class AppIcons {
