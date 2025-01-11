@@ -20,13 +20,13 @@ dependencies:
   easy_logger: ^0.0.2
 
   extension_google_sign_in_as_googleapis_auth: ^2.0.9
-  firebase_auth: ^4.9.0
-  firebase_core: ^2.15.1
+  firebase_auth: ^5.4.0
+  firebase_core: ^3.10.0
   flutter:
     sdk: flutter
-  flutter_adaptive_scaffold: ^0.2.1
+  flutter_adaptive_scaffold: ^0.3.1
   flutter_bloc: ^8.0.1
-  flutter_local_notifications: ^17.0.0
+  flutter_local_notifications: ^18.0.1
   flutter_signin_button: ^2.0.0
   flutter_slidable: ^3.0.0
   flutter_window_close: ^1.0.0
@@ -40,7 +40,7 @@ dependencies:
       url: https://github.com/Merrit/helpers.git
       ref: 178f12326dc3e2e18c8d3bd92ba239a1af73b600
   hive_flutter: ^1.1.0
-  home_widget: ^0.6.0
+  home_widget: ^0.7.0
   http: ^1.1.0
   intl: ^0.19.0
   json_annotation: ^4.8.0
@@ -53,8 +53,8 @@ dependencies:
   pub_semver: ^2.1.3
   rrule: ^0.2.14
   system_theme: ^3.0.0
-  timezone: ^0.9.1
-  tray_manager: ^0.2.2
+  timezone: ^0.10.0
+  tray_manager: ^0.3.1
   url_launcher: ^6.1.4
   uuid: ^4.4.2
   window_manager: ^0.4.0
@@ -77,11 +77,13 @@ dev_dependencies:
     git:
       url: https://github.com/Merrit/flutter_app_builder.git
       ref: a70df0728d9d7d8fd528553ff7d88be01a789a38
-  flutter_launcher_icons: ^0.13.1
-  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.2
+  flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
-  freezed: ^2.3.2
+  freezed: ^3.0.0-0.0.dev
+  intl_utils: ^2.0.0
+
   json_serializable: ^6.6.1
   mockito: ^5.4.2
   msix: ^3.6.2
