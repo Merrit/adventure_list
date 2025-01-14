@@ -30,8 +30,8 @@ Run these commands from the root directory of the repo:
 5. Run the build command for the desired platform(s):
  - `flutter build linux`
  - `flutter build windows`
- - `flutter build apk`
- - `flutter build appbundle`
+ - `flutter build apk --debug`
+ - `flutter build appbundle --debug`
 
 
 Compiled app location:
