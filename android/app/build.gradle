@@ -27,11 +27,10 @@ def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 } else {
-    // Set default debug values if environment variables are not present
-    keystoreProperties.setProperty('storePassword', System.getenv('KEY_STORE_PASSWORD') ?: "android")
-    keystoreProperties.setProperty('keyPassword', System.getenv('KEY_PASSWORD') ?: "android") 
-    keystoreProperties.setProperty('keyAlias', System.getenv('ALIAS') ?: "androiddebugkey")
-    keystoreProperties.setProperty('storeFile', System.getenv('KEY_PATH') ?: "~/.android/debug.keystore")
+    keystoreProperties.setProperty('storePassword', System.getenv('KEY_STORE_PASSWORD'));
+    keystoreProperties.setProperty('keyPassword', System.getenv('KEY_PASSWORD'));
+    keystoreProperties.setProperty('keyAlias', System.getenv('ALIAS'));
+    keystoreProperties.setProperty('storeFile', System.getenv('KEY_PATH'));
 }
 
 android {
