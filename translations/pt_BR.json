@@ -1,0 +1,74 @@
+{
+    "appName": "Nome do aplicativo",
+    "cancel": "Cancelar",
+    "completed": "Concluído",
+    "confirm": "Confirmar",
+    "delete": "Excluir",
+    "deleteCompleted": "Excluir tarefas concluídas",
+    "deleteCompletedConfirmation": "Tem certeza de que deseja excluir todas as tarefas concluídas?",
+    "deleteCompletedSubtasks": "Excluir subtarefas concluídas",
+    "deleteCompletedSuccess": "Tarefas concluídas excluídas",
+    "deleteTask": "Excluir tarefa",
+    "deleteTaskSuccessful": "Tarefa excluída",
+    "error": {
+        "error": "Erro"
+    },
+    "exit": "Sair",
+    "getStartedPrompt": "Selecione ou crie uma lista para começar",
+    "homeWidgetConfig": {
+        "listToDisplay": "Lista para exibir",
+        "title": "Configurar Widget da Tela Inicial"
+    },
+    "listSettings": {
+        "confirmDelete": "Tem certeza de que deseja excluir esta lista?",
+        "deleteList": "Excluir lista",
+        "deleteListName": "Excluir {}",
+        "listName": "Nome da lista",
+        "renameList": "Renomear lista",
+        "title": "Configurações da lista"
+    },
+    "markCompleted": "Marcar como concluída",
+    "markUncompleted": "Desmarcar como concluída",
+    "newList": "Nova lista",
+    "newTask": "Nova tarefa",
+    "pinWindow": "Fixar janela",
+    "retry": "Tentar novamente",
+    "settings": {
+        "appearance": {
+            "darkMode": "Modo escuro",
+            "title": "Aparência"
+        },
+        "integration": {
+            "autostart": "Iniciar automaticamente",
+            "autostartDescription": "Iniciar o aplicativo ao fazer login no computador",
+            "closeToTray": "Fechar para a bandeja",
+            "title": "Integração"
+        },
+        "settings": "Configurações",
+        "sync": {
+            "confirmSignOut": "Tem certeza de que deseja sair?",
+            "signOut": "Sair",
+            "title": "Sincronização"
+        },
+        "troubleshooting": {
+            "crashReporting": "Relatório de falhas",
+            "crashReportingDescription": "Enviar automaticamente relatórios de falhas para o desenvolvedor",
+            "title": "Solução de problemas"
+        },
+        "version": {
+            "currentVersion": "Versão atual: {}",
+            "title": "Versão",
+            "updateAvailable": "Atualização disponível: {}",
+            "upToDate": "Atualizado"
+        },
+        "widget": {
+            "title": "Widget",
+            "transparentBackground": "Fundo transparente"
+        }
+    },
+    "subtasks": {
+        "addSubtask": "Adicionar subtarefa",
+        "title": "Subtarefas"
+    },
+    "undo": "Desfazer"
+}
