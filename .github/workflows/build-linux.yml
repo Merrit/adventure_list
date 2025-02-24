@@ -44,7 +44,7 @@ jobs:
         uses: subosito/flutter-action@v2
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Prepare for build
         run: |
@@ -64,7 +64,7 @@ jobs:
       # ---------------------------------- Upload ---------------------------- #
 
       - name: Upload artifacts to workflow
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-artifacts
           path: output/*
