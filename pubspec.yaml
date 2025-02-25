@@ -64,7 +64,14 @@ dependencies:
       path: plugins/window_size
       ref: 6c66ad23ee79749f30a8eece542cf54eaf157ed8
   window_to_front: ^0.0.3
-  workmanager: ^0.5.0
+  # workmanager: ^0.5.0
+  # Workaround under bug is resolved:
+  # https://github.com/fluttercommunity/flutter_workmanager/issues/588
+  workmanager:
+    git:
+      url: https://github.com/fluttercommunity/flutter_workmanager.git
+      path: workmanager
+      ref: main
   xdg_desktop_portal:
     git:
       url: https://github.com/Merrit/xdg_desktop_portal.dart.git
@@ -77,7 +84,7 @@ dev_dependencies:
     git:
       url: https://github.com/Merrit/flutter_app_builder.git
       ref: fe5262c6ea43b5d2fdb15fc20d84f91e63e8beff
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.3
   flutter_lints: ^4.0.0
   flutter_test:
     sdk: flutter
