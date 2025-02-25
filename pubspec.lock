@@ -378,8 +378,8 @@ packages:
     dependency: "direct dev"
     description:
       path: "."
-      ref: b458f9cdffa9f06ba0f41dcb5afc7da8d0ac8dce
-      resolved-ref: b458f9cdffa9f06ba0f41dcb5afc7da8d0ac8dce
+      ref: fe5262c6ea43b5d2fdb15fc20d84f91e63e8beff
+      resolved-ref: fe5262c6ea43b5d2fdb15fc20d84f91e63e8beff
       url: "https://github.com/Merrit/flutter_app_builder.git"
     source: git
     version: "1.0.0"
@@ -395,10 +395,10 @@ packages:
     dependency: "direct dev"
     description:
       name: flutter_launcher_icons
-      sha256: "526faf84284b86a4cb36d20a5e45147747b7563d921373d4ee0559c54fcdbcea"
+      sha256: bfa04787c85d80ecb3f8777bde5fc10c3de809240c48fa061a2c2bf15ea5211c
       url: "https://pub.dev"
     source: hosted
-    version: "0.13.1"
+    version: "0.14.3"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -1504,10 +1504,11 @@ packages:
   workmanager:
     dependency: "direct main"
     description:
-      name: workmanager
-      sha256: ed13530cccd28c5c9959ad42d657cd0666274ca74c56dea0ca183ddd527d3a00
-      url: "https://pub.dev"
-    source: hosted
+      path: workmanager
+      ref: main
+      resolved-ref: "4ce065135dc1b91fee918f81596b42a56850391d"
+      url: "https://github.com/fluttercommunity/flutter_workmanager.git"
+    source: git
     version: "0.5.2"
   xdg_desktop_portal:
     dependency: "direct main"
