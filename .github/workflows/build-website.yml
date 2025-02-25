@@ -28,7 +28,7 @@ jobs:
 #     concurrency:
 #       group: ${{ github.workflow }}-${{ github.ref }}
 #     steps:
-#       - uses: actions/checkout@v3
+#       - uses: actions/checkout@v4
 
 #       # Using static site for now as it seems required to verify with Google
 #       # Cloud Console. ¯\_(ツ)_/¯
