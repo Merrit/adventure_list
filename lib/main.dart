@@ -110,6 +110,7 @@ Future<void> main(List<String> args) async {
         Locale('de'),
         Locale('en'),
         Locale('it'),
+        Locale('pt', 'BR'),
       ],
       child: MultiRepositoryProvider(
         providers: [
