@@ -67,6 +67,25 @@
   </screenshots>
   <content_rating type="oars-1.1"/>
   <releases>
+    <release version="0.15.0" date="2025-03-05">
+      <url type="details">https://github.com/Merrit/adventure_list/releases/tag/v0.15.0</url>
+      <description>
+        <p>Features</p>
+        <ul>
+          <li>Added Brazilian Portuguese translation.</li>
+          <li>Added initial data export functionality.</li>
+        </ul>
+        <p>Bug Fixes</p>
+        <ul>
+          <li>Fixed an issue with keystore handling in debug builds.</li>
+          <li>Fixed an issue with Windows build failures.</li>
+        </ul>
+        <p>Documentation</p>
+        <ul>
+          <li>Added BUILDING.md with build instructions.</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.14.3" date="2024-11-13">
       <url type="details">https://github.com/Merrit/adventure_list/releases/tag/v0.14.3</url>
       <description>
