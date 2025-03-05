@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:collection/collection.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -418,6 +419,61 @@ class TasksCubit extends Cubit<TasksState> {
         errorMessage: null,
       ));
     }
+  }
+
+  /// User has requested to export their tasks.
+  ///
+  /// This will prompt the user to select a location to save the tasks to.
+  ///
+  /// The tasks are exported as a list of [TaskList]s in json format.
+  ///
+  /// The returned value is true if the export was successful, false if the user
+  /// canceled the file picker or if there was an error.
+  Future<bool> exportTasks() async {
+    final List<TaskList> taskLists = state.taskLists;
+    final String json = const JsonEncoder.withIndent('  ')
+        .convert(taskLists.map((e) => e.toJson()).toList());
+    final Uint8List jsonBytes = utf8.encode(json);
+
+    final String? outputFilePath = await FilePicker.platform.saveFile(
+      bytes: jsonBytes,
+      fileName: 'tasks.json',
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+
+    if (outputFilePath == null) {
+      log.i('User canceled the file picker');
+      return false;
+    }
+
+    // If the platform is Android, the plugin has already saved the file.
+    if (defaultTargetPlatform.isAndroid) {
+      log.i('Exported tasks to $outputFilePath');
+      return true;
+    }
+
+    // If the platform is not Android, we need to save the file ourselves.
+    final File outputFile = File(outputFilePath);
+
+    try {
+      await outputFile.writeAsBytes(jsonBytes);
+    } on FileSystemException catch (e) {
+      log.e('Failed to write to file', error: e);
+      return false;
+    } on IOException catch (e) {
+      log.e('Failed to write to file', error: e);
+      return false;
+    } on OSError catch (e) {
+      log.e('Failed to write to file', error: e);
+      return false;
+    } catch (e) {
+      log.e('Failed to write to file', error: e);
+      return false;
+    }
+
+    log.i('Exported tasks to $outputFilePath');
+    return true;
   }
 
   /// Moves the provided [task] to the list with the provided [newListId].

@@ -134,6 +134,9 @@ class _AppState extends State<App> with TrayListener, WindowListener {
                         case SettingsPage.routeName:
                           child = const SettingsPage();
                           break;
+                        case ExportDataPage.routeName:
+                          child = const ExportDataPage();
+                          break;
                         default:
                           child = const TasksPage();
                       }

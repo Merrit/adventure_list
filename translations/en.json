@@ -38,6 +38,10 @@
             "darkMode": "Dark mode",
             "title": "Appearance"
         },
+        "data": {
+            "exportData": "Export data",
+            "title": "Data"
+        },
         "integration": {
             "autostart": "Autostart",
             "autostartDescription": "Start the app when you log in to your computer",
