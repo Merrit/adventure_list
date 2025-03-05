@@ -76,6 +76,18 @@ class _SettingsView extends StatelessWidget {
           ],
         );
 
+        final dataSection = _SectionCard(
+          title: 'Data', // TODO: Localization is not generating for some reason.
+          children: [
+            ListTile(
+              title: const Text('Export data'),
+              leading: const Icon(Icons.file_download),
+              trailing: const Icon(Icons.keyboard_arrow_right),
+              onTap: () => Navigator.pushNamed(context, ExportDataPage.routeName),
+            ),
+          ],
+        );
+
         final troubleshootingSection = _SectionCard(
           title: LocaleKeys.settings_troubleshooting_title.tr(),
           children: const [
@@ -101,6 +113,7 @@ class _SettingsView extends StatelessWidget {
             integrationSection,
             widgetSection,
             syncSection,
+            dataSection,
             troubleshootingSection,
             versionSection,
           ],
