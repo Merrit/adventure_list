@@ -12,6 +12,7 @@ Generated*
 *.mocks.dart
 
 # Packaging
+output/
 *.tar.gz
 
 # Test coverage
